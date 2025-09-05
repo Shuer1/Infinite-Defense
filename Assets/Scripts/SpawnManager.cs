@@ -4,7 +4,7 @@ public class SpawnManager : MonoBehaviour
 {
     public GameObject enemyPrefab;
     public float spawnInterval = 2f;
-    public float spawnRange = 8f;
+    public float spawnRadius = 10f;
 
     void Start()
     {
@@ -13,7 +13,8 @@ public class SpawnManager : MonoBehaviour
 
     void SpawnEnemy()
     {
-        Vector2 spawnPos = Random.insideUnitCircle.normalized * spawnRange;
+        Vector3 spawnPos = Random.onUnitSphere * spawnRadius;
+        spawnPos.y = 0; // 平面生成
         Instantiate(enemyPrefab, spawnPos, Quaternion.identity);
     }
 }

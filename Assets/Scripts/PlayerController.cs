@@ -6,20 +6,34 @@ public class PlayerController : MonoBehaviour
     public GameObject bulletPrefab;
     public Transform firePoint;
 
+    private Rigidbody rb;
+
+    void Start()
+    {
+        rb = GetComponent<Rigidbody>();
+    }
+
     void Update()
     {
-        // 移动 (WASD / 方向键)
+        // 移动（WASD / 方向键）
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
-        transform.Translate(new Vector3(h, v, 0) * moveSpeed * Time.deltaTime);
+        Vector3 move = new Vector3(h, 0, v) * moveSpeed;
+        rb.velocity = move;
 
-        // 鼠标朝向
-        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector3 direction = (mousePos - transform.position).normalized;
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0, 0, angle);
+        // 旋转朝向鼠标（屏幕到射线）
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Plane ground = new Plane(Vector3.up, Vector3.zero);
+        if (ground.Raycast(ray, out float enter))
+        {
+            Vector3 hitPoint = ray.GetPoint(enter);
+            Vector3 lookDir = (hitPoint - transform.position);
+            lookDir.y = 0;
+            if (lookDir != Vector3.zero)
+                transform.forward = lookDir;
+        }
 
-        // 射击 (鼠标左键)
+        // 射击
         if (Input.GetMouseButtonDown(0))
         {
             Shoot();
@@ -28,10 +42,10 @@ public class PlayerController : MonoBehaviour
 
     void Shoot()
     {
-        Instantiate(bulletPrefab, firePoint.position, transform.rotation);
+        Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
     }
 
-    void OnCollisionEnter2D(Collision2D collision)
+    private void OnCollisionEnter(Collision collision)
     {
         if (collision.collider.CompareTag("Enemy"))
         {

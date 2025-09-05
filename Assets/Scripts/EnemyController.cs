@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
-    public float moveSpeed = 2f;
+    public float moveSpeed = 3f;
     private Transform player;
 
     void Start()
@@ -14,17 +14,9 @@ public class EnemyController : MonoBehaviour
     {
         if (player != null)
         {
-            transform.position = Vector3.MoveTowards(transform.position, player.position, moveSpeed * Time.deltaTime);
-        }
-    }
-
-    void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.collider.CompareTag("Bullet"))
-        {
-            GameManager.Instance.AddScore(10);
-            Destroy(collision.gameObject);
-            Destroy(gameObject);
+            Vector3 dir = (player.position - transform.position).normalized;
+            transform.position += dir * moveSpeed * Time.deltaTime;
+            transform.LookAt(player);
         }
     }
 }
