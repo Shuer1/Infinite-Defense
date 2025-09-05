@@ -1,16 +1,29 @@
+using Unity.PlasticSCM.Editor.WebApi;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public float moveSpeed = 5f;
+    [Header("Attributes")]
+    public int health = 100;
+    public int currentHealth;
+    public int damage = 20;
+    public int level = 1;
+    public int experience = 0;
+    public int experienceToNextLevel = 100;
+
+    [Header("Movement & Shooting")]
     public GameObject bulletPrefab;
     public Transform firePoint;
+    public float fireRate = 0.3f;
+    private float fireTimer;
+    public float moveSpeed = 5f;
 
     private Rigidbody rb;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        currentHealth = health;
     }
 
     void Update()
@@ -52,5 +65,39 @@ public class PlayerController : MonoBehaviour
             GameManager.Instance.GameOver();
             Destroy(gameObject);
         }
+    }
+
+    public void TakeDamage(int damage)
+    {
+        currentHealth -= damage;
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+    public void GainExp(int exp)
+    {
+        experience += exp;
+        if (experience >= experienceToNextLevel)
+        {
+            LevelUp();
+        }
+    }
+
+    void LevelUp()
+    {
+        level++;
+        experience = 0;
+        experienceToNextLevel += 50; // 每次升级需要更多经验
+        UpgradeManager.Instance.ShowUpgradeOptions();
+    }
+
+    void Die()
+    {
+        Debug.Log("Player Died");
+        // 这里可以添加死亡动画或效果
+        GameManager.Instance.GameOver();
+        Destroy(gameObject);
     }
 }

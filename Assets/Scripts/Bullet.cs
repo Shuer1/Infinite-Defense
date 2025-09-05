@@ -2,8 +2,9 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    public float speed = 20f;
-    public float lifeTime = 2f;
+    public float speed = 15f;
+    public int damage = 10;
+    public float lifeTime = 3f;
 
     void Start()
     {
@@ -15,13 +16,16 @@ public class Bullet : MonoBehaviour
         transform.Translate(Vector3.forward * speed * Time.deltaTime);
     }
 
-    private void OnTriggerEnter(Collider other)
+    void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Enemy"))
         {
-            GameManager.Instance.AddScore(10);
-            Destroy(other.gameObject);
-            Destroy(gameObject);
+            EnemyBase enemy = other.GetComponent<EnemyBase>();
+            if (enemy != null)
+            {
+                enemy.TakeDamage(damage);
+                Destroy(gameObject);
+            }
         }
     }
 }
