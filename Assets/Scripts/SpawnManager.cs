@@ -1,18 +1,19 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class SpawnManager : MonoBehaviour
 {
-    // Start is called before the first frame update
+    public GameObject enemyPrefab;
+    public float spawnInterval = 2f;
+    public float spawnRange = 8f;
+
     void Start()
     {
-        
+        InvokeRepeating("SpawnEnemy", 1f, spawnInterval);
     }
 
-    // Update is called once per frame
-    void Update()
+    void SpawnEnemy()
     {
-        
+        Vector2 spawnPos = Random.insideUnitCircle.normalized * spawnRange;
+        Instantiate(enemyPrefab, spawnPos, Quaternion.identity);
     }
 }

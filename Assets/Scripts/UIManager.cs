@@ -1,32 +1,28 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
-    //单例模式
-    private static UIManager _instance;
-    public static UIManager Instance { get { return _instance; } }
-    private void Awake()
+    public static UIManager Instance;
+
+    public Text scoreText;
+    public Text highScoreText;
+    public GameObject gameOverPanel;
+
+    void Awake()
     {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(this.gameObject);
-        }
-        else
-        {
-            _instance = this;
-        }
-    }
-    // Start is called before the first frame update
-    void Start()
-    {
-        
+        Instance = this;
     }
 
-    // Update is called once per frame
-    void Update()
+    public void UpdateScore(int score)
     {
-        
+        scoreText.text = "Score: " + score;
+    }
+
+    public void ShowGameOver(int score, int highScore)
+    {
+        gameOverPanel.SetActive(true);
+        scoreText.text = "Score: " + score;
+        highScoreText.text = "High Score: " + highScore;
     }
 }

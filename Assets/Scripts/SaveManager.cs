@@ -1,18 +1,21 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class SaveManager : MonoBehaviour
+public static class SaveManager
 {
-    // Start is called before the first frame update
-    void Start()
+    private const string HighScoreKey = "HighScore";
+
+    public static void SaveHighScore(int score)
     {
-        
+        int currentHighScore = GetHighScore();
+        if (score > currentHighScore)
+        {
+            PlayerPrefs.SetInt(HighScoreKey, score);
+            PlayerPrefs.Save();
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    public static int GetHighScore()
     {
-        
+        return PlayerPrefs.GetInt(HighScoreKey, 0);
     }
 }
