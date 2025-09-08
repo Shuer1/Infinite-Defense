@@ -17,6 +17,8 @@ public class PlayerController : MonoBehaviour
     public float fireRate = 0.3f;
     private float fireTimer;
     public float moveSpeed = 5f;
+    [Header("虚拟移动轮盘")]
+    public VirtualJoystick joystick;
 
     private Rigidbody rb;
     private Animator animator;
@@ -30,23 +32,20 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        // 移动（WASD / 方向键）
+        // 移动输入
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
+
+        #if UNITY_ANDROID || UNITY_IOS
+                if (joystick != null)
+                {
+                    h = joystick.Horizontal;
+                    v = joystick.Vertical;
+                }
+        #endif
+
         Vector3 move = new Vector3(h, 0, v) * moveSpeed;
         rb.velocity = move;
-
-        // 旋转朝向鼠标（屏幕到射线）
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        Plane ground = new Plane(Vector3.up, Vector3.zero);
-        if (ground.Raycast(ray, out float enter))
-        {
-            Vector3 hitPoint = ray.GetPoint(enter);
-            Vector3 lookDir = (hitPoint - transform.position);
-            lookDir.y = 0;
-            if (lookDir != Vector3.zero)
-                transform.forward = lookDir;
-        }
 
         // 射击（控制间隔）
         fireTimer += Time.deltaTime;
