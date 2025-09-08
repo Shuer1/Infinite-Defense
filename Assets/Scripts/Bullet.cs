@@ -4,16 +4,24 @@ public class Bullet : MonoBehaviour
 {
     public float speed = 15f;
     public int damage = 10;
-    public float lifeTime = 3f;
+    public float lifeTime = 2f;
 
-    void Start()
+    private float timer;
+
+    void OnEnable()
     {
-        Destroy(gameObject, lifeTime);
+        timer = 0f;
     }
 
     void Update()
     {
         transform.Translate(Vector3.forward * speed * Time.deltaTime);
+
+        timer += Time.deltaTime;
+        if (timer >= lifeTime)
+        {
+            gameObject.SetActive(false); // 自动回收
+        }
     }
 
     void OnTriggerEnter(Collider other)
@@ -24,8 +32,8 @@ public class Bullet : MonoBehaviour
             if (enemy != null)
             {
                 enemy.TakeDamage(damage);
-                Destroy(gameObject);
             }
+            gameObject.SetActive(false); // 回收，而不是 Destroy
         }
     }
 }

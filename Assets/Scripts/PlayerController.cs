@@ -19,11 +19,13 @@ public class PlayerController : MonoBehaviour
     public float moveSpeed = 5f;
 
     private Rigidbody rb;
+    private Animator animator;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         currentHealth = health;
+        animator = GetComponent<Animator>();
     }
 
     void Update()
@@ -46,16 +48,20 @@ public class PlayerController : MonoBehaviour
                 transform.forward = lookDir;
         }
 
-        // 射击
-        if (Input.GetMouseButtonDown(0))
+        // 射击（控制间隔）
+        fireTimer += Time.deltaTime;
+        if (Input.GetMouseButton(0) && fireTimer >= fireRate)
         {
             Shoot();
+            fireTimer = 0f;
         }
+
+        AnimatorFunc();
     }
 
     void Shoot()
     {
-        Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+        BulletPool.Instance.GetBullet(firePoint.position, firePoint.rotation);
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -99,5 +105,11 @@ public class PlayerController : MonoBehaviour
         // 这里可以添加死亡动画或效果
         GameManager.Instance.GameOver();
         Destroy(gameObject);
+    }
+
+    void AnimatorFunc()
+    {
+        animator.SetBool("Run", rb.velocity.magnitude > 0);
+        animator.SetBool("Shoot", Input.GetMouseButton(0));
     }
 }
