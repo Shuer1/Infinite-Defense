@@ -49,6 +49,7 @@ public abstract class EnemyBase : MonoBehaviour
 
     protected virtual void Die()
     {
+        Debug.Log("Enemy Died");
         isDead = true;
         animator.SetBool("Run", false);
         animator.SetBool("Die", true);

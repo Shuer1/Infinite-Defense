@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Unity.PlasticSCM.Editor.WebApi;
 using UnityEngine;
 
@@ -100,13 +101,14 @@ public class PlayerController : MonoBehaviour
         UpgradeManager.Instance.ShowUpgradeOptions();
     }
 
-    void Die()
+    async Task Die()
     {
         isDead = true;
         animator.SetBool("Die", true);
         Debug.Log("Player Died");
         // 这里可以添加死亡动画或效果
         GameManager.Instance.GameOver();
+        await Task.Delay(2000);
         gameObject.SetActive(false);
         //Destroy(gameObject);
     }
