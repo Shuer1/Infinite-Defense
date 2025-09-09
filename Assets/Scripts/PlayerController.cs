@@ -75,12 +75,12 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public async Task TakeDamage(int damage)
+    public void TakeDamage(int damage)
     {
         currentHealth -= damage;
         if (currentHealth <= 0)
         {
-            await Die();
+            Die();
         }
     }
 
