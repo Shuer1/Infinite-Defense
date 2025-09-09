@@ -101,15 +101,14 @@ public class PlayerController : MonoBehaviour
         UpgradeManager.Instance.ShowUpgradeOptions();
     }
 
-    async Task Die()
+    void Die()
     {
         isDead = true;
         animator.SetBool("Die", true);
         Debug.Log("Player Died");
         // 这里可以添加死亡动画或效果
         GameManager.Instance.GameOver();
-        await Task.Delay(2000);
-        gameObject.SetActive(false);
+        //gameObject.SetActive(false);
         //Destroy(gameObject);
     }
 
