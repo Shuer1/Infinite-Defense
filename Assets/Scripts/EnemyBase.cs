@@ -13,12 +13,25 @@ public abstract class EnemyBase : MonoBehaviour
     private bool isDead = false;
     protected Transform player;
 
+    private EnemyManager enemyManager;
+
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player").transform;
         animator = GetComponent<Animator>();
         animator.SetBool("Run", true);
         currentHealth = maxHealth;
+
+        // 自动注册到 EnemyManager
+        GameObject pool = GameObject.Find("EnemyPool");
+        if (pool != null)
+        {
+            enemyManager = pool.GetComponent<EnemyManager>();
+            if (enemyManager != null)
+            {
+                enemyManager.RegisterEnemy(this);
+            }
+        }
     }
 
     void Update()
@@ -53,6 +66,13 @@ public abstract class EnemyBase : MonoBehaviour
         isDead = true;
         animator.SetBool("Run", false);
         animator.SetBool("Die", true);
+
+        // 自动注销
+        if (enemyManager != null)
+        {
+            enemyManager.UnregisterEnemy(this);
+        }
+
         player.GetComponent<PlayerController>().GainExp(expReward);
         Destroy(gameObject, 0.5f);
     }
