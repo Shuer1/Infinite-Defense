@@ -66,21 +66,21 @@ public class PlayerController : MonoBehaviour
         BulletPool.Instance.GetBullet(firePoint.position, firePoint.rotation);
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        if (collision.collider.CompareTag("Enemy"))
+        if (other.CompareTag("Enemy"))
         {
             GameManager.Instance.GameOver();
             Destroy(gameObject);
         }
     }
 
-    public void TakeDamage(int damage)
+    public async Task TakeDamage(int damage)
     {
         currentHealth -= damage;
         if (currentHealth <= 0)
         {
-            Die();
+            await Die();
         }
     }
 
