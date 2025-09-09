@@ -4,10 +4,10 @@ using UnityEngine;
 public abstract class EnemyBase : MonoBehaviour
 {
     public int maxHealth;
-    public int currentHealth;
     public int damage;
     public float moveSpeed;
     public int expReward;
+    private int currentHealth;
 
     private Animator animator;
     private bool isDead = false;

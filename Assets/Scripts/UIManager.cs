@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -5,8 +6,8 @@ public class UIManager : MonoBehaviour
 {
     public static UIManager Instance;
 
-    public Text scoreText;
-    public Text highScoreText;
+    public TextMeshProUGUI scoreText;
+    public TextMeshProUGUI highScoreText;
     public GameObject gameOverPanel;
 
     void Awake()

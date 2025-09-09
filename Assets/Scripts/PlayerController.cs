@@ -22,6 +22,7 @@ public class PlayerController : MonoBehaviour
 
     private Rigidbody rb;
     private Animator animator;
+    private bool isDead = false;
 
     void Start()
     {
@@ -32,6 +33,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (isDead) return;
         // 移动输入
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
@@ -100,10 +102,13 @@ public class PlayerController : MonoBehaviour
 
     void Die()
     {
+        isDead = true;
+        animator.SetBool("Die", true);
         Debug.Log("Player Died");
         // 这里可以添加死亡动画或效果
         GameManager.Instance.GameOver();
-        Destroy(gameObject);
+        gameObject.SetActive(false);
+        //Destroy(gameObject);
     }
 
     void AnimatorFunc()
