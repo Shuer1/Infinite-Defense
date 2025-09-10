@@ -36,8 +36,6 @@ public abstract class EnemyBase : MonoBehaviour
 
     void Update()
     {
-        if (isDead) return;
-
         if (player != null)
         {
             Vector3 dir = (player.position - transform.position).normalized;
@@ -53,6 +51,7 @@ public abstract class EnemyBase : MonoBehaviour
 
     public void TakeDamage(int dmg)
     {
+        Debug.Log($"敌人受到伤害: {dmg}");
         currentHealth -= dmg;
         if (currentHealth <= 0)
         {
@@ -85,7 +84,6 @@ public abstract class EnemyBase : MonoBehaviour
             if (pc != null)
             {
                 pc.TakeDamage(damage);
-                Die(); // 敌人攻击后死亡（可选规则）
             }
         }
     }
@@ -102,4 +100,16 @@ public abstract class EnemyBase : MonoBehaviour
             }
         }
     }
+
+    // 结束追踪和攻击
+    /*
+    void EndTraceAndAttack(bool playerisdead)
+    {
+
+        animator.SetBool("Run", !playerisdead);
+        animator.SetBool("Attack", !playerisdead);
+        return;
+    }
+    */
+
 }

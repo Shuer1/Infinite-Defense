@@ -7,7 +7,7 @@ public class PlayerController : MonoBehaviour
     [Header("Attributes")]
     public int health = 100;
     public int currentHealth;
-    public int damage = 20;
+    public int damage;
     public int level = 1;
     public int experience = 0;
     public int experienceToNextLevel = 100;
@@ -24,6 +24,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody rb;
     private Animator animator;
     private bool isDead = false;
+    //EnemyBase enemyBase;
 
     void Start()
     {
@@ -86,6 +87,7 @@ public class PlayerController : MonoBehaviour
 
     public void GainExp(int exp)
     {
+        Debug.Log($"获得经验: {exp}");
         experience += exp;
         if (experience >= experienceToNextLevel)
         {
@@ -105,6 +107,7 @@ public class PlayerController : MonoBehaviour
     {
         isDead = true;
         animator.SetBool("Die", true);
+        //enemyBase.playerisdied = isDead;
         Debug.Log("Player Died");
         // 这里可以添加死亡动画或效果
         GameManager.Instance.GameOver();

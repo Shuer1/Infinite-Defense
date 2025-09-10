@@ -11,7 +11,8 @@ public class UpgradeManager : MonoBehaviour
 
     public void ShowUpgradeOptions()
     {
-        Debug.Log("展示升级选项，例如：增加攻击力 / 增加血量 / 提升移动速度");
+        Debug.Log("升级了! 选择一个升级选项:");
+        Debug.Log("增加攻击力 / 增加血量 / 提升移动速度");
         // TODO: 在UI里展示选项，玩家选择后调用 ApplyUpgrade()
     }
 

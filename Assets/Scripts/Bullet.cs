@@ -11,6 +11,11 @@ public class Bullet : MonoBehaviour
         timer = 0f;
     }
 
+    void Awake()
+    {
+        
+    }
+
     void Update()
     {
         transform.Translate(Vector3.forward * speed * Time.deltaTime);
