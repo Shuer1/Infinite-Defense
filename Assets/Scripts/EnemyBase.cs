@@ -101,4 +101,9 @@ public abstract class EnemyBase : MonoBehaviour
         }
     }
 
+    public void ApplySlow(float percentage, float duration)
+    {
+        //StartCoroutine(SlowCoroutine(percentage, duration));
+    }
+
 }
