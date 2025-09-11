@@ -1266,7 +1266,7 @@ GameObject:
   - component: {fileID: 6826583898504456795}
   - component: {fileID: 94510061880323062}
   m_Layer: 0
-  m_Name: mini simple skeleton demo
+  m_Name: skeleton
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1302,7 +1302,7 @@ Animator:
   m_GameObject: {fileID: 7453004285069166174}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 41f081d5c6d286c47a33bed3f84de79a, type: 3}
-  m_Controller: {fileID: 9100000, guid: 5561dbc7379ba4bd8b477e86a1a043f1, type: 2}
+  m_Controller: {fileID: 9100000, guid: 12c5465a109754c7b883ed058c760d5b, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 1
