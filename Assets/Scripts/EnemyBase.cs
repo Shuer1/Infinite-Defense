@@ -8,16 +8,18 @@ public abstract class EnemyBase : MonoBehaviour
     public float moveSpeed;
     public int expReward;
     private int currentHealth;
-
-    private Animator animator;
     private bool isDead = false;
+    private Animator animator;
     protected Transform player;
-
     private EnemyManager enemyManager;
+    private PlayerController pc;
 
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player").transform;
+
+        pc = player.GetComponent<PlayerController>();
+
         animator = GetComponent<Animator>();
         animator.SetBool("Run", true);
         currentHealth = maxHealth;
@@ -36,6 +38,13 @@ public abstract class EnemyBase : MonoBehaviour
 
     void Update()
     {
+        if (pc.isDead)
+        {
+            animator.SetBool("Run", false);
+            animator.SetBool("Attack", false);
+            return;
+        }
+
         if (player != null)
         {
             Vector3 dir = (player.position - transform.position).normalized;
@@ -75,25 +84,12 @@ public abstract class EnemyBase : MonoBehaviour
         player.GetComponent<PlayerController>().GainExp(expReward);
         Destroy(gameObject, 0.5f);
     }
-
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            PlayerController pc = other.GetComponent<PlayerController>();
-            if (pc != null)
-            {
-                pc.TakeDamage(damage);
-            }
-        }
-    }
-
     void Attack(int damage)
     {
         animator.SetBool("Attack", true);
         if (player != null)
         {
-            PlayerController pc = player.GetComponent<PlayerController>();
+            //PlayerController pc = player.GetComponent<PlayerController>();
             if (pc != null)
             {
                 pc.TakeDamage(damage);
@@ -105,5 +101,7 @@ public abstract class EnemyBase : MonoBehaviour
     {
         //StartCoroutine(SlowCoroutine(percentage, duration));
     }
+
+
 
 }

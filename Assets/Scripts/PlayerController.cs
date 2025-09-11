@@ -18,13 +18,12 @@ public class PlayerController : MonoBehaviour
     public float fireRate = 0.3f;
     private float fireTimer;
     public float moveSpeed = 5f;
+    public bool isDead = false;
     [Header("虚拟移动轮盘")]
     public VirtualJoystick joystick;
 
     private Rigidbody rb;
     private Animator animator;
-    private bool isDead = false;
-    //EnemyBase enemyBase;
 
     void Start()
     {
@@ -67,6 +66,7 @@ public class PlayerController : MonoBehaviour
         BulletPool.Instance.GetBullet(firePoint.position, firePoint.rotation);
     }
 
+    /*
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Enemy"))
@@ -75,9 +75,11 @@ public class PlayerController : MonoBehaviour
             Destroy(gameObject);
         }
     }
+    */
 
     public void TakeDamage(int damage)
     {
+        Debug.Log($"玩家受到伤害: {damage}");
         currentHealth -= damage;
         if (currentHealth <= 0)
         {
