@@ -2335,7 +2335,7 @@ MonoBehaviour:
   experienceToNextLevel: 100
   bulletPrefab: {fileID: 1734673711578244627, guid: 440645d6786d7401bb64687ebbea99be, type: 3}
   firePoint: {fileID: 1050021790}
-  fireRate: 0.3
+  fireRate: 0.2
   moveSpeed: 5
   joystick: {fileID: 473153303}
 --- !u!54 &942823809
@@ -2507,7 +2507,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   separationRadius: 1.5
-  separationForce: 3
+  separationForce: 2
 --- !u!1 &1050021789
 GameObject:
   m_ObjectHideFlags: 0

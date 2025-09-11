@@ -101,15 +101,4 @@ public abstract class EnemyBase : MonoBehaviour
         }
     }
 
-    // 结束追踪和攻击
-    /*
-    void EndTraceAndAttack(bool playerisdead)
-    {
-
-        animator.SetBool("Run", !playerisdead);
-        animator.SetBool("Attack", !playerisdead);
-        return;
-    }
-    */
-
 }
