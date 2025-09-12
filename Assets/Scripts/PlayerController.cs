@@ -80,6 +80,7 @@ public class PlayerController : MonoBehaviour
     public void TakeDamage(int damage)
     {
         Debug.Log($"玩家受到伤害: {damage}");
+        animator.SetTrigger("Hit");
         currentHealth -= damage;
         if (currentHealth <= 0)
         {

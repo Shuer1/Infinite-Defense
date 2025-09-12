@@ -7,7 +7,7 @@ public abstract class EnemyBase : MonoBehaviour
     public int damage;
     public float moveSpeed;
     public int expReward;
-    private int currentHealth;
+    [SerializeField]private int currentHealth;
     private bool isDead = false;
     private Animator animator;
     protected Transform player;
@@ -16,12 +16,12 @@ public abstract class EnemyBase : MonoBehaviour
 
     void Start()
     {
+        currentHealth = maxHealth;
         player = GameObject.FindGameObjectWithTag("Player").transform;
 
         pc = player.GetComponent<PlayerController>();
 
         animator = GetComponent<Animator>();
-        animator.SetBool("Run", true);
         currentHealth = maxHealth;
 
         // 自动注册到 EnemyManager
@@ -36,6 +36,13 @@ public abstract class EnemyBase : MonoBehaviour
         }
     }
 
+    // 增加状态变量和攻击间隔控制
+    private string currentState = "Idle";
+    private float attackCooldown = 1f; // 攻击冷却时间
+    private float lastAttackTime = 0f;
+    private float attackRange = 2f;
+    private float chaseRange = 2.5f; // 比攻击范围稍大，作为缓冲
+
     void Update()
     {
         if (pc.isDead)
@@ -47,14 +54,46 @@ public abstract class EnemyBase : MonoBehaviour
 
         if (player != null)
         {
-            Vector3 dir = (player.position - transform.position).normalized;
-            transform.position += dir * moveSpeed * Time.deltaTime;
-            transform.LookAt(player);
-
-            if (Vector3.Distance(transform.position, player.position) < 2f)
+            float distance = Vector3.Distance(transform.position, player.position);
+            
+            // 距离大于追逐范围，保持奔跑状态
+            if (distance > chaseRange)
             {
-                Attack(damage);
+                ChangeAniStatus("Attack", "Run");
+                Vector3 dir = (player.position - transform.position).normalized;
+                transform.position += dir * moveSpeed * Time.deltaTime;
+                transform.LookAt(player);
             }
+            // 距离在攻击范围内，且攻击冷却已结束
+            else if (distance <= attackRange && Time.time - lastAttackTime >= attackCooldown)
+            {
+                ChangeAniStatus("Run", "Attack");
+                Attack(damage);
+                lastAttackTime = Time.time; // 记录攻击时间
+            }
+            // 在缓冲区域内，保持当前状态
+            else if (currentState == "Attack")
+            {
+                // 已经在攻击状态，保持不动
+            }
+            else
+            {
+                // 已经在奔跑状态，继续移动到攻击位置
+                Vector3 dir = (player.position - transform.position).normalized;
+                transform.position += dir * moveSpeed * Time.deltaTime;
+                transform.LookAt(player);
+            }
+        }
+    }
+
+    void ChangeAniStatus(string currentStatus, string targetStatus)
+    {
+        // 只有当前状态与目标状态不同时才切换
+        if (currentState != targetStatus)
+        {
+            animator.SetBool(targetStatus, true);
+            animator.SetBool(currentStatus, false);
+            currentState = targetStatus; // 更新状态变量
         }
     }
 
@@ -72,8 +111,7 @@ public abstract class EnemyBase : MonoBehaviour
     {
         Debug.Log("Enemy Died");
         isDead = true;
-        animator.SetBool("Run", false);
-        animator.SetBool("Die", true);
+        ChangeAniStatus("Run","Die");
 
         // 自动注销
         if (enemyManager != null)
@@ -86,7 +124,12 @@ public abstract class EnemyBase : MonoBehaviour
     }
     void Attack(int damage)
     {
-        animator.SetBool("Attack", true);
+        ChangeAniStatus("Run", "Attack");
+        //AttackPlayer(); //该方法放在攻击动画中执行：Frame28执行事件
+    }
+
+    public void AttackPlayer()
+    {
         if (player != null)
         {
             //PlayerController pc = player.GetComponent<PlayerController>();
