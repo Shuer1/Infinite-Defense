@@ -4,8 +4,7 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
-
-    public int score;
+    public int score = 0;
     private bool isGameOver;
 
     void Awake()
@@ -17,6 +16,7 @@ public class GameManager : MonoBehaviour
     {
         score += value;
         UIManager.Instance.UpdateScore(score);
+        SaveManager.SaveHighScore(score);
     }
 
     public void GameOver()

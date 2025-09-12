@@ -1203,9 +1203,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
+  currentHealth: 0
   damage: 10
   moveSpeed: 3
   expReward: 10
+  scoreReward: 1
 --- !u!65 &4455548449738154627
 BoxCollider:
   m_ObjectHideFlags: 0

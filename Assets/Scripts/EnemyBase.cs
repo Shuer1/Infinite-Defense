@@ -4,21 +4,33 @@ using UnityEngine;
 public abstract class EnemyBase : MonoBehaviour
 {
     public int maxHealth;
+    [SerializeField] private int currentHealth;
     public int damage;
     public float moveSpeed;
     public int expReward;
-    [SerializeField]private int currentHealth;
+    public int scoreReward;
+    
     private bool isDead = false;
     private Animator animator;
     protected Transform player;
     private EnemyManager enemyManager;
     private PlayerController pc;
 
+    //增加状态变量和攻击间隔控制（以下变量用于动画控制）
+    private string currentState = "Idle";
+    private float attackCooldown = 1f; // 攻击冷却时间
+    private float lastAttackTime = 0f;
+    private float attackRange = 2f;
+    private float chaseRange = 2.5f; // 比攻击范围稍大，作为缓冲
+
     void Start()
     {
+        gameObject.tag = "Enemy";
         currentHealth = maxHealth;
         player = GameObject.FindGameObjectWithTag("Player").transform;
-
+        if (player == null) {
+            return;
+        }
         pc = player.GetComponent<PlayerController>();
 
         animator = GetComponent<Animator>();
@@ -35,13 +47,6 @@ public abstract class EnemyBase : MonoBehaviour
             }
         }
     }
-
-    // 增加状态变量和攻击间隔控制
-    private string currentState = "Idle";
-    private float attackCooldown = 1f; // 攻击冷却时间
-    private float lastAttackTime = 0f;
-    private float attackRange = 2f;
-    private float chaseRange = 2.5f; // 比攻击范围稍大，作为缓冲
 
     void Update()
     {
@@ -109,6 +114,7 @@ public abstract class EnemyBase : MonoBehaviour
 
     protected virtual void Die()
     {
+        gameObject.tag = "DiedEnemy";
         Debug.Log("Enemy Died");
         isDead = true;
         ChangeAniStatus("Run","Die");
@@ -120,7 +126,8 @@ public abstract class EnemyBase : MonoBehaviour
         }
 
         player.GetComponent<PlayerController>().GainExp(expReward);
-        Destroy(gameObject, 0.5f);
+        GameManager.Instance.AddScore(scoreReward);
+        Destroy(gameObject, 0.5f); //等待0.5s播放死亡动画
     }
     void Attack(int damage)
     {

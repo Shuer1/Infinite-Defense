@@ -66,17 +66,6 @@ public class PlayerController : MonoBehaviour
         BulletPool.Instance.GetBullet(firePoint.position, firePoint.rotation);
     }
 
-    /*
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Enemy"))
-        {
-            GameManager.Instance.GameOver();
-            Destroy(gameObject);
-        }
-    }
-    */
-
     public void TakeDamage(int damage)
     {
         Debug.Log($"玩家受到伤害: {damage}");
@@ -109,7 +98,7 @@ public class PlayerController : MonoBehaviour
     void Die()
     {
         isDead = true;
-        animator.SetBool("Die", true);
+        animator.SetTrigger("Die");
         //enemyBase.playerisdied = isDead;
         Debug.Log("Player Died");
         // 这里可以添加死亡动画或效果
