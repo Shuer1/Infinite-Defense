@@ -1,20 +1,22 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 public class UpgradeManager : MonoBehaviour
 {
     public static UpgradeManager Instance;
-    string[] choices = { "Attack", "FireRate", "Nothing", "MaxHealth" };
-    private static System.Random _random = new();
+    
+    [Tooltip("所有可用的升级选项")]
+    public List<UpgradeData> allUpgrades = new List<UpgradeData>();
     
     [Tooltip("拖入玩家控制器实例")]
     public PlayerController playerController;
+    
     [Tooltip("拖入子弹预制体")]
-    public Bullet bulletPrefab;  // 仅用于更新预制体属性
+    public Bullet bulletPrefab;
 
-    void Awake()
+    private void Awake()
     {
-        // 完善单例模式
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -24,94 +26,151 @@ public class UpgradeManager : MonoBehaviour
             Instance = this;
         }
 
-        // 自动获取玩家控制器
         if (playerController == null)
             playerController = FindObjectOfType<PlayerController>();
     }
 
+    /// <summary>
+    /// 显示升级选项（随机选择3个）
+    /// </summary>
     public void ShowUpgradeOptions()
     {
-        Debug.Log("升级了! 随机选择一个升级选项:");
-        Debug.Log("增加子弹攻击力 / 增加攻击速度 / 无加成 / 提升最大生命值");
-
-        string choice = GetRandomChoice(choices);
-        Debug.Log("你的随机升级选项是: " + choice);
-
-        //ApplyUpgrade(choice, playerController);
-        ApplyUpgrade("Attack",playerController);
-    }
-    
-    public string GetRandomChoice(string[] arr)
-    {
-        if (arr == null || arr.Length == 0)
+        if (allUpgrades.Count < 3)
         {
-            Debug.LogError("升级选项数组为空或未初始化");
-            return null;
-        }
-        return arr[_random.Next(arr.Length)];
-    }
-
-    public void ApplyUpgrade(string option, PlayerController player)
-    {
-        if (player == null)
-        {
-            Debug.LogError("玩家控制器为空，无法应用升级");
+            Debug.LogError("升级选项不足3个，请检查配置");
             return;
         }
 
-        switch (option)
+        // 随机选择3个不重复的升级选项
+        var randomUpgrades = GetRandomUniqueUpgrades(3);
+        
+        // 显示升级面板
+        if (UpgradePanel.Instance != null)
+        {
+            UpgradePanel.Instance.Show(randomUpgrades);
+        }
+        else
+        {
+            Debug.LogError("升级面板实例不存在");
+        }
+    }
+    
+    /// <summary>
+    /// 随机获取指定数量的不重复升级选项
+    /// </summary>
+    private List<UpgradeData> GetRandomUniqueUpgrades(int count)
+    {
+        // 打乱顺序并取前count个
+        return allUpgrades
+            .OrderBy(x => Random.Range(0, allUpgrades.Count))
+            .Take(count)
+            .ToList();
+    }
+
+    /// <summary>
+    /// 应用玩家选择的升级
+    /// </summary>
+    public void ApplySelectedUpgrade(string upgradeId)
+    {
+        var upgrade = allUpgrades.FirstOrDefault(u => u.upgradeId == upgradeId);
+        if (upgrade == null)
+        {
+            Debug.LogError($"找不到升级选项: {upgradeId}");
+            return;
+        }
+
+        ApplyUpgradeEffect(upgradeId, upgrade.value);
+        Debug.Log($"已选择升级: {upgrade.displayName}");
+    }
+
+    /// <summary>
+    /// 应用升级效果
+    /// </summary>
+    private void ApplyUpgradeEffect(string upgradeId, int value)
+    {
+        switch (upgradeId)
         {
             case "Attack":
-                if (bulletPrefab == null)
-                {
-                    Debug.LogError("未设置子弹预制体，无法升级攻击力");
-                    return;
-                }
-
-                // 1. 更新预制体（确保新生成的子弹使用新属性）
-                bulletPrefab.damage += 5;
-                Debug.Log($"子弹攻击力提升! 新攻击力: {bulletPrefab.damage}");
-
-                // 2. 同步更新对象池中所有子弹
-                UpdateAllPooledBulletsDamage(bulletPrefab.damage);
+                ApplyAttackUpgrade(value);
                 break;
-                
             case "FireRate":
-                player.fireRate -= 0.05f;
-                player.fireRate = Mathf.Max(0.1f, player.fireRate);
-                Debug.Log($"攻击速度提升! 当前攻击速度: {player.fireRate:F2}");
+                ApplyFireRateUpgrade(value);
                 break;
-                
             case "MaxHealth":
-                player.health += 20;
-                player.currentHealth = player.health;
-                Debug.Log($"最大生命值提升! 当前生命值: {player.health}");
+                ApplyMaxHealthUpgrade(value);
                 break;
-                
-            case "Nothing":
-                Debug.Log("本次升级没有获得任何加成");
+            /*
+            case "MoveSpeed":
+                ApplyMoveSpeedUpgrade(value);
                 break;
-                
+            case "BulletSpeed":
+                ApplyBulletSpeedUpgrade(value);
+                break;
+            case "BulletRange":
+                ApplyBulletRangeUpgrade(value);
+                break;
+            */
             default:
-                Debug.LogWarning("未知的升级选项: " + option);
+                Debug.LogWarning($"未知的升级类型: {upgradeId}");
                 break;
         }
+    }
+
+    // 各种升级效果的具体实现
+    private void ApplyAttackUpgrade(int value)
+    {
+        if (bulletPrefab == null) return;
+        
+        bulletPrefab.damage += value;
+        UpdateAllPooledBulletsDamage(bulletPrefab.damage);
+        Debug.Log($"子弹攻击力提升! 新攻击力: {bulletPrefab.damage}");
+    }
+
+    private void ApplyFireRateUpgrade(int value)
+    {
+        if (playerController == null) return;
+        
+        float fireRateReduction = value * 0.01f; // 转换为攻击速度减少值
+        playerController.fireRate = Mathf.Max(0.1f, playerController.fireRate - fireRateReduction);
+        Debug.Log($"攻击速度提升! 当前攻击速度: {playerController.fireRate:F2}");
+    }
+
+    private void ApplyMaxHealthUpgrade(int value)
+    {
+        if (playerController == null) return;
+        
+        playerController.health += value;
+        playerController.currentHealth = playerController.health;
+        Debug.Log($"最大生命值提升! 当前生命值: {playerController.health}");
+    }
+
+    private void ApplyMoveSpeedUpgrade(int value)
+    {
+        if (playerController == null) return;
+        
+        playerController.moveSpeed += value * 0.1f; // 移动速度小幅提升
+        Debug.Log($"移动速度提升! 当前速度: {playerController.moveSpeed:F2}");
+    }
+
+    private void ApplyBulletSpeedUpgrade(int value)
+    {
+        // 实现子弹速度升级逻辑
+        Debug.Log($"子弹速度提升! 提升值: {value}");
+    }
+
+    private void ApplyBulletRangeUpgrade(int value)
+    {
+        // 实现子弹射程升级逻辑
+        Debug.Log($"子弹射程提升! 提升值: {value}");
     }
 
     /// <summary>
     /// 更新对象池中所有子弹的攻击力
     /// </summary>
-    /// <param name="newDamage">新的攻击力值</param>
     private void UpdateAllPooledBulletsDamage(int newDamage)
     {
-        // 通过单例获取子弹池
-        if (BulletPool.Instance == null)
-        {
-            Debug.LogError("子弹池实例不存在，无法更新子弹");
-            return;
-        }
+        if (BulletPool.Instance == null) return;
 
-        // 获取对象池中所有子弹并更新
         int updatedCount = 0;
         foreach (var bulletObj in BulletPool.Instance.GetAllBullets())
         {
