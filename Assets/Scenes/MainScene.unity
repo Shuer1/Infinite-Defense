@@ -1382,7 +1382,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 564323558, guid: 860682da1945f498c827a3a6a37fa4a0, type: 3}
+  m_Sprite: {fileID: 21300000, guid: c107054475fa6450fb0f7e614ebbbc3e, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -4133,6 +4133,11 @@ MonoBehaviour:
     description: Get this type of bullets
     cardImage: {fileID: 21300000, guid: 143b1cdf5322c4a1d86476f72a48cd1c, type: 3}
     value: 1
+  - upgradeId: Speed
+    displayName: PlusSpeed
+    description: To plus shoot speed
+    cardImage: {fileID: 21300000, guid: f3ae44abec44741ff8d41e098cf430cb, type: 3}
+    value: 1
   playerController: {fileID: 942823808}
   bulletPrefab: {fileID: 741479308755480698, guid: 440645d6786d7401bb64687ebbea99be, type: 3}
 --- !u!4 &1761685146
@@ -4685,11 +4690,11 @@ SceneRoots:
   - {fileID: 493960728}
   - {fileID: 852916297}
   - {fileID: 1135337741}
+  - {fileID: 1761685146}
   - {fileID: 754504812}
   - {fileID: 1662286653}
   - {fileID: 1031757753}
   - {fileID: 232166977}
-  - {fileID: 1761685146}
   - {fileID: 1683609181}
   - {fileID: 455223340}
   - {fileID: 574606342}
