@@ -1,43 +1,68 @@
 using Unity.VisualScripting;
 using UnityEngine;
+using System.Collections;
 
 public abstract class EnemyBase : MonoBehaviour
 {
+    // 动画参数常量（避免魔法字符串）
+    private const string AnimIdle = "Idle";
+    private const string AnimRun = "Run";
+    private const string AnimAttack = "Attack";
+    private const string AnimDie = "Die";
+
+    public EnemyType enemyType;
+    public event System.Action<EnemyBase> OnDeath; // 死亡事件
     public int maxHealth;
-    [SerializeField] private int currentHealth;
+    public int currentHealth;
     public int damage;
     public float moveSpeed;
     public int expReward;
     public int scoreReward;
-    
-    private bool isDead = false;
+
+    public bool isDead = false;
     private Animator animator;
     protected Transform player;
     private EnemyManager enemyManager;
     private PlayerController pc;
 
-    //增加状态变量和攻击间隔控制（以下变量用于动画控制）
-    private string currentState = "Idle";
-    private float attackCooldown = 1f; // 攻击冷却时间
-    private float lastAttackTime = 0f;
-    private float attackRange = 2f;
-    private float chaseRange = 2.5f; // 比攻击范围稍大，作为缓冲
+    // 可在Inspector中编辑的范围参数
+    [SerializeField] private float attackRange = 2f;
+    [SerializeField] private float chaseRange = 2.5f; // 比攻击范围稍大作为缓冲
+    [SerializeField] private float attackCooldown = 1f; // 攻击冷却时间
+    public float lastAttackTime = 0f;
+    private string currentState = AnimIdle; // 初始状态设为Idle
+    public float originalMoveSpeed; // 用于减速效果的原始速度保存
 
     void Start()
     {
         gameObject.tag = "Enemy";
         currentHealth = maxHealth;
-        player = GameObject.FindGameObjectWithTag("Player").transform;
-        if (player == null) {
-            return;
+        originalMoveSpeed = moveSpeed; // 初始化原始速度
+
+        // 安全获取玩家引用
+        player = GameObject.FindGameObjectWithTag("Player")?.transform;
+        if (player != null)
+        {
+            pc = player.GetComponent<PlayerController>();
+            if (pc == null)
+            {
+                Debug.LogWarning("Player上未找到PlayerController组件", this);
+            }
         }
-        pc = player.GetComponent<PlayerController>();
+        else
+        {
+            Debug.LogWarning("未找到标签为Player的物体", this);
+        }
 
+        // 初始化动画组件
         animator = GetComponent<Animator>();
-        currentHealth = maxHealth;
+        if (animator == null)
+        {
+            Debug.LogWarning("Enemy未添加Animator组件", this);
+        }
 
-        // 自动注册到 EnemyManager
-        GameObject pool = GameObject.Find("EnemyPool");
+        // 注册到EnemyManager
+        GameObject pool = GameObject.Find("EnemyManager");
         if (pool != null)
         {
             enemyManager = pool.GetComponent<EnemyManager>();
@@ -45,67 +70,79 @@ public abstract class EnemyBase : MonoBehaviour
             {
                 enemyManager.RegisterEnemy(this);
             }
+            else
+            {
+                Debug.LogWarning("EnemyManager上未找到EnemyManager组件", this);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("未找到EnemyManager物体", this);
         }
     }
 
     void Update()
     {
-        if (pc.isDead)
+        // 死亡状态不执行任何逻辑
+        if (isDead) return;
+
+        // 玩家死亡或不存在时停止行动
+        if (pc?.isDead ?? true || player == null)
         {
-            animator.SetBool("Run", false);
-            animator.SetBool("Attack", false);
+            ChangeAniStatus(currentState, AnimIdle);
             return;
         }
 
-        if (player != null)
+        float distance = Vector3.Distance(transform.position, player.position);
+
+        // 距离大于追逐范围：移动追逐
+        if (distance > chaseRange)
         {
-            float distance = Vector3.Distance(transform.position, player.position);
-            
-            // 距离大于追逐范围，保持奔跑状态
-            if (distance > chaseRange)
-            {
-                ChangeAniStatus("Attack", "Run");
-                Vector3 dir = (player.position - transform.position).normalized;
-                transform.position += dir * moveSpeed * Time.deltaTime;
-                transform.LookAt(player);
-            }
-            // 距离在攻击范围内，且攻击冷却已结束
-            else if (distance <= attackRange && Time.time - lastAttackTime >= attackCooldown)
-            {
-                ChangeAniStatus("Run", "Attack");
-                Attack(damage);
-                lastAttackTime = Time.time; // 记录攻击时间
-            }
-            // 在缓冲区域内，保持当前状态
-            else if (currentState == "Attack")
-            {
-                // 已经在攻击状态，保持不动
-            }
-            else
-            {
-                // 已经在奔跑状态，继续移动到攻击位置
-                Vector3 dir = (player.position - transform.position).normalized;
-                transform.position += dir * moveSpeed * Time.deltaTime;
-                transform.LookAt(player);
-            }
+            ChangeAniStatus(AnimAttack, AnimRun);
+            MoveTowardsPlayer();
+        }
+        // 距离在攻击范围内且冷却结束：攻击
+        else if (distance <= attackRange && Time.time - lastAttackTime >= attackCooldown)
+        {
+            ChangeAniStatus(AnimRun, AnimAttack);
+            Attack(damage);
+            lastAttackTime = Time.time;
+        }
+        // 在缓冲区域内且当前不是攻击状态：继续移动到攻击位置
+        else if (currentState != AnimAttack)
+        {
+            MoveTowardsPlayer();
         }
     }
 
-    void ChangeAniStatus(string currentStatus, string targetStatus)
+    // 移动到玩家的通用方法
+    private void MoveTowardsPlayer()
     {
-        // 只有当前状态与目标状态不同时才切换
-        if (currentState != targetStatus)
+        Vector3 dir = (player.position - transform.position).normalized;
+        transform.position += dir * moveSpeed * Time.deltaTime;
+        transform.LookAt(player);
+    }
+
+    // 动画状态切换（参数名更清晰）
+    void ChangeAniStatus(string fromState, string toState)
+    {
+        if (currentState == toState || animator == null) return;
+
+        animator.SetBool(toState, true);
+        if (fromState != AnimIdle) // Idle状态不需要手动关闭（作为默认状态）
         {
-            animator.SetBool(targetStatus, true);
-            animator.SetBool(currentStatus, false);
-            currentState = targetStatus; // 更新状态变量
+            animator.SetBool(fromState, false);
         }
+        currentState = toState;
     }
 
     public void TakeDamage(int dmg)
     {
-        Debug.Log($"敌人受到伤害: {dmg}");
+        if (isDead) return; // 已死亡不接受伤害
+
         currentHealth -= dmg;
+        Debug.Log($"敌人受到伤害: {dmg}, 剩余生命值: {currentHealth}");
+
         if (currentHealth <= 0)
         {
             Die();
@@ -114,44 +151,125 @@ public abstract class EnemyBase : MonoBehaviour
 
     protected virtual void Die()
     {
+        if (isDead) return; // 防止重复调用
+
+        isDead = true;
         gameObject.tag = "DiedEnemy";
         Debug.Log("Enemy Died");
-        isDead = true;
-        ChangeAniStatus("Run","Die");
+        ChangeAniStatus(currentState, AnimDie);
 
-        // 自动注销
+        // 触发死亡事件
+        OnDeath?.Invoke(this);
+
+        // 从EnemyManager注销
         if (enemyManager != null)
         {
             enemyManager.UnregisterEnemy(this);
         }
 
-        player.GetComponent<PlayerController>().GainExp(expReward);
-        GameManager.Instance.AddScore(scoreReward);
-        Destroy(gameObject, 0.5f); //等待0.5s播放死亡动画
+        // 安全给予奖励
+        if (player != null && pc != null)
+        {
+            pc.GainExp(expReward);
+        }
+        GameManager.Instance?.AddScore(scoreReward);
+
+        // 移除销毁代码，改为由对象池处理回收
+        // 原错误代码：Destroy(gameObject, 0.5f);
     }
+
     void Attack(int damage)
     {
-        ChangeAniStatus("Run", "Attack");
-        //AttackPlayer(); //该方法放在攻击动画中执行：Frame28执行事件
+        ChangeAniStatus(AnimRun, AnimAttack);
+        // 攻击逻辑通过动画事件调用AttackPlayer()
     }
 
     public void AttackPlayer()
     {
-        if (player != null)
-        {
-            //PlayerController pc = player.GetComponent<PlayerController>();
-            if (pc != null)
-            {
-                pc.TakeDamage(damage);
-            }
-        }
+        if (pc == null || isDead) return;
+
+        pc.TakeDamage(damage);
     }
 
+    // 实现减速效果
     public void ApplySlow(float percentage, float duration)
     {
-        //StartCoroutine(SlowCoroutine(percentage, duration));
+        if (isDead) return;
+
+        StartCoroutine(SlowCoroutine(percentage, duration));
     }
 
+    private IEnumerator SlowCoroutine(float slowPercentage, float duration)
+    {
+        float slowFactor = 1 - (slowPercentage / 100f);
+        moveSpeed *= slowFactor;
 
+        yield return new WaitForSeconds(duration);
 
+        // 恢复原始速度（防止多次减速叠加问题）
+        moveSpeed = originalMoveSpeed;
+    }
+    
+    /// <summary>
+    /// 重置敌人状态（用于从对象池取出时）
+    /// </summary>
+    /// <param name="spawnPos">重生位置</param>
+    /// <param name="rotation">重生旋转</param>
+    public void ResetEnemyState(Vector3 spawnPos, Quaternion rotation)
+    {
+        // 重置位置和旋转
+        transform.position = spawnPos;
+        transform.rotation = rotation;
+
+        // 激活对象
+        gameObject.SetActive(true);
+
+        // 重置标签
+        gameObject.tag = "Enemy";
+
+        // 重置生命状态
+        currentHealth = maxHealth;
+        isDead = false;
+
+        // 重置移动状态
+        moveSpeed = originalMoveSpeed;
+        StopAllCoroutines(); // 终止所有未完成的协程（如减速）
+
+        // 重置攻击冷却
+        lastAttackTime = 0f;
+
+        // 重置动画状态
+        if (animator != null)
+        {
+            animator.SetBool(AnimDie, false);
+            animator.SetBool(AnimIdle, true);
+        }
+        currentState = AnimIdle;
+
+        // 关键修复：重新获取玩家引用（避免旧引用失效）
+        player = GameObject.FindGameObjectWithTag("Player")?.transform;
+        if (player != null)
+        {
+            pc = player.GetComponent<PlayerController>();
+            if (pc == null)
+            {
+                Debug.LogWarning("Player上未找到PlayerController组件", this);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("未找到标签为Player的物体", this);
+        }
+
+        // 可选：重置其他临时状态（如Buff/Debuff、AI目标等）
+        ResetCustomStates(); // 留给子类实现自定义重置逻辑
+    }
+
+    /// <summary>
+    /// 子类可重写此方法，添加自定义状态重置
+    /// </summary>
+    protected virtual void ResetCustomStates()
+    {
+        // 例如：清除特殊攻击标记、重置技能CD等
+    }
 }
