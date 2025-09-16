@@ -9,8 +9,6 @@ public class UpgradePanel : MonoBehaviour
     [SerializeField] private GameObject panel;
     [SerializeField] private Transform cardContainer;
     [SerializeField] private UpgradeCard cardPrefab;
-    [SerializeField] private Button closeButton;
-
     private List<UpgradeCard> spawnedCards = new();
 
     private void Awake()
@@ -24,8 +22,6 @@ public class UpgradePanel : MonoBehaviour
         {
             Destroy(gameObject);
         }
-
-        closeButton.onClick.AddListener(Hide);
         Hide(); // 初始隐藏面板
     }
 

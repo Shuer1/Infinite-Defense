@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 
 public class UpgradeManager : MonoBehaviour
 {
@@ -83,6 +84,12 @@ public class UpgradeManager : MonoBehaviour
         Debug.Log($"已选择升级: {upgrade.displayName}");
     }
 
+    public enum ParameterType
+    {
+        Integer,
+        String,
+    }
+
     /// <summary>
     /// 应用升级效果
     /// </summary>
@@ -103,13 +110,21 @@ public class UpgradeManager : MonoBehaviour
             case "MoveSpeed":
                 ApplyMoveSpeedUpgrade(value);
                 break;
-            case "BulletSpeed":
-                ApplyBulletSpeedUpgrade(value);
+            */
+            case "SlowTime":
+                ApplySlowTimeLongerUpgrade(value);
                 break;
+            
             case "BulletRange":
                 ApplyBulletRangeUpgrade(value);
                 break;
-            */
+            
+            case "Explosive":
+                GetSpecialBullet(value);
+                break;
+            case "Slow":
+                GetSpecialBullet(value);
+                break;
             default:
                 Debug.LogWarning($"未知的升级类型: {upgradeId}");
                 break;
@@ -117,7 +132,7 @@ public class UpgradeManager : MonoBehaviour
     }
 
     // 各种升级效果的具体实现
-    private void ApplyAttackUpgrade(int value)
+    private void ApplyAttackUpgrade(int value) //1、子弹伤害增加
     {
         if (bulletPrefab == null) return;
         
@@ -126,16 +141,16 @@ public class UpgradeManager : MonoBehaviour
         Debug.Log($"子弹攻击力提升! 新攻击力: {bulletPrefab.damage}");
     }
 
-    private void ApplyFireRateUpgrade(int value)
+    private void ApplyFireRateUpgrade(int value) //2、射速增加
     {
         if (playerController == null) return;
         
-        float fireRateReduction = value * 0.01f; // 转换为攻击速度减少值
+        float fireRateReduction = value * 0.01f; //转换为攻击速度减少值
         playerController.fireRate = Mathf.Max(0.1f, playerController.fireRate - fireRateReduction);
         Debug.Log($"攻击速度提升! 当前攻击速度: {playerController.fireRate:F2}");
     }
 
-    private void ApplyMaxHealthUpgrade(int value)
+    private void ApplyMaxHealthUpgrade(int value) //3、提升最大生命值
     {
         if (playerController == null) return;
         
@@ -144,24 +159,37 @@ public class UpgradeManager : MonoBehaviour
         Debug.Log($"最大生命值提升! 当前生命值: {playerController.health}");
     }
 
-    private void ApplyMoveSpeedUpgrade(int value)
+    private void ApplyMoveSpeedUpgrade(int value) //4、移动速度增加
     {
         if (playerController == null) return;
         
-        playerController.moveSpeed += value * 0.1f; // 移动速度小幅提升
+        playerController.moveSpeed += value * 0.1f;
         Debug.Log($"移动速度提升! 当前速度: {playerController.moveSpeed:F2}");
     }
 
-    private void ApplyBulletSpeedUpgrade(int value)
+    private void ApplySlowTimeLongerUpgrade(int value)
     {
-        // 实现子弹速度升级逻辑
-        Debug.Log($"子弹速度提升! 提升值: {value}");
+        // 实现冰冻时间延长
+        Debug.Log("You get longer duration of freezing");
     }
 
     private void ApplyBulletRangeUpgrade(int value)
     {
         // 实现子弹射程升级逻辑
-        Debug.Log($"子弹射程提升! 提升值: {value}");
+        Debug.Log($"爆炸范围提升: {value}");
+    }
+
+    private void GetSpecialBullet(int value)
+    {
+        switch (value)
+        {
+            case 1:
+                Debug.Log("You get Explosive Bullet!");
+                break;
+            case 2:
+                Debug.Log("You get Ice Bullet!");
+                break;
+        }
     }
 
     /// <summary>
