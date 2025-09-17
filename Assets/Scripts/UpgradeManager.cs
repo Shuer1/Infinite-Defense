@@ -6,13 +6,16 @@ using System.Security.Cryptography;
 public class UpgradeManager : MonoBehaviour
 {
     public static UpgradeManager Instance;
-    
+
+    [Tooltip("升级面板的缩放动画组件")]
+    [SerializeField] private PanelScaleAnimation upgradePanelScaleAnim;
+
     [Tooltip("所有可用的升级选项")]
     public List<UpgradeData> allUpgrades = new List<UpgradeData>();
-    
+
     [Tooltip("拖入玩家控制器实例")]
     public PlayerController playerController;
-    
+
     [Tooltip("拖入子弹预制体")]
     public Bullet bulletPrefab;
 
@@ -38,16 +41,26 @@ public class UpgradeManager : MonoBehaviour
     {
         if (allUpgrades.Count < 3)
         {
-            Debug.LogError("升级选项不足3个，请检查配置");
+            Debug.LogError("升级选项不足3个,请检查配置");
             return;
         }
 
         // 随机选择3个不重复的升级选项
         var randomUpgrades = GetRandomUniqueUpgrades(3);
-        
-        // 显示升级面板
+
+        // 显示升级面板和缩放动画
         if (UpgradePanel.Instance != null)
         {
+            if (upgradePanelScaleAnim != null)
+            {
+                upgradePanelScaleAnim.OpenPanel();
+            }
+            else
+            {
+                Debug.LogError("为赋值upgradePanelScaleAnim");
+            }
+
+            //显示升级选项内容
             UpgradePanel.Instance.Show(randomUpgrades);
         }
         else
@@ -55,7 +68,7 @@ public class UpgradeManager : MonoBehaviour
             Debug.LogError("升级面板实例不存在");
         }
     }
-    
+
     /// <summary>
     /// 随机获取指定数量的不重复升级选项
     /// </summary>
@@ -84,12 +97,6 @@ public class UpgradeManager : MonoBehaviour
         Debug.Log($"已选择升级: {upgrade.displayName}");
     }
 
-    public enum ParameterType
-    {
-        Integer,
-        String,
-    }
-
     /// <summary>
     /// 应用升级效果
     /// </summary>
@@ -114,11 +121,11 @@ public class UpgradeManager : MonoBehaviour
             case "SlowTime":
                 ApplySlowTimeLongerUpgrade(value);
                 break;
-            
+
             case "BulletRange":
                 ApplyBulletRangeUpgrade(value);
                 break;
-            
+
             case "Explosive":
                 GetSpecialBullet(value);
                 break;
@@ -135,7 +142,7 @@ public class UpgradeManager : MonoBehaviour
     private void ApplyAttackUpgrade(int value) //1、子弹伤害增加
     {
         if (bulletPrefab == null) return;
-        
+
         bulletPrefab.damage += value;
         UpdateAllPooledBulletsDamage(bulletPrefab.damage);
         Debug.Log($"子弹攻击力提升! 新攻击力: {bulletPrefab.damage}");
@@ -144,7 +151,7 @@ public class UpgradeManager : MonoBehaviour
     private void ApplyFireRateUpgrade(int value) //2、射速增加
     {
         if (playerController == null) return;
-        
+
         float fireRateReduction = value * 0.01f; //转换为攻击速度减少值
         playerController.fireRate = Mathf.Max(0.1f, playerController.fireRate - fireRateReduction);
         Debug.Log($"攻击速度提升! 当前攻击速度: {playerController.fireRate:F2}");
@@ -153,7 +160,7 @@ public class UpgradeManager : MonoBehaviour
     private void ApplyMaxHealthUpgrade(int value) //3、提升最大生命值
     {
         if (playerController == null) return;
-        
+
         playerController.health += value;
         playerController.currentHealth = playerController.health;
         Debug.Log($"最大生命值提升! 当前生命值: {playerController.health}");
@@ -162,7 +169,7 @@ public class UpgradeManager : MonoBehaviour
     private void ApplyMoveSpeedUpgrade(int value) //4、移动速度增加
     {
         if (playerController == null) return;
-        
+
         playerController.moveSpeed += value * 0.1f;
         Debug.Log($"移动速度提升! 当前速度: {playerController.moveSpeed:F2}");
     }
@@ -215,5 +222,6 @@ public class UpgradeManager : MonoBehaviour
 
         Debug.Log($"已更新对象池中 {updatedCount} 个子弹的攻击力");
     }
+    
 }
     

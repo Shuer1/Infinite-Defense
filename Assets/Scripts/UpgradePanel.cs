@@ -5,7 +5,6 @@ using System.Collections.Generic;
 public class UpgradePanel : MonoBehaviour
 {
     public static UpgradePanel Instance;
-
     [SerializeField] private GameObject panel;
     [SerializeField] private Transform cardContainer;
     [SerializeField] private UpgradeCard cardPrefab;
