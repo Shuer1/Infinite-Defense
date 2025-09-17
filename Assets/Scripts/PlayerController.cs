@@ -39,13 +39,13 @@ public class PlayerController : MonoBehaviour
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
 
-        #if UNITY_ANDROID || UNITY_IOS
-                if (joystick != null)
-                {
-                    h = joystick.Horizontal;
-                    v = joystick.Vertical;
-                }
-        #endif
+#if UNITY_ANDROID || UNITY_IOS
+        if (joystick != null)
+        {
+            h = joystick.Horizontal;
+            v = joystick.Vertical;
+        }
+#endif
 
         Vector3 move = new Vector3(h, 0, v) * moveSpeed;
         rb.velocity = move;
@@ -103,13 +103,21 @@ public class PlayerController : MonoBehaviour
         Debug.Log("Player Died");
         // 这里可以添加死亡动画或效果
         GameManager.Instance.GameOver();
-        //gameObject.SetActive(false);
-        //Destroy(gameObject);
     }
 
     void AnimatorFunc()
     {
         animator.SetBool("Run", rb.velocity.magnitude > 0);
         animator.SetBool("Shoot", Input.GetMouseButton(0));
+    }
+
+    public void ResetToLive() //复活功能 - 用于激励广告！提高游戏宽容度！
+    {
+
+    }
+
+    void InitiatePlayerInfo()  //游戏开始时，初始化玩家数据信息
+    {
+        
     }
 }
