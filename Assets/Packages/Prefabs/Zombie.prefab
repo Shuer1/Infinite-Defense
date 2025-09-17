@@ -1202,12 +1202,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3590ee3ea43c64d39b86e8566d1db4d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enemyType: 0
   maxHealth: 100
   currentHealth: 0
   damage: 10
   moveSpeed: 3
+  originalMoveSpeed: 3
   expReward: 10
   scoreReward: 1
+  isDead: 0
+  attackRange: 2
+  chaseRange: 2.5
+  attackCooldown: 1
 --- !u!65 &4455548449738154627
 BoxCollider:
   m_ObjectHideFlags: 0

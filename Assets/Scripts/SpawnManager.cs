@@ -15,12 +15,15 @@ public class SpawnManager : MonoBehaviour
 
     void Start()
     {
+        // ⚠️测试阶段：默认从第1波开始
         currentWave = 1;
 
-        // 从存档加载当前波数（默认从第1波开始）
+        // ✅正式版：从存档加载当前波数
         //currentWave = SaveManager.GetCurrentWave();   core initiation
+
         // 注册波数完成事件
         enemyManager.OnAllEnemiesCleared += StartNextWave;
+
         // 启动当前波
         StartWave(currentWave);
     }

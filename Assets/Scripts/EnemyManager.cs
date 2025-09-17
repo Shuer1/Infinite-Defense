@@ -100,24 +100,8 @@ public class EnemyManager : MonoBehaviour
             enemy = pool.Dequeue();
         }
 
-        //直接调用重置法
+        //调用状态重置方法
         enemy.ResetEnemyState(spawnPos, rotation);
-
-        /*
-        // 激活并设置位置
-        enemy.transform.position = spawnPos;
-        enemy.transform.rotation = rotation;
-        enemy.gameObject.SetActive(true);
-        // 重置Tag为敌人（解决重生时Tag仍为DiedEnemy的问题）
-        enemy.gameObject.tag = "Enemy";
-        // 重置其余信息（待补充）
-        enemy.currentHealth = enemy.maxHealth;
-        enemy.isDead = false;
-        enemy.moveSpeed = enemy.originalMoveSpeed;
-        enemy.StopAllCoroutines();
-
-        //重置动画
-        */
 
         RegisterEnemy(enemy); // 注册到活跃列表
         return enemy;

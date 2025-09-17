@@ -16,6 +16,7 @@ public abstract class EnemyBase : MonoBehaviour
     public int currentHealth;
     public int damage;
     public float moveSpeed;
+    public float originalMoveSpeed; // 用于减速效果的原始速度保存
     public int expReward;
     public int scoreReward;
 
@@ -29,15 +30,20 @@ public abstract class EnemyBase : MonoBehaviour
     [SerializeField] private float attackRange = 2f;
     [SerializeField] private float chaseRange = 2.5f; // 比攻击范围稍大作为缓冲
     [SerializeField] private float attackCooldown = 1f; // 攻击冷却时间
-    public float lastAttackTime = 0f;
+    private float lastAttackTime = 0f;
     private string currentState = AnimIdle; // 初始状态设为Idle
-    public float originalMoveSpeed; // 用于减速效果的原始速度保存
 
     void Start()
     {
         gameObject.tag = "Enemy";
         currentHealth = maxHealth;
-        originalMoveSpeed = moveSpeed; // 初始化原始速度
+        // 新增：校验移动速度是否合理，避免初始为0
+        if (moveSpeed <= 0)
+        {
+            Debug.Log($"{gameObject.name}的moveSpeed设置为0或负数,自动设为默认值2f", this);
+            moveSpeed = 2f;
+        }
+        originalMoveSpeed = moveSpeed; // 确保原始速度正确保存
 
         // 安全获取玩家引用
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
@@ -231,9 +237,10 @@ public abstract class EnemyBase : MonoBehaviour
         currentHealth = maxHealth;
         isDead = false;
 
-        // 重置移动状态
+        // 强化速度重置，确保不为0
+        //moveSpeed = originalMoveSpeed <= 0 ? 2f : originalMoveSpeed;
         moveSpeed = originalMoveSpeed;
-        StopAllCoroutines(); // 终止所有未完成的协程（如减速）
+        StopAllCoroutines(); // 终止可能的减速协程
 
         // 重置攻击冷却
         lastAttackTime = 0f;
@@ -262,7 +269,7 @@ public abstract class EnemyBase : MonoBehaviour
         }
 
         // 可选：重置其他临时状态（如Buff/Debuff、AI目标等）
-        ResetCustomStates(); // 留给子类实现自定义重置逻辑
+        //ResetCustomStates(); // 留给子类实现自定义重置逻辑
     }
 
     /// <summary>
