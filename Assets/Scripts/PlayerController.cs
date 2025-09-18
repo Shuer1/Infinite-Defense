@@ -20,11 +20,16 @@ public class PlayerController : MonoBehaviour
     private float fireTimer;
     public float moveSpeed = 5f;
     public bool isDead = false;
+    private bool isMoving = false;
+    private float moveThreshold = 0.01f;
     [Header("虚拟移动轮盘")]
     public VirtualJoystick joystick;
 
     private Rigidbody rb;
     private Animator animator;
+    [Header("玩家音效")]
+    public AudioSource moveSound;
+    public AudioSource shootSound;
 
     void Awake()
     {
@@ -56,11 +61,39 @@ public class PlayerController : MonoBehaviour
         Vector3 move = new Vector3(h, 0, v) * moveSpeed;
         rb.velocity = move;
 
+        // 判断是否在移动（输入值超过阈值）
+        bool isMovingNow = (h * h + v * v) > moveThreshold * moveThreshold; 
+        // 用平方和判断，避免开方运算，效率更高
+
+        // 状态变化时更新音效
+        if (isMovingNow != isMoving)
+        {
+            isMoving = isMovingNow;
+            
+            if (isMoving)
+            {
+                // 开始移动：播放音效
+                if (moveSound != null && !moveSound.isPlaying)
+                {
+                    moveSound.Play();
+                }
+            }
+            else
+            {
+                // 停止移动：停止音效
+                if (moveSound != null && moveSound.isPlaying)
+                {
+                    moveSound.Stop();
+                }
+            }
+        }
+
         // 射击（控制间隔）
         fireTimer += Time.deltaTime;
         if (Input.GetMouseButton(0) && fireTimer >= fireRate)
         {
             Shoot();
+            shootSound.Play();
             fireTimer = 0f;
         }
 
