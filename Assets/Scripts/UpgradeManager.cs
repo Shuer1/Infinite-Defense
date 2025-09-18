@@ -18,6 +18,10 @@ public class UpgradeManager : MonoBehaviour
 
     [Tooltip("拖入子弹预制体")]
     public Bullet bulletPrefab;
+    //升级特效、音效
+    [SerializeField] private ParticleSystem upgradeEffect;
+    private ParticleSystem.MainModule mainModule;
+    [SerializeField] private AudioSource upgradeAudio;
 
     private void Awake()
     {
@@ -32,6 +36,24 @@ public class UpgradeManager : MonoBehaviour
 
         if (playerController == null)
             playerController = FindObjectOfType<PlayerController>();
+
+        if (upgradeEffect == null)
+        {
+            Debug.LogError("upgradeEffct is null");
+            return;
+        }
+
+        mainModule = upgradeEffect.main;
+
+    }
+
+    void Update()
+    {
+        //处理升级特效
+        if (!upgradeEffect.isPlaying && upgradeEffect.time >= mainModule.duration - 0.01f)
+        {
+            upgradeEffect.gameObject.SetActive(false);
+        }
     }
 
     /// <summary>
@@ -136,6 +158,8 @@ public class UpgradeManager : MonoBehaviour
                 Debug.LogWarning($"未知的升级类型: {upgradeId}");
                 break;
         }
+        upgradeEffect.gameObject.SetActive(true); //显示升级特效
+        upgradeAudio.Play();
     }
 
     // 各种升级效果的具体实现
