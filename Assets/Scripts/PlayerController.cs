@@ -25,19 +25,11 @@ public class PlayerController : MonoBehaviour
 
     private Rigidbody rb;
     private Animator animator;
-    private UIManager uiManager;
 
     void Awake()
     {
-        uiManager = FindObjectOfType<UIManager>();
-        if (uiManager == null)
-        {
-            Debug.LogError("UIManager is null");
-            return;
-        }
-
         currentHealth = health;
-        uiManager.UpdateAndShowPlayerHP(currentHealth,health);
+        UIManager.Instance.UpdateAndShowPlayerHP(currentHealth,health);
     }
 
     void Start()
@@ -86,7 +78,7 @@ public class PlayerController : MonoBehaviour
         animator.SetTrigger("Hit");
         // Original Method : currentHealth -= damage;
         currentHealth = Mathf.Max(currentHealth - damage, 0);
-        uiManager.UpdateAndShowPlayerHP(currentHealth,health);
+        UIManager.Instance.UpdateAndShowPlayerHP(currentHealth,health);
         if (currentHealth <= 0)
         {
             Die();
@@ -108,8 +100,10 @@ public class PlayerController : MonoBehaviour
         level++;
         experience = 0;
         experienceToNextLevel += 50; // 每次升级需要更多经验
+        //升级刷新回复血量
         currentHealth = health;
-        uiManager.UpdateAndShowPlayerHP(currentHealth,health);
+        UIManager.Instance.UpdateAndShowPlayerHP(currentHealth,health);
+
         UpgradeManager.Instance.ShowUpgradeOptions();
     }
 
