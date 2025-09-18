@@ -1,12 +1,13 @@
 using System.Threading.Tasks;
 using Unity.PlasticSCM.Editor.WebApi;
+using UnityEditor.Scripting;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
     [Header("Attributes")]
     public int health = 100;
-    public int currentHealth;
+    public int currentHealth = 100;
     public int damage;
     public int level = 1;
     public int experience = 0;
@@ -24,11 +25,24 @@ public class PlayerController : MonoBehaviour
 
     private Rigidbody rb;
     private Animator animator;
+    private UIManager uiManager;
+
+    void Awake()
+    {
+        uiManager = FindObjectOfType<UIManager>();
+        if (uiManager == null)
+        {
+            Debug.LogError("UIManager is null");
+            return;
+        }
+
+        currentHealth = health;
+        uiManager.UpdateAndShowPlayerHP(currentHealth,health);
+    }
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        currentHealth = health;
         animator = GetComponent<Animator>();
     }
 
@@ -70,7 +84,9 @@ public class PlayerController : MonoBehaviour
     {
         Debug.Log($"玩家受到伤害: {damage}");
         animator.SetTrigger("Hit");
-        currentHealth -= damage;
+        // Original Method : currentHealth -= damage;
+        currentHealth = Mathf.Max(currentHealth - damage, 0);
+        uiManager.UpdateAndShowPlayerHP(currentHealth,health);
         if (currentHealth <= 0)
         {
             Die();
@@ -92,6 +108,8 @@ public class PlayerController : MonoBehaviour
         level++;
         experience = 0;
         experienceToNextLevel += 50; // 每次升级需要更多经验
+        currentHealth = health;
+        uiManager.UpdateAndShowPlayerHP(currentHealth,health);
         UpgradeManager.Instance.ShowUpgradeOptions();
     }
 
