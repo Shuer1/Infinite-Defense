@@ -1334,7 +1334,7 @@ MonoBehaviour:
   expReward: 25
   scoreReward: 3
   isDead: 0
-  attackRange: 1.5
+  attackRange: 1.2
   chaseRange: 2.5
   attackCooldown: 1
 --- !u!65 &6826583898504456795
