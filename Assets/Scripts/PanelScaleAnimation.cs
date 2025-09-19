@@ -91,7 +91,6 @@ public class PanelScaleAnimation : MonoBehaviour
             targetPanel.localScale = Vector3.Lerp(startScale, targetScale, t);
             canvasGroup.alpha = Mathf.Lerp(startAlpha, targetAlpha, t);
 
-            LogDebug($"动画中: t={t:F2}, scale={targetPanel.localScale}");
             yield return null;
         }
 
@@ -99,7 +98,6 @@ public class PanelScaleAnimation : MonoBehaviour
         targetPanel.localScale = targetScale;
         canvasGroup.alpha = targetAlpha;
         isAnimating = false;
-        LogDebug($"动画完成: 最终scale={targetPanel.localScale}");
     }
 
     private void EnsureCanvasGroupExists()
@@ -126,7 +124,7 @@ public class PanelScaleAnimation : MonoBehaviour
             }
             else
             {
-                Debug.LogError("未找到RectTransform组件！");
+                Debug.LogError("未找到RectTransform组件!");
                 return;
             }
         }

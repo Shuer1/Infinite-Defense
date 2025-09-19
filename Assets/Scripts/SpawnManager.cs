@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 
 public class SpawnManager : MonoBehaviour
@@ -13,17 +14,18 @@ public class SpawnManager : MonoBehaviour
 
     private int currentWave;
 
+    [Header("勾选以重置当前波数为1")]
+    public bool isPrepareToTest = false;
+
     void Start()
     {
-        // ⚠️测试阶段：默认从第1波开始
-        currentWave = 1;
-
+        /*
         // ✅正式版：从存档加载当前波数
-        //currentWave = SaveManager.GetCurrentWave();   core initiation
-
+        currentWave = SaveManager.GetCurrentWave();
+        */
+        PrepareTest(isPrepareToTest);  //待删除-测试工具
         // 注册波数完成事件
         enemyManager.OnAllEnemiesCleared += StartNextWave;
-
         // 启动当前波
         StartWave(currentWave);
     }
@@ -68,5 +70,21 @@ public class SpawnManager : MonoBehaviour
         currentWave++;
         SaveManager.SaveCurrentWave(currentWave); // 保存进度
         StartWave(currentWave);
+    }
+
+    private void PrepareTest(bool isTest)
+    {
+        if (isTest)
+        {
+            // ⚠️测试阶段：默认从第1波开始
+            currentWave = SaveManager.TestSaveAndGetCurrentWave();
+            Debug.Log("✅已经重置关卡波数进度!关闭isTest选项!重新Play即可!");
+            EditorApplication.isPlaying = false;
+        }
+        else
+        {
+            // ✅正式版：从存档加载当前波数
+            currentWave = SaveManager.GetCurrentWave();
+        }
     }
 }
