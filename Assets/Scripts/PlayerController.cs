@@ -126,6 +126,8 @@ public class PlayerController : MonoBehaviour
         {
             LevelUp();
         }
+
+        UIManager.Instance.ShowAndUpdatePlayerExp(experience,experienceToNextLevel); //统一更新经验信息
     }
 
     void LevelUp()
@@ -135,8 +137,7 @@ public class PlayerController : MonoBehaviour
         experienceToNextLevel += 50; // 每次升级需要更多经验
         //升级刷新回复血量
         currentHealth = health;
-        UIManager.Instance.UpdateAndShowPlayerHP(currentHealth,health);
-
+        UIManager.Instance.UpdateAndShowPlayerHP(currentHealth, health);
         UpgradeManager.Instance.ShowUpgradeOptions();
     }
 
@@ -156,9 +157,9 @@ public class PlayerController : MonoBehaviour
         animator.SetBool("Shoot", Input.GetMouseButton(0));
     }
 
-    public void ResetToLive() //复活功能 - 用于激励广告！提高游戏宽容度！
+    private void ResetToLive() //复活功能 - 用于激励广告！提高游戏宽容度！
     {
-
+        
     }
 
     void InitiatePlayerInfo()  //游戏开始时，初始化玩家数据信息

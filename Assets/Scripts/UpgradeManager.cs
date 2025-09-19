@@ -169,6 +169,7 @@ public class UpgradeManager : MonoBehaviour
 
         bulletPrefab.damage += value;
         UpdateAllPooledBulletsDamage(bulletPrefab.damage);
+        UIManager.Instance.ShowAndUpdatePlayerAttack(bulletPrefab.damage); //更新显示UI
         Debug.Log($"子弹攻击力提升! 新攻击力: {bulletPrefab.damage}");
     }
 
@@ -187,6 +188,7 @@ public class UpgradeManager : MonoBehaviour
 
         playerController.health += value;
         playerController.currentHealth = playerController.health;
+        UIManager.Instance.UpdateAndShowPlayerHP(playerController.currentHealth,playerController.health);
         Debug.Log($"最大生命值提升! 当前生命值: {playerController.health}");
     }
 
