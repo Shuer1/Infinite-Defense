@@ -1,7 +1,9 @@
 using System.Threading.Tasks;
 using Unity.PlasticSCM.Editor.WebApi;
+using Unity.VisualScripting;
 using UnityEditor.Scripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -30,9 +32,12 @@ public class PlayerController : MonoBehaviour
     [Header("玩家音效")]
     public AudioSource moveSound;
     public AudioSource shootSound;
+    [Header("按钮Btn_UI_Element")]
+    public Button btn_ResetLive;
 
     void Awake()
     {
+        InitiatePlayerInfo();
         currentHealth = health;
         UIManager.Instance.UpdateAndShowPlayerHP(currentHealth,health);
     }
@@ -157,13 +162,13 @@ public class PlayerController : MonoBehaviour
         animator.SetBool("Shoot", Input.GetMouseButton(0));
     }
 
-    private void ResetToLive() //复活功能 - 用于激励广告！提高游戏宽容度！
+    public void ResetLive() //复活功能 - 用于激励广告！提高游戏宽容度!
     {
-        
+        Debug.Log("选择复活!");
     }
 
     void InitiatePlayerInfo()  //游戏开始时，初始化玩家数据信息
     {
-        
+        Debug.Log("初始化玩家信息完成!True!");
     }
 }
