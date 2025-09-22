@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &1734673711578244627
+--- !u!1 &1798052242460508876
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,48 +8,48 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 4550018249206622140}
-  - component: {fileID: 1691575190958749358}
-  - component: {fileID: 7458760520979243239}
-  - component: {fileID: 3421113048057298871}
-  - component: {fileID: 741479308755480698}
+  - component: {fileID: 2434742502399738960}
+  - component: {fileID: 8094736926251898620}
+  - component: {fileID: 5861376355530138435}
+  - component: {fileID: 5506194066829774227}
+  - component: {fileID: 5092929290123476697}
   m_Layer: 0
-  m_Name: Bullet
+  m_Name: FrostBullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4550018249206622140
+--- !u!4 &2434742502399738960
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1734673711578244627}
+  m_GameObject: {fileID: 1798052242460508876}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.508}
-  m_LocalScale: {x: 0.04, y: 0.04, z: 0.19999999}
-  m_ConstrainProportionsScale: 1
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.04, y: 0.04, z: 0.2}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &1691575190958749358
+--- !u!33 &8094736926251898620
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1734673711578244627}
+  m_GameObject: {fileID: 1798052242460508876}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &7458760520979243239
+--- !u!23 &5861376355530138435
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1734673711578244627}
+  m_GameObject: {fileID: 1798052242460508876}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -85,13 +85,13 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &3421113048057298871
+--- !u!65 &5506194066829774227
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1734673711578244627}
+  m_GameObject: {fileID: 1798052242460508876}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -106,18 +106,24 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &741479308755480698
+--- !u!114 &5092929290123476697
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1734673711578244627}
+  m_GameObject: {fileID: 1798052242460508876}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b5213d87ecb7b4ac69ed090ce7d9bf79, type: 3}
+  m_Script: {fileID: 11500000, guid: 4cca3e30f79ea4046b6264697333d3ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 20
-  damage: 40
+  speed: 15
+  damage: 10
   lifeTime: 2
+  frostRadius: 2
+  frostDamage: 3
+  slowPercentage: 50
+  slowDuration: 2
+  hitEffect: {fileID: 0}
+  hitSound: {fileID: 8300000, guid: 000393e3a6a7942a0ba3b2f5e68de444, type: 3}

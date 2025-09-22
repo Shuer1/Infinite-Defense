@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using UnityEngine;
 
 public class Bullet : MonoBehaviour
@@ -6,6 +7,7 @@ public class Bullet : MonoBehaviour
     public int damage = 10;
     public float lifeTime = 2f;
     private float timer;
+
     void OnEnable()
     {
         timer = 0f;
@@ -13,7 +15,7 @@ public class Bullet : MonoBehaviour
 
     void Awake()
     {
-        
+
     }
 
     void Update()
@@ -27,16 +29,23 @@ public class Bullet : MonoBehaviour
         }
     }
 
-    void OnTriggerEnter(Collider other)
+    // 添加可被重写的触发方法
+    protected virtual void OnTriggerEnter(Collider other)
     {
+        // 基类默认实现（可以留空或实现基础逻辑）
         if (other.CompareTag("Enemy"))
         {
+            // 基础子弹逻辑（如果需要）
             EnemyBase enemy = other.GetComponent<EnemyBase>();
-            if (enemy != null)
-            {
-                enemy.TakeDamage(damage);
-            }
-            gameObject.SetActive(false); // 回收，而不是 Destroy
+            enemy?.TakeDamage(damage);
+
+            // 回收子弹
+            gameObject.SetActive(false);
         }
+    }
+
+    private void ResetBullet()
+    {
+        
     }
 }
