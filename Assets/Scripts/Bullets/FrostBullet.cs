@@ -12,21 +12,22 @@ public class FrostBullet : Bullet
     public float slowPercentage = 50f; // 减速百分比数值（50%）
     public float slowDuration = 2f; // 减速持续时间
     [Header("冰冻特效及音效")]
-    public ParticleSystem hitEffect;
+    public GameObject frostEffectPrefab; // 修复类型为GameObject，适配对象池
     public AudioClip hitSound;
 
     protected override void OnTriggerEnter(Collider other)
     {
-        // 播放特效
-        if (hitEffect != null)
+        // 从对象池获取并播放特效（替换Instantiate）
+        if (frostEffectPrefab != null)
         {
-            Instantiate(hitEffect, transform.position, transform.rotation);
+            Debug.Log("Shoot Frost Bullet");
+            ParticleEffectPool.Instance.PlayEffect(frostEffectPrefab, transform.position, transform.rotation);
         }
-        // 播放音效（需AudioSource组件）
+        // 播放音效（保持不变）
         AudioSource.PlayClipAtPoint(hitSound, transform.position);
 
         base.OnTriggerEnter(other);
-        // 检测范围内所有敌人
+        // 检测范围内所有敌人（保持不变）
         Collider[] colliders = Physics.OverlapSphere(transform.position, frostRadius);
         foreach (var col in colliders)
         {
@@ -38,11 +39,11 @@ public class FrostBullet : Bullet
             }
         }
 
-        // 回收子弹
+        // 回收子弹（保持不变）
         gameObject.SetActive(false);
     }
 
-    // 绘制Gizmos方便调试减速范围
+    // 绘制Gizmos（保持不变）
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.cyan;

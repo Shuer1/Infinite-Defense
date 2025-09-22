@@ -34,12 +34,19 @@ public class PlayerController : MonoBehaviour
     public AudioSource shootSound;
     [Header("按钮Btn_UI_Element")]
     public Button btn_ResetLive;
+    [Header("子弹概率配置")]
+    [Range(0, 100)]
+    public int normalBulletChance = 100;
+    [Range(0, 100)]
+    public int explosiveBulletChance = 0;
+    private int frostBulletChance => 100 - normalBulletChance - explosiveBulletChance;
+
 
     void Awake()
     {
         InitiatePlayerInfo();
         currentHealth = health;
-        UIManager.Instance.UpdateAndShowPlayerHP(currentHealth,health);
+        UIManager.Instance.UpdateAndShowPlayerHP(currentHealth, health);
     }
 
     void Start()
@@ -67,14 +74,14 @@ public class PlayerController : MonoBehaviour
         rb.velocity = move;
 
         // 判断是否在移动（输入值超过阈值）
-        bool isMovingNow = (h * h + v * v) > moveThreshold * moveThreshold; 
+        bool isMovingNow = (h * h + v * v) > moveThreshold * moveThreshold;
         // 用平方和判断，避免开方运算，效率更高
 
         // 状态变化时更新音效
         if (isMovingNow != isMoving)
         {
             isMoving = isMovingNow;
-            
+
             if (isMoving)
             {
                 // 开始移动：播放音效
@@ -105,9 +112,52 @@ public class PlayerController : MonoBehaviour
         AnimatorFunc();
     }
 
+    // 修改Shoot()方法，添加空检查和调试输出
     void Shoot()
     {
-        BulletPool.Instance.GetBullet(firePoint.position, firePoint.rotation);
+        ClampProbabilities(); // 每次射击前强制修正概率，确保合法性
+
+        // 调试输出当前概率配置（方便排查）
+        Debug.Log($"当前子弹概率 - 普通: {normalBulletChance}%, 爆炸: {explosiveBulletChance}%, 冰冻: {frostBulletChance}%");
+
+        int randomValue = Random.Range(0, 100);
+        Debug.Log($"随机值: {randomValue}"); // 输出随机值，验证是否进入目标分支
+
+        int cumulativeProbability = 0;
+
+        // 普通子弹
+        cumulativeProbability += normalBulletChance;
+        if (randomValue < cumulativeProbability)
+        {
+            if (BulletPool.Instance == null)
+            {
+                Debug.LogError("普通子弹池未初始化！请检查BulletPool的Instance设置");
+                return;
+            }
+            BulletPool.Instance.GetBullet(firePoint.position, firePoint.rotation);
+            return;
+        }
+
+        // 爆炸子弹
+        cumulativeProbability += explosiveBulletChance;
+        if (randomValue < cumulativeProbability)
+        {
+            if (ExplosiveBulletPool.Instance == null)
+            {
+                Debug.LogError("爆炸子弹池未初始化！请检查ExplosiveBulletPool的Instance设置");
+                return;
+            }
+            ExplosiveBulletPool.Instance.GetBullet(firePoint.position, firePoint.rotation);
+            return;
+        }
+
+        // 冰冻子弹
+        if (FrostBulletPool.Instance == null)
+        {
+            Debug.LogError("冰冻子弹池未初始化！请检查FrostBulletPool的Instance设置");
+            return;
+        }
+        FrostBulletPool.Instance.GetBullet(firePoint.position, firePoint.rotation);
     }
 
     public void TakeDamage(int damage)
@@ -116,7 +166,7 @@ public class PlayerController : MonoBehaviour
         animator.SetTrigger("Hit");
         // Original Method : currentHealth -= damage;
         currentHealth = Mathf.Max(currentHealth - damage, 0);
-        UIManager.Instance.UpdateAndShowPlayerHP(currentHealth,health);
+        UIManager.Instance.UpdateAndShowPlayerHP(currentHealth, health);
         if (currentHealth <= 0)
         {
             Die();
@@ -132,7 +182,7 @@ public class PlayerController : MonoBehaviour
             LevelUp();
         }
 
-        UIManager.Instance.ShowAndUpdatePlayerExp(experience,experienceToNextLevel); //统一更新经验信息
+        UIManager.Instance.ShowAndUpdatePlayerExp(experience, experienceToNextLevel); //统一更新经验信息
     }
 
     void LevelUp()
@@ -171,4 +221,51 @@ public class PlayerController : MonoBehaviour
     {
         Debug.Log("初始化玩家信息完成!True!");
     }
+    
+    private void ClampProbabilities()
+    {
+        // 限制普通子弹概率范围
+        normalBulletChance = Mathf.Clamp(normalBulletChance, 0, 100);
+        // 限制爆炸子弹概率范围（剩余可用概率内）
+        explosiveBulletChance = Mathf.Clamp(explosiveBulletChance, 0, 100 - normalBulletChance);
+        // 此时冰冻子弹概率自动为非负且总和为100
+    }
+
+    /// <summary>
+    /// 调整子弹概率（用于升级或加成系统）
+    /// </summary>
+    /// <param name="normalDelta">普通子弹概率变化量（可正可负）</param>
+    /// <param name="explosiveDelta">爆炸子弹概率变化量（可正可负）</param>
+    // 补充：在设置概率的方法中显式调用修正逻辑（原代码已包含，这里强化注释）
+    public void AdjustBulletChances(int normalDelta, int explosiveDelta)
+    {
+        normalBulletChance += normalDelta;
+        explosiveBulletChance += explosiveDelta;
+        ClampProbabilities(); // 确保修正
+    }
+
+    public void SetBulletChance(BulletType bulletType, int newPercentage)
+    {
+        switch (bulletType)
+        {
+            case BulletType.Normal:
+                normalBulletChance = newPercentage;
+                break;
+            case BulletType.Explosive:
+                explosiveBulletChance = newPercentage;
+                break;
+            case BulletType.Frost:
+                int delta = (100 - normalBulletChance - explosiveBulletChance) - newPercentage;
+                explosiveBulletChance += delta;
+                break;
+        }
+        ClampProbabilities(); // 确保修正
+    }
+}
+
+public enum BulletType
+{
+    Normal,    // 普通子弹
+    Explosive, // 爆炸子弹
+    Frost      // 冰冻子弹
 }
