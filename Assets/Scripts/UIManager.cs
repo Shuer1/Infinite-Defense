@@ -11,6 +11,7 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI maxHPText;
     public TextMeshProUGUI attack;
     public TextMeshProUGUI exp;
+    [Header("Game Over Info")]
     public GameObject gameOverPanel;
 
     void Awake()
@@ -35,8 +36,6 @@ public class UIManager : MonoBehaviour
     public void ShowGameOver(int score, int highScore)
     {
         gameOverPanel.SetActive(true);
-        scoreText.text = "Score: " + score;
-        highScoreText.text = "High Score: " + highScore;
     }
 
     public void UpdateAndShowPlayerHP(int currentHP, int maxHP)
