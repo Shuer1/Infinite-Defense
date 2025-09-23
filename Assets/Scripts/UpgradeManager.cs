@@ -18,6 +18,8 @@ public class UpgradeManager : MonoBehaviour
 
     [Tooltip("拖入子弹预制体")]
     public Bullet bulletPrefab;
+    public ExplosiveBullet explosiveBulletPrefab;
+    public FrostBullet frostBulletPrefab;
     //升级特效、音效
     [SerializeField] private ParticleSystem upgradeEffect;
     private ParticleSystem.MainModule mainModule;

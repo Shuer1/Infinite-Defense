@@ -66,7 +66,7 @@ public class BulletPool : MonoBehaviour
         return pool.ToArray();  // 将队列转换为数组返回，避免直接操作内部队列
     }
 
-    /// 回收子弹
+    /// 手动调用，回收子弹
     public void ReturnBullet(GameObject bullet)
     {
         if (bullet != null)

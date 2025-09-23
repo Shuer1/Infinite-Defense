@@ -1,8 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// 冰冻子弹：命中后产生范围减速效果
-/// </summary>
 public class FrostBullet : Bullet
 {
     [Header("冰冻特性")]

@@ -17,13 +17,9 @@ public class ExplosiveBullet : Bullet
         // 从对象池获取并播放特效（替换Instantiate）
         if (hitEffectPrefab != null)
         {
-            Debug.Log("Shoot Explosive Bullet");
             ParticleEffectPool.Instance.PlayEffect(hitEffectPrefab, transform.position, transform.rotation);
         }
-        else
-        {
-            Debug.LogError("Explosion effect is null!");
-        }
+        
         // 播放音效（保持不变）
         AudioSource.PlayClipAtPoint(hitSound, transform.position);
         base.OnTriggerEnter(other);
