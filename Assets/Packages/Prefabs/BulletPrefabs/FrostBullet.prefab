@@ -63,7 +63,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: f4f4e4650895446c6a184a2d94676e9c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -125,5 +125,5 @@ MonoBehaviour:
   frostDamage: 3
   slowPercentage: 50
   slowDuration: 2
-  hitEffect: {fileID: 7817930246235817348, guid: ae205193434e84fe6a5e291b48c4d5d4, type: 3}
+  frostEffectPrefab: {fileID: 6004755151496686226, guid: ae205193434e84fe6a5e291b48c4d5d4, type: 3}
   hitSound: {fileID: 8300000, guid: 000393e3a6a7942a0ba3b2f5e68de444, type: 3}

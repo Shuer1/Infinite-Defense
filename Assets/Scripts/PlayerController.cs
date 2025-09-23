@@ -16,7 +16,6 @@ public class PlayerController : MonoBehaviour
     public int experienceToNextLevel = 100;
 
     [Header("Movement & Shooting")]
-    public GameObject bulletPrefab;
     public Transform firePoint;
     public float fireRate = 0.3f;
     private float fireTimer;
@@ -112,7 +111,6 @@ public class PlayerController : MonoBehaviour
         AnimatorFunc();
     }
 
-    // 修改Shoot()方法，添加空检查和调试输出
     void Shoot()
     {
         ClampProbabilities(); // 每次射击前强制修正概率，确保合法性
@@ -131,7 +129,7 @@ public class PlayerController : MonoBehaviour
         {
             if (BulletPool.Instance == null)
             {
-                Debug.LogError("普通子弹池未初始化！请检查BulletPool的Instance设置");
+                Debug.LogError("普通子弹池未初始化!请检查BulletPool的Instance设置");
                 return;
             }
             BulletPool.Instance.GetBullet(firePoint.position, firePoint.rotation);
@@ -144,7 +142,7 @@ public class PlayerController : MonoBehaviour
         {
             if (ExplosiveBulletPool.Instance == null)
             {
-                Debug.LogError("爆炸子弹池未初始化！请检查ExplosiveBulletPool的Instance设置");
+                Debug.LogError("爆炸子弹池未初始化!请检查ExplosiveBulletPool的Instance设置");
                 return;
             }
             ExplosiveBulletPool.Instance.GetBullet(firePoint.position, firePoint.rotation);
@@ -154,7 +152,7 @@ public class PlayerController : MonoBehaviour
         // 冰冻子弹
         if (FrostBulletPool.Instance == null)
         {
-            Debug.LogError("冰冻子弹池未初始化！请检查FrostBulletPool的Instance设置");
+            Debug.LogError("冰冻子弹池未初始化!请检查FrostBulletPool的Instance设置");
             return;
         }
         FrostBulletPool.Instance.GetBullet(firePoint.position, firePoint.rotation);

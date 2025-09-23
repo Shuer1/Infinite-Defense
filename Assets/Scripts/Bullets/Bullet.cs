@@ -44,7 +44,7 @@ public class Bullet : MonoBehaviour
         }
     }
 
-    private void ResetBullet()
+    private void ResetBullet() //特殊类型子弹的特效、状态重置等
     {
         
     }

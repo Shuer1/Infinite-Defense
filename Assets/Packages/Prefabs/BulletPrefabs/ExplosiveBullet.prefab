@@ -63,7 +63,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: bed131b0e5094425282e8a37cc06cc04, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -123,5 +123,5 @@ MonoBehaviour:
   lifeTime: 2
   explosionRadius: 2
   explosionDamage: 5
-  hitEffect: {fileID: 6118532528513622706, guid: f183a4f2538424d42aab1b82a46567cb, type: 3}
+  hitEffectPrefab: {fileID: 8602304315960938330, guid: f183a4f2538424d42aab1b82a46567cb, type: 3}
   hitSound: {fileID: 8300000, guid: 90f94821fe37743d08308eb0c50a6450, type: 3}

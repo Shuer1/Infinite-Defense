@@ -20,6 +20,10 @@ public class ExplosiveBullet : Bullet
             Debug.Log("Shoot Explosive Bullet");
             ParticleEffectPool.Instance.PlayEffect(hitEffectPrefab, transform.position, transform.rotation);
         }
+        else
+        {
+            Debug.LogError("Explosion effect is null!");
+        }
         // 播放音效（保持不变）
         AudioSource.PlayClipAtPoint(hitSound, transform.position);
         base.OnTriggerEnter(other);

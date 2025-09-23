@@ -3080,7 +3080,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 419411002348774512, guid: 247a3e752e93a864db063f5c85fd8391, type: 3}
       propertyPath: m_Name
-      value: Aura Buff
+      value: Upgrade Effect
       objectReference: {fileID: 0}
     - target: {fileID: 419411002348774512, guid: 247a3e752e93a864db063f5c85fd8391, type: 3}
       propertyPath: m_IsActive
@@ -3551,7 +3551,6 @@ MonoBehaviour:
   level: 1
   experience: 0
   experienceToNextLevel: 100
-  bulletPrefab: {fileID: 1734673711578244627, guid: 440645d6786d7401bb64687ebbea99be, type: 3}
   firePoint: {fileID: 1050021790}
   fireRate: 0.2
   moveSpeed: 5
@@ -3957,9 +3956,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   effectConfigs:
-  - effectPrefab: {fileID: 6752434346227649632, guid: 4898056eac8fe4ed4b6a013151ee4642, type: 3}
+  - effectPrefab: {fileID: 8602304315960938330, guid: f183a4f2538424d42aab1b82a46567cb, type: 3}
     initialSize: 5
-  - effectPrefab: {fileID: 1798052242460508876, guid: a7f7c92e4227049f5b634ae1c99edcb2, type: 3}
+  - effectPrefab: {fileID: 6004755151496686226, guid: ae205193434e84fe6a5e291b48c4d5d4, type: 3}
     initialSize: 5
 --- !u!1 &1120021339
 GameObject:

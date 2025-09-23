@@ -23,6 +23,10 @@ public class FrostBullet : Bullet
             Debug.Log("Shoot Frost Bullet");
             ParticleEffectPool.Instance.PlayEffect(frostEffectPrefab, transform.position, transform.rotation);
         }
+        else
+        {
+            Debug.LogError("Frost effect is null");
+        }
         // 播放音效（保持不变）
         AudioSource.PlayClipAtPoint(hitSound, transform.position);
 
