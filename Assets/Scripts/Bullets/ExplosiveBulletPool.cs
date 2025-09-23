@@ -11,7 +11,7 @@ public class ExplosiveBulletPool : MonoBehaviour
     public GameObject explosiveBulletPrefab; // 爆炸子弹预制体
     public int poolSize = 20;
 
-    private Queue<GameObject> pool = new Queue<GameObject>();
+    private Queue<GameObject> pool = new();
 
     void Awake()
     {

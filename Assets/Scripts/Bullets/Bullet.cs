@@ -5,7 +5,7 @@ public class Bullet : MonoBehaviour
 {
     public float speed = 15f;
     public int damage = 10;
-    public float lifeTime = 2f;
+    public float lifeTime = 2f; //控制子弹回收
     private float timer;
 
     void OnEnable()

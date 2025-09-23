@@ -39,7 +39,7 @@ public class ExplosiveBullet : Bullet
             }
         }
 
-        // 回收子弹（保持不变）
+        // 回收子弹（保持不变
         gameObject.SetActive(false);
     }
 

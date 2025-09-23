@@ -1,4 +1,3 @@
-using UnityEditor;
 using UnityEngine;
 
 public class SpawnManager : MonoBehaviour
@@ -78,8 +77,7 @@ public class SpawnManager : MonoBehaviour
         {
             // ⚠️测试阶段：默认从第1波开始
             currentWave = SaveManager.TestSaveAndGetCurrentWave();
-            Debug.Log("✅已经重置关卡波数进度!关闭isTest选项!重新Play即可!");
-            EditorApplication.isPlaying = false;
+            Debug.LogError("✅已经重置关卡波数进度!关闭isTest选项!重新Play即可!");
         }
         else
         {

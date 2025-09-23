@@ -1,7 +1,6 @@
 using System.Threading.Tasks;
-using Unity.PlasticSCM.Editor.WebApi;
-using Unity.VisualScripting;
-using UnityEditor.Scripting;
+//using Unity.PlasticSCM.Editor.WebApi;
+//using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -61,13 +60,13 @@ public class PlayerController : MonoBehaviour
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
 
-#if UNITY_ANDROID || UNITY_IOS
-        if (joystick != null)
-        {
-            h = joystick.Horizontal;
-            v = joystick.Vertical;
-        }
-#endif
+        #if UNITY_ANDROID || UNITY_IOS || UNITY_WEBGL
+                if (joystick != null)
+                {
+                    h = joystick.Horizontal;
+                    v = joystick.Vertical;
+                }
+        #endif
 
         Vector3 move = new Vector3(h, 0, v) * moveSpeed;
         rb.velocity = move;

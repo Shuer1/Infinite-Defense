@@ -8,7 +8,7 @@ public class BulletPool : MonoBehaviour
     public GameObject bulletPrefab;
     public int poolSize = 20;
 
-    private Queue<GameObject> pool = new Queue<GameObject>();
+    private Queue<GameObject> pool = new();
 
     void Awake()
     {
@@ -66,9 +66,7 @@ public class BulletPool : MonoBehaviour
         return pool.ToArray();  // 将队列转换为数组返回，避免直接操作内部队列
     }
 
-    /// <summary>
-    /// 回收子弹（可选：如果需要手动回收可以调用）
-    /// </summary>
+    /// 回收子弹
     public void ReturnBullet(GameObject bullet)
     {
         if (bullet != null)
