@@ -25,7 +25,7 @@ public static class SaveManager
         }
     }
 
-    //Test PlayerPref.Save()
+    //Test PlayerPref.Save()   可选操作：正式版发布时，直接删除及其引用
     public static int TestSaveAndGetCurrentWave()
     {
         PlayerPrefs.SetInt(CurrentWaveKey, 1);

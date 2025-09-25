@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class SpawnManager : MonoBehaviour
@@ -19,10 +20,10 @@ public class SpawnManager : MonoBehaviour
     void Start()
     {
         /*
-        // ✅正式版：从存档加载当前波数
+        // ✅正式版：待开启    （可选）将PrepareTest()方法完全删除，实现从存档加载当前波数
         currentWave = SaveManager.GetCurrentWave();
         */
-        PrepareTest(isPrepareToTest);  //待删除-测试工具
+        PrepareTest(isPrepareToTest);  //待删除-测试工具方法
         // 注册波数完成事件
         enemyManager.OnAllEnemiesCleared += StartNextWave;
         // 启动当前波
@@ -40,11 +41,11 @@ public class SpawnManager : MonoBehaviour
         for (int i = 0; i < enemyCount; i++)
         {
             // 随机生成位置（平面上）
-            Vector3 spawnPos = Random.onUnitSphere * spawnRadius;
+            Vector3 spawnPos = UnityEngine.Random.onUnitSphere * spawnRadius;
             spawnPos.y = 0;
 
             // 随机决定怪物类型
-            EnemyType type = Random.value < heavyChance ? EnemyType.Heavy : EnemyType.Basic;
+            EnemyType type = UnityEngine.Random.value < heavyChance ? EnemyType.Heavy : EnemyType.Basic;
 
             // 从对象池获取怪物
             enemyManager.GetEnemy(type, spawnPos, Quaternion.identity);
@@ -75,7 +76,7 @@ public class SpawnManager : MonoBehaviour
     {
         if (isTest)
         {
-            // ⚠️测试阶段：默认从第1波开始
+            // ⚠️测试阶段：勾选重置数据从第1波开始
             currentWave = SaveManager.TestSaveAndGetCurrentWave();
             Debug.LogError("✅已经重置关卡波数进度!关闭isTest选项!重新Play即可!");
         }

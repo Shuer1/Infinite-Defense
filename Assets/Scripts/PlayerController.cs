@@ -43,7 +43,6 @@ public class PlayerController : MonoBehaviour
     void Awake()
     {
         InitiatePlayerInfo();
-        currentHealth = health;
         UIManager.Instance.UpdateAndShowPlayerHP(currentHealth, health);
     }
 
@@ -114,11 +113,7 @@ public class PlayerController : MonoBehaviour
     {
         ClampProbabilities(); // 每次射击前强制修正概率，确保合法性
 
-        // 调试输出当前概率配置（方便排查）
-        Debug.Log($"当前子弹概率 - 普通: {normalBulletChance}%, 爆炸: {explosiveBulletChance}%, 冰冻: {frostBulletChance}%");
-
         int randomValue = Random.Range(0, 100);
-        Debug.Log($"随机值: {randomValue}"); // 输出随机值，验证是否进入目标分支
 
         int cumulativeProbability = 0;
 
@@ -217,6 +212,7 @@ public class PlayerController : MonoBehaviour
     void InitiatePlayerInfo()  //游戏开始时，初始化玩家数据信息
     {
         Debug.Log("初始化玩家信息完成!True!");
+        currentHealth = health;
     }
     
     private void ClampProbabilities()
