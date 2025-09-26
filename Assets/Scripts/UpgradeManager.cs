@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using Unity.VisualScripting;
 
 public class UpgradeManager : MonoBehaviour
 {
@@ -24,6 +25,20 @@ public class UpgradeManager : MonoBehaviour
     [SerializeField] private ParticleSystem upgradeEffect;
     private ParticleSystem.MainModule mainModule;
     [SerializeField] private AudioSource upgradeAudio;
+
+    public enum PoolType
+    {
+        BulletPool,          // 普通子弹池
+        ExplosiveBulletPool, // 爆炸子弹池
+        FrostBulletPool      // 冰冻子弹池
+    }
+
+    public enum BulletType
+    {
+        Bullet,
+        ExplosiveBullet,
+        FrostBullet
+    }
 
     private void Awake()
     {
@@ -128,33 +143,26 @@ public class UpgradeManager : MonoBehaviour
     {
         switch (upgradeId)
         {
-            case "Attack":
+            case "Attack":                  //普通子弹攻击力
                 ApplyAttackUpgrade(value);
                 break;
-            case "FireRate":
+            case "FireRate":                //玩家射速
                 ApplyFireRateUpgrade(value);
                 break;
-            case "MaxHealth":
+            case "MaxHealth":               //玩家最大血量
                 ApplyMaxHealthUpgrade(value);
                 break;
-            /*
-            case "MoveSpeed":
-                ApplyMoveSpeedUpgrade(value);
+            case "AddChanceForExplosive":   //增加烈焰弹发射几率
+                GetOrAddSpecialBullet(value);
                 break;
-            */
-            case "SlowTime":
-                ApplySlowTimeLongerUpgrade(value);
+            case "AddChanceForFrost":       //增加冰霜弹发射几率
+                GetOrAddSpecialBullet(value);
                 break;
-
-            case "BulletRange":
+            case "ExploseRange":            //提升烈焰弹伤害范围
                 ApplyBulletRangeUpgrade(value);
                 break;
-
-            case "Explosive":
-                GetSpecialBullet(value);
-                break;
-            case "Slow":
-                GetSpecialBullet(value);
+            case "SlowTime":                //提升冰霜弹减速时长
+                ApplySlowTimeLongerUpgrade(value);
                 break;
             default:
                 Debug.LogWarning($"未知的升级类型: {upgradeId}");
@@ -170,7 +178,7 @@ public class UpgradeManager : MonoBehaviour
         if (bulletPrefab == null) return;
 
         bulletPrefab.damage += value;
-        UpdateAllPooledBulletsDamage(bulletPrefab.damage);
+        UpdateAllPooledBulletsDamage(BulletType.Bullet,PoolType.BulletPool,bulletPrefab.damage);
         UIManager.Instance.ShowAndUpdatePlayerAttack(bulletPrefab.damage); //更新显示UI
         Debug.Log($"子弹攻击力提升! 新攻击力: {bulletPrefab.damage}");
     }
@@ -190,66 +198,108 @@ public class UpgradeManager : MonoBehaviour
 
         playerController.health += value;
         playerController.currentHealth = playerController.health;
-        UIManager.Instance.UpdateAndShowPlayerHP(playerController.currentHealth,playerController.health);
+        UIManager.Instance.UpdateAndShowPlayerHP(playerController.currentHealth, playerController.health);
         Debug.Log($"最大生命值提升! 当前生命值: {playerController.health}");
     }
 
-    private void ApplyMoveSpeedUpgrade(int value) //4、移动速度增加
+    private void GetOrAddSpecialBullet(int value) //4and5、获得特殊子弹OR增加特殊子弹发射几率
     {
-        if (playerController == null) return;
+        if (explosiveBulletPrefab == null || frostBulletPrefab == null) return;
 
-        playerController.moveSpeed += value * 0.1f;
-        Debug.Log($"移动速度提升! 当前速度: {playerController.moveSpeed:F2}");
+        switch (value)
+        {
+            case 1:
+                Debug.Log("Develop Explosive Bullet!");
+                explosiveBulletPrefab.explosionDamage += 5;
+                // 同步更新对象池中的爆炸子弹伤害
+                UpdateAllPooledBulletsDamage(BulletType.ExplosiveBullet, PoolType.ExplosiveBulletPool, explosiveBulletPrefab.explosionDamage);
+                break;
+            case 2:
+                Debug.Log("Develop Frost Bullet!");
+                frostBulletPrefab.damage += 5;
+                // 同步更新对象池中的冰冻子弹伤害
+                UpdateAllPooledBulletsDamage(BulletType.FrostBullet, PoolType.FrostBulletPool, frostBulletPrefab.damage);
+                break;
+        }
     }
 
     private void ApplySlowTimeLongerUpgrade(int value)
     {
         // 实现冰冻时间延长
-        Debug.Log("You get longer duration of freezing");
+        Debug.Log("The freezing time of frost bullet increases");
     }
 
     private void ApplyBulletRangeUpgrade(int value)
     {
-        // 实现子弹射程升级逻辑
+        // 实现烈焰弹范围升级逻辑
         Debug.Log($"爆炸范围提升: {value}");
     }
 
-    private void GetSpecialBullet(int value)
+    /// 更新对象池中所有子弹的攻击力/特殊伤害
+    private void UpdateAllPooledBulletsDamage(BulletType bulletType, PoolType poolType, int newDamage)
     {
-        switch (value)
+        // 根据池类型获取对应的对象池实例及子弹列表
+        IEnumerable<GameObject> bulletList = GetBulletListByPoolType(poolType);
+        if (bulletList == null)
         {
-            case 1:
-                Debug.Log("You get Explosive Bullet!");
-                break;
-            case 2:
-                Debug.Log("You get Ice Bullet!");
-                break;
+            Debug.LogWarning($"更新失败：{poolType} 实例不存在或池中无子弹");
+            return;
         }
-    }
-
-    /// <summary>
-    /// 更新对象池中所有子弹的攻击力
-    /// </summary>
-    private void UpdateAllPooledBulletsDamage(int newDamage)
-    {
-        if (BulletPool.Instance == null) return;
 
         int updatedCount = 0;
-        foreach (var bulletObj in BulletPool.Instance.GetAllBullets())
+        foreach (var bulletObj in bulletList)
         {
-            if (bulletObj != null)
+            // 跳过空对象或已销毁的子弹
+            if (bulletObj == null || !bulletObj.activeInHierarchy)
+                continue;
+
+            // 根据子弹类型更新对应伤害属性
+            switch (bulletType)
             {
-                Bullet bullet = bulletObj.GetComponent<Bullet>();
-                if (bullet != null)
-                {
-                    bullet.damage = newDamage;
-                    updatedCount++;
-                }
+                case BulletType.Bullet:
+                    Bullet bullet = bulletObj.GetComponent<Bullet>();
+                    if (bullet != null)
+                    {
+                        bullet.damage = newDamage;
+                        updatedCount++;
+                    }
+                    break;
+                case BulletType.ExplosiveBullet:
+                    ExplosiveBullet explosive = bulletObj.GetComponent<ExplosiveBullet>();
+                    if (explosive != null)
+                    {
+                        explosive.explosionDamage = newDamage;
+                        updatedCount++;
+                    }
+                    break;
+                case BulletType.FrostBullet:
+                    FrostBullet frost = bulletObj.GetComponent<FrostBullet>();
+                    if (frost != null)
+                    {
+                        frost.damage = newDamage;
+                        updatedCount++;
+                    }
+                    break;
             }
         }
 
-        Debug.Log($"已更新对象池中 {updatedCount} 个子弹的攻击力");
+        Debug.Log($"已更新 {poolType} 中 {updatedCount} 个子弹的伤害(新值：{newDamage})");
     }
-    
+
+    // 根据池类型获取对应的子弹列表
+    private IEnumerable<GameObject> GetBulletListByPoolType(PoolType poolType)
+    {
+        switch (poolType)
+        {
+            case PoolType.BulletPool:
+                return BulletPool.Instance != null ? BulletPool.Instance.GetAllBullets() : null;
+            case PoolType.ExplosiveBulletPool:
+                return ExplosiveBulletPool.Instance != null ? ExplosiveBulletPool.Instance.GetAllBullets() : null;
+            case PoolType.FrostBulletPool:
+                return FrostBulletPool.Instance != null ? FrostBulletPool.Instance.GetAllBullets() : null;
+            default:
+                Debug.LogError($"未定义的池类型：{poolType}");
+                return null;
+        }
+    }
 }
-    
