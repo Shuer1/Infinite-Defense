@@ -43,7 +43,7 @@ public class PlayerController : MonoBehaviour
     void Awake()
     {
         InitiatePlayerInfo();
-        UIManager.Instance.UpdateAndShowPlayerHP(currentHealth, health);
+        //UIManager.Instance.UpdateAndShowPlayerHP(currentHealth, health);
     }
 
     void Start()

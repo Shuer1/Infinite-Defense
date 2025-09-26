@@ -12,7 +12,7 @@ public class BulletPool : MonoBehaviour
 
     void Awake()
     {
-        // 完善单例模式，防止重复实例
+        // 单例
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
