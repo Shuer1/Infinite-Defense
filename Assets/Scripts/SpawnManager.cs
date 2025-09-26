@@ -10,20 +10,14 @@ public class SpawnManager : MonoBehaviour
     public int baseEnemyCount = 5;     // 第1波基础数量
     public int enemiesPerWaveIncrease = 2; // 每波增加的数量
     public float heavyEnemyBaseChance = 0.1f; // 第1波重型怪物概率
-    public float heavyChancePerWave = 0.05f;  // 每波增加的重型概率
+    public float heavyExtraChancePerWave = 0.05f;  // 每波增加的重型概率
 
     private int currentWave;
 
-    [Header("勾选以重置当前波数为1")]
-    public bool isPrepareToTest = false;
-
     void Start()
     {
-        /*
-        // ✅正式版：待开启    （可选）将PrepareTest()方法完全删除，实现从存档加载当前波数
+        //初始化存档波数
         currentWave = SaveManager.GetCurrentWave();
-        */
-        PrepareTest(isPrepareToTest);  //待删除-测试工具方法
         // 注册波数完成事件
         enemyManager.OnAllEnemiesCleared += StartNextWave;
         // 启动当前波
@@ -61,7 +55,7 @@ public class SpawnManager : MonoBehaviour
     // 计算当前波重型怪物概率（上限100%）
     private float CalculateHeavyChance(int wave)
     {
-        return Mathf.Clamp01(heavyEnemyBaseChance + (wave - 1) * heavyChancePerWave);
+        return Mathf.Clamp01(heavyEnemyBaseChance + (wave - 1) * heavyExtraChancePerWave);
     }
 
     // 开始下一波
@@ -70,20 +64,5 @@ public class SpawnManager : MonoBehaviour
         currentWave++;
         SaveManager.SaveCurrentWave(currentWave); // 保存进度
         StartWave(currentWave);
-    }
-
-    private void PrepareTest(bool isTest)
-    {
-        if (isTest)
-        {
-            // ⚠️测试阶段：勾选重置数据从第1波开始
-            currentWave = SaveManager.TestSaveAndGetCurrentWave();
-            Debug.LogError("✅已经重置关卡波数进度!关闭isTest选项!重新Play即可!");
-        }
-        else
-        {
-            // ✅正式版：从存档加载当前波数
-            currentWave = SaveManager.GetCurrentWave();
-        }
     }
 }
