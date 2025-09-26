@@ -8,15 +8,17 @@ public class UpgradeData
     public string description; // 描述文本
     public Sprite cardImage; // 卡片图片
     public int value; // 升级数值
+    public UpgradeType type; // 新增：关联升级类型枚举（与管理器保持一致）
 }
 
+// 统一升级类型枚举（与UpgradeManager同步，移除重复定义）
 public enum UpgradeType
 {
-    Attack,        // 子弹攻击力
-    FireRate,      // 攻击速度
-    MaxHealth,     // 最大生命值
-    MoveSpeed,     // 移动速度
-    BulletSpeed,   // 子弹速度
-    BulletRange    // 子弹射程
+    Attack,               // 普通子弹攻击力
+    FireRate,             // 玩家射速
+    MaxHealth,            // 玩家最大血量
+    AddChanceForExplosive,// 增加爆炸弹发射几率
+    AddChanceForFrost,    // 增加冰冻弹发射几率
+    ExploseRange,         // 爆炸弹范围
+    SlowTime              // 冰冻弹减速时长
 }
-    

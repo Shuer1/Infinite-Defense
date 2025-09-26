@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Events;
 using TMPro;
 
 public class UpgradeCard : MonoBehaviour
@@ -14,6 +13,8 @@ public class UpgradeCard : MonoBehaviour
 
     private void Awake()
     {
+        // 安全校验：避免重复添加监听
+        selectButton.onClick.RemoveAllListeners();
         selectButton.onClick.AddListener(OnCardSelected);
     }
 
@@ -22,6 +23,12 @@ public class UpgradeCard : MonoBehaviour
     /// </summary>
     public void Initialize(UpgradeData data)
     {
+        if (data == null)
+        {
+            Debug.LogError("初始化升级卡片失败：UpgradeData为null", this);
+            return;
+        }
+        
         upgradeId = data.upgradeId;
         cardImage.sprite = data.cardImage;
         titleText.text = data.displayName;
@@ -44,10 +51,5 @@ public class UpgradeCard : MonoBehaviour
         {
             UpgradePanel.Instance.Hide();
         }
-        else
-        {
-            Debug.LogError("UpgradePanel 单例为 null!");
-        }
     }
 }
-    

@@ -5776,36 +5776,43 @@ MonoBehaviour:
     description: power of basic bullet
     cardImage: {fileID: 21300000, guid: c8439979792a240b5ac63f7f39db7e92, type: 3}
     value: 5
+    type: 0
   - upgradeId: FireRate
     displayName: PlusSpeed
     description: To plus shoot speed
     cardImage: {fileID: 21300000, guid: 6a9500b43427c49babbb10c4eeb3f255, type: 3}
     value: 1
+    type: 1
   - upgradeId: MaxHealth
     displayName: MoreHealth
     description: To plus player health
     cardImage: {fileID: 21300000, guid: 1188bc38816864d239c9ed6bb36189da, type: 3}
     value: 20
+    type: 2
   - upgradeId: AddChanceForExplosive
     displayName: ExplosiveBullet
     description: Get this type of bullets
     cardImage: {fileID: 21300000, guid: 908aafae518114a35a786b70355a683a, type: 3}
-    value: 1
+    value: 2
+    type: 3
   - upgradeId: AddChanceForFrost
     displayName: IceBullet
     description: Get this type of bullets
     cardImage: {fileID: 21300000, guid: 143b1cdf5322c4a1d86476f72a48cd1c, type: 3}
     value: 2
+    type: 4
   - upgradeId: ExploseRange
     displayName: WiderRange
     description: More explose range
     cardImage: {fileID: 21300000, guid: 9065e93b766a04f3980f9786cb9adec4, type: 3}
     value: 1
+    type: 5
   - upgradeId: SlowTime
     displayName: LongerDuration
     description: LongerDuration
     cardImage: {fileID: 21300000, guid: c7c5562fd799b4917b366ae4f0a91ba5, type: 3}
     value: 1
+    type: 6
   playerController: {fileID: 942823808}
   bulletPrefab: {fileID: 741479308755480698, guid: 440645d6786d7401bb64687ebbea99be, type: 3}
   explosiveBulletPrefab: {fileID: 6415290478015143737, guid: 4898056eac8fe4ed4b6a013151ee4642, type: 3}

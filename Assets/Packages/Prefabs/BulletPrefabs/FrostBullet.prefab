@@ -119,7 +119,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 15
-  damage: 10
+  damage: 50
   lifeTime: 2
   frostRadius: 2
   frostDamage: 3

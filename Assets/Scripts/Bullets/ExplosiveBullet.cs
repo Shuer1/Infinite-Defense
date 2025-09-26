@@ -8,6 +8,7 @@ public class ExplosiveBullet : Bullet
     [Header("爆炸特性")]
     public float explosionRadius = 2f; // 爆炸范围
     public int explosionDamage = 5; // 爆炸伤害（低于基础子弹）
+    private int totalDamage;
     [Header("爆炸特效及音效")]
     public GameObject hitEffectPrefab; // 改为GameObject类型，适配对象池
     public AudioClip hitSound;

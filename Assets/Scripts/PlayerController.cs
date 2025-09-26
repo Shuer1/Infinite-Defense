@@ -224,12 +224,7 @@ public class PlayerController : MonoBehaviour
         // 此时冰冻子弹概率自动为非负且总和为100
     }
 
-    /// <summary>
-    /// 调整子弹概率（用于升级或加成系统）
-    /// </summary>
-    /// <param name="normalDelta">普通子弹概率变化量（可正可负）</param>
-    /// <param name="explosiveDelta">爆炸子弹概率变化量（可正可负）</param>
-    // 补充：在设置概率的方法中显式调用修正逻辑（原代码已包含，这里强化注释）
+    /// 调整子弹概率（用于升级系统）
     public void AdjustBulletChances(int normalDelta, int explosiveDelta)
     {
         normalBulletChance += normalDelta;
