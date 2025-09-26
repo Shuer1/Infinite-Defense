@@ -4,7 +4,7 @@ using UnityEngine;
 public class Bullet : MonoBehaviour
 {
     public float speed = 15f;
-    public int damage = 10;
+    public int damage = 50;
     public float lifeTime = 2f; //控制子弹回收
     private float timer;
 
@@ -12,12 +12,6 @@ public class Bullet : MonoBehaviour
     {
         timer = 0f;
     }
-
-    void Awake()
-    {
-
-    }
-
     void Update()
     {
         transform.Translate(Vector3.forward * speed * Time.deltaTime);
@@ -42,10 +36,5 @@ public class Bullet : MonoBehaviour
             // 回收子弹
             gameObject.SetActive(false);
         }
-    }
-
-    private void ResetBullet() //特殊类型子弹的特效、状态重置等
-    {
-        
     }
 }

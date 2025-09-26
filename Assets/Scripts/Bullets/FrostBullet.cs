@@ -13,6 +13,11 @@ public class FrostBullet : Bullet
     public GameObject frostEffectPrefab; // 修复类型为GameObject，适配对象池
     public AudioClip hitSound;
 
+    void Start()
+    {
+        totalDamage = damage + frostDamage;
+    }
+
     protected override void OnTriggerEnter(Collider other)
     {
         // 从对象池获取并播放特效（替换Instantiate）
@@ -36,7 +41,7 @@ public class FrostBullet : Bullet
             if (col.CompareTag("Enemy"))
             {
                 EnemyBase enemy = col.GetComponent<EnemyBase>();
-                enemy?.TakeDamage(frostDamage);
+                enemy?.TakeDamage(totalDamage);
                 enemy?.ApplySlow(slowPercentage, slowDuration);
             }
         }
