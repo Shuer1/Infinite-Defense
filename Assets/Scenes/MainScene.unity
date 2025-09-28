@@ -1036,7 +1036,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -141, y: 107}
+  m_AnchoredPosition: {x: -165, y: 165}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &455362743
@@ -1929,8 +1929,8 @@ Transform:
   m_GameObject: {fileID: 574606338}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 59.1}
-  m_LocalScale: {x: 3, y: 1, z: 14}
+  m_LocalPosition: {x: 0, y: 0, z: 27.3}
+  m_LocalScale: {x: 3, y: 1, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -2426,7 +2426,7 @@ Transform:
   m_GameObject: {fileID: 754927628}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.0000009536743, z: -6.61001}
+  m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3918,7 +3918,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   health: 100
   currentHealth: 100
-  damage: 10
   level: 1
   experience: 0
   experienceToNextLevel: 100
@@ -3930,8 +3929,8 @@ MonoBehaviour:
   moveSound: {fileID: 754927731}
   shootSound: {fileID: 1050021791}
   btn_ResetLive: {fileID: 1260621336}
-  normalBulletChance: 0
-  explosiveBulletChance: 0
+  normalBulletChance: 80
+  explosiveBulletChance: 10
 --- !u!54 &942823809
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -5791,24 +5790,24 @@ MonoBehaviour:
     type: 2
   - upgradeId: AddChanceForExplosive
     displayName: ExplosiveBullet
-    description: Get this type of bullets
+    description: More chance & damage
     cardImage: {fileID: 21300000, guid: 908aafae518114a35a786b70355a683a, type: 3}
-    value: 2
+    value: 1
     type: 3
   - upgradeId: AddChanceForFrost
-    displayName: IceBullet
-    description: Get this type of bullets
+    displayName: FrostBullet
+    description: More chance & damage
     cardImage: {fileID: 21300000, guid: 143b1cdf5322c4a1d86476f72a48cd1c, type: 3}
-    value: 2
+    value: 1
     type: 4
   - upgradeId: ExploseRange
-    displayName: WiderRange
-    description: More explose range
+    displayName: RangeUp
+    description: Wider explose range
     cardImage: {fileID: 21300000, guid: 9065e93b766a04f3980f9786cb9adec4, type: 3}
     value: 1
     type: 5
   - upgradeId: SlowTime
-    displayName: LongerDuration
+    displayName: FrostTime
     description: LongerDuration
     cardImage: {fileID: 21300000, guid: c7c5562fd799b4917b366ae4f0a91ba5, type: 3}
     value: 1

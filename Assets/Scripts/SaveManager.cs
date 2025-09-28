@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public static class SaveManager
@@ -20,17 +21,9 @@ public static class SaveManager
         int currentWave = GetCurrentWave();
         if (wave > currentWave)
         {
-            PlayerPrefs.SetInt(CurrentWaveKey,wave);
+            PlayerPrefs.SetInt(CurrentWaveKey, wave);
             PlayerPrefs.Save();
         }
-    }
-
-    //Test PlayerPref.Save()   可选操作：正式版发布时，直接删除及其引用
-    public static int TestSaveAndGetCurrentWave()
-    {
-        PlayerPrefs.SetInt(CurrentWaveKey, 1);
-        PlayerPrefs.Save();
-        return PlayerPrefs.GetInt(CurrentWaveKey);
     }
 
     public static int GetHighScore()
@@ -42,4 +35,6 @@ public static class SaveManager
     {
         return PlayerPrefs.GetInt(CurrentWaveKey, 1);
     }
+
+    
 }

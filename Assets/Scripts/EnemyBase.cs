@@ -32,6 +32,8 @@ public abstract class EnemyBase : MonoBehaviour
     [SerializeField] private float attackCooldown = 1f; // 攻击冷却时间
     private float lastAttackTime = 0f;
     private string currentState = AnimIdle; // 初始状态设为Idle
+    private float originalAnimSpeed;
+    bool isFrozen = false;
 
     void Start()
     {
@@ -65,6 +67,11 @@ public abstract class EnemyBase : MonoBehaviour
         if (animator == null)
         {
             Debug.LogWarning("Enemy未添加Animator组件", this);
+            originalAnimSpeed = 1f;
+        }
+        else
+        {
+            originalAnimSpeed = animator.speed;
         }
 
         // 注册到EnemyManager
@@ -200,20 +207,35 @@ public abstract class EnemyBase : MonoBehaviour
     // 实现减速效果
     public void ApplySlow(float percentage, float duration)
     {
-        if (isDead) return;
+        if (isDead || isFrozen) return;
 
         StartCoroutine(SlowCoroutine(percentage, duration));
     }
 
     private IEnumerator SlowCoroutine(float slowPercentage, float duration)
     {
+        isFrozen = true;
         float slowFactor = 1 - (slowPercentage / 100f);  //减速因子
         moveSpeed *= slowFactor;
+
+        if (animator != null)
+        {
+            animator.speed = slowFactor;
+        }
 
         yield return new WaitForSeconds(duration);
 
         // 恢复原始速度（防止多次减速叠加问题）
+        isFrozen = false;
         moveSpeed = originalMoveSpeed;
+        if (animator != null)
+        {
+            animator.speed = originalAnimSpeed;
+        }
+        else
+        {
+            Debug.LogError("Animator is null!");
+        }
     }
     
     /// <summary>

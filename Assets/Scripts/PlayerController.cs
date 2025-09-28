@@ -9,7 +9,7 @@ public class PlayerController : MonoBehaviour
     [Header("Attributes")]
     public int health = 100;
     public int currentHealth = 100;
-    public int damage;
+    //public int playerDamage; 玩家伤害基于子弹伤害，该属性目前: No Usage
     public int level = 1;
     public int experience = 0;
     public int experienceToNextLevel = 100;
