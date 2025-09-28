@@ -207,7 +207,7 @@ public abstract class EnemyBase : MonoBehaviour
 
     private IEnumerator SlowCoroutine(float slowPercentage, float duration)
     {
-        float slowFactor = 1 - (slowPercentage / 100f);
+        float slowFactor = 1 - (slowPercentage / 100f);  //减速因子
         moveSpeed *= slowFactor;
 
         yield return new WaitForSeconds(duration);

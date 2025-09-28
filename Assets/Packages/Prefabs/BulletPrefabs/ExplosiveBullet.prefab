@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 6415290478015143737}
   m_Layer: 0
   m_Name: ExplosiveBullet
-  m_TagString: Untagged
+  m_TagString: Bullet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -121,7 +121,7 @@ MonoBehaviour:
   speed: 15
   damage: 50
   lifeTime: 2
-  explosionRadius: 2
+  explosionRadius: 1
   explosionDamage: 5
   hitEffectPrefab: {fileID: 8602304315960938330, guid: f183a4f2538424d42aab1b82a46567cb, type: 3}
   hitSound: {fileID: 8300000, guid: 90f94821fe37743d08308eb0c50a6450, type: 3}

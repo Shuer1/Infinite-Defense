@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 5092929290123476697}
   m_Layer: 0
   m_Name: FrostBullet
-  m_TagString: Untagged
+  m_TagString: Bullet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -122,8 +122,8 @@ MonoBehaviour:
   damage: 50
   lifeTime: 2
   frostRadius: 2
-  frostDamage: 3
+  frostDamage: 2
   slowPercentage: 50
-  slowDuration: 2
+  slowDuration: 1.5
   frostEffectPrefab: {fileID: 6004755151496686226, guid: ae205193434e84fe6a5e291b48c4d5d4, type: 3}
   hitSound: {fileID: 8300000, guid: 000393e3a6a7942a0ba3b2f5e68de444, type: 3}

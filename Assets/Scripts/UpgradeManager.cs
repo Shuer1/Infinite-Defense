@@ -181,7 +181,7 @@ public class UpgradeManager : MonoBehaviour
         Frost
     }
 
-    private void ApplyAttackUpgrade(int value)
+    private void ApplyAttackUpgrade(int value) //提升普通子弹伤害
     {
         if (bulletPrefab == null)
         {
@@ -195,7 +195,7 @@ public class UpgradeManager : MonoBehaviour
         Debug.Log($"普通子弹伤害提升至：{bulletPrefab.damage}");
     }
 
-    private void ApplyFireRateUpgrade(int value)
+    private void ApplyFireRateUpgrade(int value) //提升射速
     {
         if (playerController == null)
         {
@@ -208,7 +208,7 @@ public class UpgradeManager : MonoBehaviour
         Debug.Log($"射速提升，当前间隔：{playerController.fireRate:F2}秒");
     }
 
-    private void ApplyMaxHealthUpgrade(int value)
+    private void ApplyMaxHealthUpgrade(int value) //提升最大生命值
     {
         if (playerController == null)
         {
@@ -222,7 +222,7 @@ public class UpgradeManager : MonoBehaviour
         Debug.Log($"最大生命值提升至：{playerController.health}");
     }
 
-    private void GetOrAddSpecialBullet(SpecialBulletType type, int extraDamageValue)
+    private void GetOrAddSpecialBullet(SpecialBulletType type, int extraDamageValue) //获得特殊子弹/增加伤害
     {
         switch (type)
         {
@@ -249,7 +249,7 @@ public class UpgradeManager : MonoBehaviour
         }
     }
 
-    private void ApplySlowTimeLongerUpgrade(int value)
+    private void ApplySlowTimeLongerUpgrade(int value) //提升减速效果
     {
         if (frostBulletPrefab == null)
         {
@@ -263,7 +263,7 @@ public class UpgradeManager : MonoBehaviour
         Debug.Log($"冰冻减速时长提升至：{frostBulletPrefab.slowDuration:F1}秒");
     }
 
-    private void ApplyBulletRangeUpgrade(int value)
+    private void ApplyBulletRangeUpgrade(int value) //提升爆炸范围
     {
         if (explosiveBulletPrefab == null)
         {
@@ -277,7 +277,7 @@ public class UpgradeManager : MonoBehaviour
         Debug.Log($"爆炸范围提升至：{explosiveBulletPrefab.explosionRadius:F1}米");
     }
 
-    private void UpdateAllPooledBulletsDamage(BulletType bulletType, PoolType poolType, int newDamage)
+    private void UpdateAllPooledBulletsDamage(BulletType bulletType, PoolType poolType, int newDamage) //更新子弹伤害提升后的对象池
     {
         var bulletList = GetBulletListByPoolType(poolType);
         if (bulletList == null)
@@ -324,7 +324,7 @@ public class UpgradeManager : MonoBehaviour
         Debug.Log($"同步 {poolType} 中的所有子弹伤害，新值：{newDamage}", this);
     }
 
-    private void UpdateAllPooledFrostSlowDuration(float newDuration)
+    private void UpdateAllPooledFrostSlowDuration(float newDuration) //更新减速时长提升后的对象池
     {
         var bulletList = GetBulletListByPoolType(PoolType.FrostBulletPool);
         if (bulletList == null) return;
@@ -343,7 +343,7 @@ public class UpgradeManager : MonoBehaviour
         Debug.Log($"同步冰冻子弹池 {updatedCount} 个减速时长，新值：{newDuration:F1}秒", this);
     }
 
-    private void UpdateAllPooledExplosionRange(float newRange)
+    private void UpdateAllPooledExplosionRange(float newRange)  //更新爆炸范围提升后的对象池
     {
         var bulletList = GetBulletListByPoolType(PoolType.ExplosiveBulletPool);
         if (bulletList == null) return;
@@ -362,7 +362,7 @@ public class UpgradeManager : MonoBehaviour
         Debug.Log($"同步爆炸子弹池 {updatedCount} 个范围，新值：{newRange:F1}米", this);
     }
 
-    private IEnumerable<GameObject> GetBulletListByPoolType(PoolType poolType)
+    private IEnumerable<GameObject> GetBulletListByPoolType(PoolType poolType) //通过池类型判断获取到子弹列表
     {
         return poolType switch
         {

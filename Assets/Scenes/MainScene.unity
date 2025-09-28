@@ -3930,8 +3930,8 @@ MonoBehaviour:
   moveSound: {fileID: 754927731}
   shootSound: {fileID: 1050021791}
   btn_ResetLive: {fileID: 1260621336}
-  normalBulletChance: 60
-  explosiveBulletChance: 20
+  normalBulletChance: 0
+  explosiveBulletChance: 0
 --- !u!54 &942823809
 Rigidbody:
   m_ObjectHideFlags: 0
