@@ -121,7 +121,7 @@ MonoBehaviour:
   speed: 15
   damage: 50
   lifeTime: 2
-  frostRadius: 2
+  frostRadius: 1.2
   frostDamage: 2
   slowPercentage: 50
   slowDuration: 1.5
