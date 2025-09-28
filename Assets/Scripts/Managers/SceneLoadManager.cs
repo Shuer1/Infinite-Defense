@@ -4,6 +4,9 @@ using System;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class SceneLoadManager : MonoBehaviour
 {
@@ -57,18 +60,27 @@ public class SceneLoadManager : MonoBehaviour
         LoadSceneAsync("MainScene", true);
     }
 
+    public void ExitGame()
+    {
+        #if UNITY_EDITOR
+            EditorApplication.isPlaying = false;
+        #elif UNITY_ANDROID
+            Application.Quit();
+        #endif
+    }
+
     public void LoadSceneAsync(string sceneName, bool showLoadingUI = true)
     {
         // 重置状态
         _isFadeToBlackComplete = false;
-        
+
         // 显示加载界面
         if (loadingUI != null && showLoadingUI)
         {
             loadingUI.SetActive(true);
             progressBar.value = 0;
             progressText.text = "Loading : 0%";
-            
+
             // 重置遮罩透明度
             if (blackMask != null)
             {
