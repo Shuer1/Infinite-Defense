@@ -192,6 +192,8 @@ public class UpgradeManager : MonoBehaviour
         bulletPrefab.damage += value;
         UpdateAllPooledBulletsDamage(BulletType.Bullet, PoolType.BulletPool, bulletPrefab.damage);
         UIManager.Instance?.ShowAndUpdatePlayerAttack(bulletPrefab.damage);
+
+        DataManager.SaveInt(DataManager.BaseBulletDamageKey,bulletPrefab.damage); //保存基础子弹伤害
         Debug.Log($"普通子弹伤害提升至：{bulletPrefab.damage}");
     }
 
@@ -205,6 +207,8 @@ public class UpgradeManager : MonoBehaviour
 
         float reduction = value * FIRE_RATE_REDUCTION_MULTIPLIER;
         playerController.fireRate = Mathf.Max(MIN_FIRE_RATE, playerController.fireRate - reduction);
+
+        DataManager.SaveFloat(DataManager.PlayerShootSpeedKey,playerController.fireRate,isGreater:false);
         Debug.Log($"射速提升，当前间隔：{playerController.fireRate:F2}秒");
     }
 
@@ -219,6 +223,8 @@ public class UpgradeManager : MonoBehaviour
         playerController.health += value;
         playerController.currentHealth = Mathf.Min(playerController.currentHealth + value, playerController.health);
         UIManager.Instance?.UpdateAndShowPlayerHP(playerController.currentHealth, playerController.health);
+
+        DataManager.SaveInt(DataManager.PlayerMaxHealthKey,playerController.health);
         Debug.Log($"最大生命值提升至：{playerController.health}");
     }
 
@@ -234,6 +240,8 @@ public class UpgradeManager : MonoBehaviour
                 }
                 explosiveBulletPrefab.explosionDamage += extraDamageValue;
                 UpdateAllPooledBulletsDamage(BulletType.ExplosiveBullet, PoolType.ExplosiveBulletPool, explosiveBulletPrefab.explosionDamage);
+
+                DataManager.SaveInt(DataManager.ExplosiveBulletDamageKey,explosiveBulletPrefab.explosionDamage);
                 Debug.Log($"爆炸子弹伤害提升至：{explosiveBulletPrefab.explosionDamage}");
                 break;
             case SpecialBulletType.Frost:
@@ -244,6 +252,8 @@ public class UpgradeManager : MonoBehaviour
                 }
                 frostBulletPrefab.frostDamage += extraDamageValue;
                 UpdateAllPooledBulletsDamage(BulletType.FrostBullet, PoolType.FrostBulletPool, frostBulletPrefab.damage);
+
+                DataManager.SaveInt(DataManager.FrostBulletDamageKey,frostBulletPrefab.frostDamage);
                 Debug.Log($"冰冻子弹伤害提升至：{frostBulletPrefab.damage}");
                 break;
         }
@@ -260,6 +270,8 @@ public class UpgradeManager : MonoBehaviour
         float addDuration = value * SLOW_DURATION_MULTIPLIER;
         frostBulletPrefab.slowDuration += addDuration;
         UpdateAllPooledFrostSlowDuration(frostBulletPrefab.slowDuration);
+
+        DataManager.SaveFloat(DataManager.FrostFreezeDurationKey,frostBulletPrefab.slowDuration);
         Debug.Log($"冰冻减速时长提升至：{frostBulletPrefab.slowDuration:F1}秒");
     }
 
@@ -274,6 +286,8 @@ public class UpgradeManager : MonoBehaviour
         float addRange = value * EXPLOSION_RANGE_MULTIPLIER;
         explosiveBulletPrefab.explosionRadius += addRange;
         UpdateAllPooledExplosionRange(explosiveBulletPrefab.explosionRadius);
+
+        DataManager.SaveFloat(DataManager.ExplosionRangeKey,explosiveBulletPrefab.explosionRadius);
         Debug.Log($"爆炸范围提升至：{explosiveBulletPrefab.explosionRadius:F1}米");
     }
 

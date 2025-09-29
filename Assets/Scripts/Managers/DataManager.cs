@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEditor;
 
 public static class DataManager
 {
@@ -20,12 +21,12 @@ public static class DataManager
 
     // 子弹数据（Int）
     public const string BaseBulletDamageKey = "BaseBulletDamage";
-    public const string FlameBulletDamageKey = "FlameBulletDamage";
+    public const string ExplosiveBulletDamageKey = "ExplosiveBulletDamage";
     public const string FrostBulletDamageKey = "FrostBulletDamage";
 
     // 子弹范围数据（Float）
-    public const string FlameExplosionRangeKey = "FlameExplosionRange";
-    public const string FrostFreezeRangeKey = "FrostFreezeDuration";
+    public const string ExplosionRangeKey = "ExplosionRange";
+    public const string FrostFreezeDurationKey = "FrostFreezeDuration";
 
 
     // --------------- 内存缓存（减少PlayerPrefs访问频率） ---------------
@@ -117,8 +118,31 @@ public static class DataManager
         return value;
     }
 
+    // --------------- 新增：强制保存Int类型（忽略优劣判断） ---------------
+    /// <summary>
+    /// 强制保存Int类型数据（无论新旧值，直接更新）
+    /// </summary>
+    public static void SaveIntForce(string key, int newValue)
+    {
+        // 直接更新PlayerPrefs和缓存，不判断优劣
+        PlayerPrefs.SetInt(key, newValue);
+        _intCache[key] = newValue; // 覆盖缓存
+        _isDirty = true; // 标记需要写入磁盘
+    }
 
-    // --------------- 手动触发保存（关卡结束时调用） ---------------
+    // --------------- 新增：强制保存Float类型（忽略优劣判断） ---------------
+    /// <summary>
+    /// 强制保存Float类型数据（无论新旧值，直接更新）
+    /// </summary>
+    public static void SaveFloatForce(string key, float newValue)
+    {
+        PlayerPrefs.SetFloat(key, newValue);
+        _floatCache[key] = newValue;
+        _isDirty = true;
+    }
+
+
+    // --------------- 手动触发保存（关卡结束/玩家死亡/退出关卡时调用） ---------------
     /// <summary>
     /// 将所有修改的数据写入本地磁盘（建议关卡结束、暂停时调用）
     /// </summary>
@@ -128,7 +152,11 @@ public static class DataManager
         {
             PlayerPrefs.Save();
             _isDirty = false;
-            // Debug.Log("数据已保存到本地"); // 调试用，发布时可注释
+            Debug.Log("数据已保存到本地"); // 调试用，发布时可注释
+        }
+        else
+        {
+            Debug.Log("Nothing Updated...");
         }
     }
 
@@ -144,6 +172,6 @@ public static class DataManager
         _floatCache.Clear();
         _isDirty = false;
         PlayerPrefs.Save();
-        // Debug.Log("所有本地数据已清空");
+        Debug.Log("所有本地数据已清空");
     }
 }

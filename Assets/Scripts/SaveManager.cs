@@ -7,8 +7,6 @@ public static class SaveManager
     private const string HighScoreKey = "HighScore";
     private const string CurrentWaveKey = "CurrentWave";
     private const string PlayerHealthKey = "PlayerHealth";
-    private static string[] IntDataKeys = { "HighScore", "CurrentWave", "PlayerHealth", "Bullet", "ExplosiveBullet", "FrostBullet" };
-
     public static void SaveHighScore(int score) //保存最高分
     {
         int currentHighScore = GetHighScore();
@@ -52,12 +50,5 @@ public static class SaveManager
     {
         return PlayerPrefs.GetInt(PlayerHealthKey, 100);
     }
-
-    public static int GetIntTypeData(string intDataKey)
-    {
-        return PlayerPrefs.GetInt(intDataKey, 1);
-    }
     
-    
-
 }

@@ -197,9 +197,6 @@ public class PlayerController : MonoBehaviour
         Debug.Log("Player Died");
         // 这里可以添加死亡动画或效果
         GameManager.Instance.GameOver();
-        
-        //玩家死亡调用数据保存
-        DataManager.FlushSave();
     }
 
     void AnimatorFunc()

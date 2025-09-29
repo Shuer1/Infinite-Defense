@@ -30,10 +30,11 @@ public class UIManager : MonoBehaviour
     }
     public void UpdateAndShowhighScore()  //用于初始化显示历史最高分数
     {
-        int current_highScore = SaveManager.GetHighScore();
+        //int current_highScore = SaveManager.GetHighScore();
+        int current_highScore = DataManager.GetInt(DataManager.HighScoreKey,0);
         highScoreText.text = "High Score: " + current_highScore;
     }
-    public void ShowGameOver(int score, int highScore)
+    public void ShowGameOver()
     {
         gameOverPanel.SetActive(true);
     }
