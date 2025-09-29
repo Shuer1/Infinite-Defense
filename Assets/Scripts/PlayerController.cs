@@ -190,12 +190,16 @@ public class PlayerController : MonoBehaviour
 
     void Die()
     {
+
         isDead = true;
         animator.SetTrigger("Die");
         //enemyBase.playerisdied = isDead;
         Debug.Log("Player Died");
         // 这里可以添加死亡动画或效果
         GameManager.Instance.GameOver();
+        
+        //玩家死亡调用数据保存
+        DataManager.FlushSave();
     }
 
     void AnimatorFunc()

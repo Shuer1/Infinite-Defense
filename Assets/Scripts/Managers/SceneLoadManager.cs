@@ -60,13 +60,18 @@ public class SceneLoadManager : MonoBehaviour
         LoadSceneAsync("MainScene", true);
     }
 
-    public void ExitGame()
+    public void LoadStartScene()
     {
-        #if UNITY_EDITOR
-            EditorApplication.isPlaying = false;
-        #elif UNITY_ANDROID
+        SceneManager.LoadScene(0); // 开始界面场景序号是0
+    }
+
+    public void ExitGame() //判断运行环境
+    {
+#if UNITY_EDITOR
+        EditorApplication.isPlaying = false;
+#elif UNITY_ANDROID
             Application.Quit();
-        #endif
+#endif
     }
 
     public void LoadSceneAsync(string sceneName, bool showLoadingUI = true)
