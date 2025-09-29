@@ -18,8 +18,6 @@ public class GameManager : MonoBehaviour
         score += value;
         UIManager.Instance.UpdateScore(score);
 
-        //分数每增加就调用保存方法
-        //SaveManager.SaveHighScore(score);
         DataManager.SaveInt(DataManager.HighScoreKey,score);
 
     }
@@ -30,7 +28,7 @@ public class GameManager : MonoBehaviour
         Debug.Log("Game Over UI Appears");
         isGameOver = true;
 
-        DataManager.FlushSave();
+        DataManager.FlushSave();            //全部数据统一保存
         UIManager.Instance.ShowGameOver();
     }
 

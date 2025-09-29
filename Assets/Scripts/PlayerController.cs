@@ -7,16 +7,15 @@ using UnityEngine.UI;
 public class PlayerController : MonoBehaviour
 {
     [Header("Attributes")]
-    public int health = 100;
+    public int health = 100; //Data1
     public int currentHealth = 100;
-    //public int playerDamage; 玩家伤害基于子弹伤害，该属性目前: No Usage
-    public int level = 1;
+    public int level = 1; //Data2
     public int experience = 0;
-    public int experienceToNextLevel = 100;
+    public int experienceToNextLevel = 100; //Data3
 
     [Header("Movement & Shooting")]
     public Transform firePoint;
-    public float fireRate = 0.3f;
+    public float fireRate = 0.3f; //Data4
     private float fireTimer;
     public float moveSpeed = 5f;
     public bool isDead = false;
@@ -40,10 +39,9 @@ public class PlayerController : MonoBehaviour
     private int frostBulletChance => 100 - normalBulletChance - explosiveBulletChance;
 
 
-    void Awake()
+    void Awake() //初始化玩家数据
     {
-        InitiatePlayerInfo();
-        //UIManager.Instance.UpdateAndShowPlayerHP(currentHealth, health);
+        InitiatePlayerData();
     }
 
     void Start()
@@ -181,11 +179,14 @@ public class PlayerController : MonoBehaviour
     {
         level++;
         experience = 0;
-        experienceToNextLevel += 50; // 每次升级需要更多经验
+        experienceToNextLevel += 50; // 每次升级需要更多经验：应优化为使用非线性增长，前期较容易，后期越来越难
         //升级刷新回复血量
         currentHealth = health;
         UIManager.Instance.UpdateAndShowPlayerHP(currentHealth, health);
         UpgradeManager.Instance.ShowUpgradeOptions();
+
+        DataManager.SaveInt(DataManager.PlayerLevelKey, level);
+        DataManager.SaveInt(DataManager.NextLevelExpKey,experienceToNextLevel);
     }
 
     void Die()
@@ -210,10 +211,13 @@ public class PlayerController : MonoBehaviour
         Debug.Log("选择复活!");
     }
 
-    void InitiatePlayerInfo()  //游戏开始时，初始化玩家数据信息
+    void InitiatePlayerData()  //游戏开始时，初始化玩家数据信息
     {
+        health = DataManager.GetInt(DataManager.PlayerMaxHealthKey);
+        level = DataManager.GetInt(DataManager.PlayerLevelKey);
+        experienceToNextLevel = DataManager.GetInt(DataManager.NextLevelExpKey);
+        fireRate = DataManager.GetInt(DataManager.PlayerShootSpeedKey);
         Debug.Log("初始化玩家信息完成!True!");
-        currentHealth = health;
     }
     
     private void ClampProbabilities()
