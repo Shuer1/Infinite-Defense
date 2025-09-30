@@ -3,11 +3,11 @@ using UnityEngine;
 public class FrostBullet : Bullet
 {
     [Header("冰冻特性")]
-    public float frostRadius = 2.5f; // 减速范围
-    public int frostDamage = 3; // 冰冻伤害（低于基础子弹）
+    public float frostRadius = 1.0f; // 减速范围(不考虑升级)
+    public int frostDamage = 3; // 冰冻伤害（低于基础子弹） Data1
     [Tooltip("减速百分比,eg:50表示50%,会被转换成0.5倍速度")]
-    public float slowPercentage = 50f; // 减速百分比数值（50%）
-    public float slowDuration = 2f; // 减速持续时间
+    public float slowPercentage = 50f; // 摸默认减速百分比数值（50%）（不考虑升级）
+    public float slowDuration = 2f; // 减速持续时间 Data2
     [Header("冰冻特效及音效")]
     public GameObject frostEffectPrefab; // 适配对象池
     public AudioClip hitSound;

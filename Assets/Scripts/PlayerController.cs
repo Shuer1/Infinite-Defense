@@ -1,4 +1,6 @@
 using System.Threading.Tasks;
+using UnityEditor;
+
 //using Unity.PlasticSCM.Editor.WebApi;
 //using Unity.VisualScripting;
 using UnityEngine;
@@ -33,19 +35,13 @@ public class PlayerController : MonoBehaviour
     public Button btn_ResetLive;
     [Header("子弹概率配置")]
     [Range(0, 100)]
-    public int normalBulletChance = 100;
+    public int normalBulletChance = 100; //Data5
     [Range(0, 100)]
-    public int explosiveBulletChance = 0;
-    private int frostBulletChance => 100 - normalBulletChance - explosiveBulletChance;
-
-
-    void Awake() //初始化玩家数据
-    {
-        InitiatePlayerData();
-    }
+    public int explosiveBulletChance = 0; //Data6
 
     void Start()
     {
+        SyncPlayerData(); //同步初始化玩家数据
         rb = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
     }
@@ -105,6 +101,20 @@ public class PlayerController : MonoBehaviour
         }
 
         AnimatorFunc();
+    }
+
+    void SyncPlayerData()  //初始化玩家相关信息
+    {
+        //玩家自身数据
+        health = DataManager.GetInt(DataManager.PlayerMaxHealthKey);
+        level = DataManager.GetInt(DataManager.PlayerLevelKey);
+        experienceToNextLevel = DataManager.GetInt(DataManager.NextLevelExpKey);
+        fireRate = DataManager.GetFloat(DataManager.PlayerShootSpeedKey);
+        //不同类型子弹射击几率
+        normalBulletChance = DataManager.GetInt(DataManager.NormalBulletChanceKey);
+        explosiveBulletChance = DataManager.GetInt(DataManager.ExplosiveBulletChanceKey);
+
+        Debug.Log("初始化玩家信息完成!True!");
     }
 
     void Shoot()
@@ -210,16 +220,6 @@ public class PlayerController : MonoBehaviour
     {
         Debug.Log("选择复活!");
     }
-
-    void InitiatePlayerData()  //游戏开始时，初始化玩家数据信息
-    {
-        health = DataManager.GetInt(DataManager.PlayerMaxHealthKey);
-        level = DataManager.GetInt(DataManager.PlayerLevelKey);
-        experienceToNextLevel = DataManager.GetInt(DataManager.NextLevelExpKey);
-        fireRate = DataManager.GetInt(DataManager.PlayerShootSpeedKey);
-        Debug.Log("初始化玩家信息完成!True!");
-    }
-    
     private void ClampProbabilities()
     {
         // 限制普通子弹概率范围

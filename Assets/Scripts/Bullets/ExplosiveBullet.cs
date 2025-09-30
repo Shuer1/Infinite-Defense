@@ -26,6 +26,11 @@ public class ExplosiveBullet : Bullet
         _enemyLayerIndex = LayerMask.NameToLayer("Enemy");
     }
 
+    void Start()
+    {
+        SyncExplosiveBulletData();
+    }
+
 
     /// <summary>
     /// 触发碰撞时处理（仅响应敌人）
@@ -82,5 +87,11 @@ public class ExplosiveBullet : Bullet
     {
         Gizmos.color = new Color(1f, 0.5f, 0f, 0.5f); // 橙色半透明
         Gizmos.DrawWireSphere(transform.position, explosionRadius);
+    }
+
+    void SyncExplosiveBulletData()
+    {
+        DataManager.GetInt(DataManager.ExplosiveDamageKey);
+        DataManager.GetFloat(DataManager.ExplosionRangeKey);
     }
 }

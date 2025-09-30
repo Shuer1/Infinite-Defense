@@ -17,7 +17,7 @@ public class SpawnManager : MonoBehaviour
     void Start()
     {
         //初始化存档波数
-        currentWave = DataManager.GetInt(DataManager.CurrentWaveKey,1); //DefaultValue:1
+        currentWave = DataManager.GetInt(DataManager.CurrentWaveKey);
         // 注册波数完成事件
         enemyManager.OnAllEnemiesCleared += StartNextWave;
         // 启动当前波

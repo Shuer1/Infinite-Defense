@@ -5,7 +5,7 @@ using UnityEditor;
 public static class DataManager
 {
     // --------------- 所有数据键定义（集中管理，避免硬编码） ---------------
-    // 基础数据（Int）
+    // 基础数据（Int）✅
     public const string HighScoreKey = "HighScore";
     public const string CurrentWaveKey = "CurrentWave";
     public const string PlayerMaxHealthKey = "PlayerMaxHealth";
@@ -13,21 +13,23 @@ public static class DataManager
     public const string NextLevelExpKey = "NextLevelExp";
     public const string PlayerShootSpeedKey = "PlayerShootSpeed";
 
-    // 敌人数据（Int）
+    // 敌人数据（Int）✅
     public const string Enemy1MaxHealthKey = "BaseEnemyMaxHealth";
     public const string Enemy2MaxHealthKey = "HeavyEnemyMaxHealth";
     public const string Enemy1DamageKey = "BaseEnemyDamage";
     public const string Enemy2DamageKey = "HeavyEnemyDamage";
 
-    // 子弹数据（Int）
+    // 子弹数据（Int）✅
     public const string BaseBulletDamageKey = "BaseBulletDamage";
-    public const string ExplosiveBulletDamageKey = "ExplosiveBulletDamage";
-    public const string FrostBulletDamageKey = "FrostBulletDamage";
-
-    // 子弹范围数据（Float）
+    //烈焰弹
+    public const string ExplosiveDamageKey = "ExplosiveDamage";
     public const string ExplosionRangeKey = "ExplosionRange";
+    //冰霜弹
+    public const string FrostDamageKey = "FrostDamage";
     public const string FrostFreezeDurationKey = "FrostFreezeDuration";
-
+    //发射几率比例/100
+    public const string NormalBulletChanceKey = "NormalBulletChance";
+    public const string ExplosiveBulletChanceKey = "ExplosiveBulletChance";
 
     // --------------- 内存缓存（减少PlayerPrefs访问频率） ---------------
     private static readonly Dictionary<string, int> _intCache = new Dictionary<string, int>();
@@ -116,6 +118,43 @@ public static class DataManager
         value = PlayerPrefs.GetFloat(key, defaultValue);
         _floatCache[key] = value;
         return value;
+    }
+
+    /// </summary>
+    /// <param name="key">数据键</param>
+    /// <param name="initialValue">业务初始值</param>
+    /// <returns>初始化后的值（已保存的值或初始值）</returns>
+    public static int InitializeIntData(string key, int initialValue)
+    {
+        if (PlayerPrefs.HasKey(key))
+        {
+            // 已保存过数据，直接读取
+            return GetInt(key);
+        }
+        else
+        {
+            // 首次初始化，设置初始值并保存到缓存（暂不写入磁盘，批量处理）
+            _intCache[key] = initialValue;
+            PlayerPrefs.SetInt(key, initialValue);
+            _isDirty = true; // 标记需要保存（批量处理）
+            return initialValue;
+        }
+    }
+
+    // Float类型同理
+    public static float InitializeFloatData(string key, float initialValue)
+    {
+        if (PlayerPrefs.HasKey(key))
+        {
+            return GetFloat(key);
+        }
+        else
+        {
+            _floatCache[key] = initialValue;
+            PlayerPrefs.SetFloat(key, initialValue);
+            _isDirty = true;
+            return initialValue;
+        }
     }
 
     // --------------- 新增：强制保存Int类型（忽略优劣判断） ---------------

@@ -3,14 +3,19 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    public float speed = 15f;
-    public int damage = 50;
+    public float speed = 15f; //默认不变/不升级等
+    public int damage; //Data1
     public float lifeTime = 2f; //控制子弹回收
     private float timer;
 
     void OnEnable()
     {
         timer = 0f;
+    }
+
+    void Start()
+    {
+        DataManager.GetInt(DataManager.BaseBulletDamageKey);  //初始化
     }
     void Update()
     {

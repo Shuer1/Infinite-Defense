@@ -4106,15 +4106,15 @@ MonoBehaviour:
   experience: 0
   experienceToNextLevel: 100
   firePoint: {fileID: 1050021790}
-  fireRate: 0.2
+  fireRate: 0.5
   moveSpeed: 5
   isDead: 0
   joystick: {fileID: 473153303}
   moveSound: {fileID: 754927731}
   shootSound: {fileID: 1050021791}
   btn_ResetLive: {fileID: 1260621336}
-  normalBulletChance: 80
-  explosiveBulletChance: 10
+  normalBulletChance: 100
+  explosiveBulletChance: 0
 --- !u!54 &942823809
 Rigidbody:
   m_ObjectHideFlags: 0

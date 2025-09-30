@@ -241,7 +241,7 @@ public class UpgradeManager : MonoBehaviour
                 explosiveBulletPrefab.explosionDamage += extraDamageValue;
                 UpdateAllPooledBulletsDamage(BulletType.ExplosiveBullet, PoolType.ExplosiveBulletPool, explosiveBulletPrefab.explosionDamage);
 
-                DataManager.SaveInt(DataManager.ExplosiveBulletDamageKey,explosiveBulletPrefab.explosionDamage);
+                DataManager.SaveInt(DataManager.ExplosiveDamageKey,explosiveBulletPrefab.explosionDamage);
                 Debug.Log($"爆炸子弹伤害提升至：{explosiveBulletPrefab.explosionDamage}");
                 break;
             case SpecialBulletType.Frost:
@@ -253,7 +253,7 @@ public class UpgradeManager : MonoBehaviour
                 frostBulletPrefab.frostDamage += extraDamageValue;
                 UpdateAllPooledBulletsDamage(BulletType.FrostBullet, PoolType.FrostBulletPool, frostBulletPrefab.damage);
 
-                DataManager.SaveInt(DataManager.FrostBulletDamageKey,frostBulletPrefab.frostDamage);
+                DataManager.SaveInt(DataManager.FrostDamageKey,frostBulletPrefab.frostDamage);
                 Debug.Log($"冰冻子弹伤害提升至：{frostBulletPrefab.damage}");
                 break;
         }
@@ -328,7 +328,7 @@ public class UpgradeManager : MonoBehaviour
                     var frost = bulletObj.GetComponent<FrostBullet>();
                     if (frost != null)
                     {
-                        frost.damage = newDamage;
+                        frost.frostDamage = newDamage;
                         updatedCount++;
                     }
                     break;

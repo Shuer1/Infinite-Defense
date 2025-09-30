@@ -21,22 +21,12 @@ public class UIManager : MonoBehaviour
 
     void Start()
     {
-        UpdateAndShowhighScore();
+        InitiateUIInfo();
     }
 
     public void UpdateScore(int score)
     {
         scoreText.text = "Score: " + score;
-    }
-    public void UpdateAndShowhighScore()  //用于初始化显示历史最高分数
-    {
-        //int current_highScore = SaveManager.GetHighScore();
-        int current_highScore = DataManager.GetInt(DataManager.HighScoreKey,0);
-        highScoreText.text = "High Score: " + current_highScore;
-    }
-    public void ShowGameOver()
-    {
-        gameOverPanel.SetActive(true);
     }
 
     public void UpdateAndShowPlayerHP(int currentHP, int maxHP)
@@ -61,8 +51,23 @@ public class UIManager : MonoBehaviour
         exp.text = currentExp.ToString() + " / " + nextLevelExp.ToString();
     }
 
+    private void ShowhighScore()  //用于初始化显示历史最高分数
+    {
+        int current_highScore = DataManager.GetInt(DataManager.HighScoreKey);
+        highScoreText.text = "High Score: " + current_highScore;
+    }
+    private void ShowMaxHP()
+    {
+        int maxHP = DataManager.GetInt(DataManager.PlayerMaxHealthKey);
+    }
+
     private void InitiateUIInfo()
     {
-
+        ShowhighScore();
+    }
+    
+    public void ShowGameOver()
+    {
+        gameOverPanel.SetActive(true);
     }
 }

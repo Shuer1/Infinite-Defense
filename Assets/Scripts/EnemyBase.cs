@@ -12,13 +12,13 @@ public abstract class EnemyBase : MonoBehaviour
 
     public EnemyType enemyType;
     public event System.Action<EnemyBase> OnDeath; // 死亡事件
-    public int maxHealth;
+    public int maxHealth; //data1✅
     public int currentHealth;
-    public int damage;
+    public int damage; //data2✅
     public float moveSpeed;
     public float originalMoveSpeed; // 用于减速效果的原始速度保存
-    public int expReward;
-    public int scoreReward;
+    public int expReward; //data3⚠️
+    public int scoreReward; //data4⚠️
 
     public bool isDead = false;
     private Animator animator;
@@ -32,13 +32,12 @@ public abstract class EnemyBase : MonoBehaviour
     [SerializeField] private float attackCooldown = 1f; // 攻击冷却时间
     private float lastAttackTime = 0f;
     private string currentState = AnimIdle; // 初始状态设为Idle
-    private float originalAnimSpeed;
+    private float originalAnimSpeed = 1.0f;
     bool isFrozen = false;
 
-    void Start()
+    protected void Start()
     {
         gameObject.tag = "Enemy";
-        currentHealth = maxHealth;
         // 新增：校验移动速度是否合理，避免初始为0
         if (moveSpeed <= 0)
         {
