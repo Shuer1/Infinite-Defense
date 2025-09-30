@@ -4113,8 +4113,8 @@ MonoBehaviour:
   moveSound: {fileID: 754927731}
   shootSound: {fileID: 1050021791}
   btn_ResetLive: {fileID: 1260621336}
-  normalBulletChance: 100
-  explosiveBulletChance: 0
+  normalBulletChance: 50
+  explosiveBulletChance: 10
 --- !u!54 &942823809
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -6328,13 +6328,13 @@ MonoBehaviour:
     displayName: ExplosiveBullet
     description: More chance & damage
     cardImage: {fileID: 21300000, guid: 908aafae518114a35a786b70355a683a, type: 3}
-    value: 1
+    value: 2
     type: 3
   - upgradeId: AddChanceForFrost
     displayName: FrostBullet
     description: More chance & damage
     cardImage: {fileID: 21300000, guid: 143b1cdf5322c4a1d86476f72a48cd1c, type: 3}
-    value: 1
+    value: 2
     type: 4
   - upgradeId: ExploseRange
     displayName: RangeUp

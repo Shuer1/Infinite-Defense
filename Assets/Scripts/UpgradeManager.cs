@@ -86,7 +86,7 @@ public class UpgradeManager : MonoBehaviour
     {
         if (allUpgrades.Count < 3)
         {
-            Debug.LogError($"升级选项不足3个（当前：{allUpgrades.Count}）", this);
+            Debug.LogError($"升级选项不足3个(当前：{allUpgrades.Count})", this);
             return;
         }
 
@@ -181,7 +181,7 @@ public class UpgradeManager : MonoBehaviour
         Frost
     }
 
-    private void ApplyAttackUpgrade(int value) //提升普通子弹伤害
+    private void ApplyAttackUpgrade(int value) //提升普通子弹伤害 实现保存✅
     {
         if (bulletPrefab == null)
         {
@@ -193,11 +193,11 @@ public class UpgradeManager : MonoBehaviour
         UpdateAllPooledBulletsDamage(BulletType.Bullet, PoolType.BulletPool, bulletPrefab.damage);
         UIManager.Instance?.ShowAndUpdatePlayerAttack(bulletPrefab.damage);
 
-        DataManager.SaveInt(DataManager.BaseBulletDamageKey,bulletPrefab.damage); //保存基础子弹伤害
+        DataManager.SaveInt(DataManager.BaseBulletDamageKey,bulletPrefab.damage);
         Debug.Log($"普通子弹伤害提升至：{bulletPrefab.damage}");
     }
 
-    private void ApplyFireRateUpgrade(int value) //提升射速
+    private void ApplyFireRateUpgrade(int value) //提升射速 实现保存✅
     {
         if (playerController == null)
         {
@@ -212,7 +212,7 @@ public class UpgradeManager : MonoBehaviour
         Debug.Log($"射速提升，当前间隔：{playerController.fireRate:F2}秒");
     }
 
-    private void ApplyMaxHealthUpgrade(int value) //提升最大生命值
+    private void ApplyMaxHealthUpgrade(int value) //提升最大生命值 实现保存✅
     {
         if (playerController == null)
         {
@@ -228,7 +228,7 @@ public class UpgradeManager : MonoBehaviour
         Debug.Log($"最大生命值提升至：{playerController.health}");
     }
 
-    private void GetOrAddSpecialBullet(SpecialBulletType type, int extraDamageValue) //获得特殊子弹/增加伤害
+    private void GetOrAddSpecialBullet(SpecialBulletType type, int extraDamageValue) //获得特殊子弹/增加伤害 实现保存✅
     {
         switch (type)
         {
@@ -259,7 +259,7 @@ public class UpgradeManager : MonoBehaviour
         }
     }
 
-    private void ApplySlowTimeLongerUpgrade(int value) //提升减速效果
+    private void ApplySlowTimeLongerUpgrade(int value) //提升减速效果 实现保存✅
     {
         if (frostBulletPrefab == null)
         {
@@ -275,7 +275,7 @@ public class UpgradeManager : MonoBehaviour
         Debug.Log($"冰冻减速时长提升至：{frostBulletPrefab.slowDuration:F1}秒");
     }
 
-    private void ApplyBulletRangeUpgrade(int value) //提升爆炸范围
+    private void ApplyBulletRangeUpgrade(int value) //提升爆炸范围 实现保存✅
     {
         if (explosiveBulletPrefab == null)
         {
