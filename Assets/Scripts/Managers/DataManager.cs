@@ -15,7 +15,9 @@ public static class DataManager
 
     // 敌人数据（Int）✅
     public const string Enemy1MaxHealthKey = "BaseEnemyMaxHealth";
+    public const string Enemy1ExpRewardKey = "BaseEnemyExpEReward"; //经验奖励01，新增
     public const string Enemy2MaxHealthKey = "HeavyEnemyMaxHealth";
+    public const string Enemy2ExpRewardKey = "HeavyEnemyExpEReward"; //经验奖励02，新增
     public const string Enemy1DamageKey = "BaseEnemyDamage";
     public const string Enemy2DamageKey = "HeavyEnemyDamage";
 

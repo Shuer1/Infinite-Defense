@@ -241,7 +241,8 @@ public class UpgradeManager : MonoBehaviour
                 explosiveBulletPrefab.explosionDamage += extraDamageValue;
                 UpdateAllPooledBulletsDamage(BulletType.ExplosiveBullet, PoolType.ExplosiveBulletPool, explosiveBulletPrefab.explosionDamage);
 
-                DataManager.SaveInt(DataManager.ExplosiveDamageKey,explosiveBulletPrefab.explosionDamage);
+                DataManager.SaveInt(DataManager.ExplosiveDamageKey, explosiveBulletPrefab.explosionDamage);
+                DataManager.SaveInt(DataManager.ExplosiveBulletChanceKey,0);
                 Debug.Log($"爆炸子弹伤害提升至：{explosiveBulletPrefab.explosionDamage}");
                 break;
             case SpecialBulletType.Frost:

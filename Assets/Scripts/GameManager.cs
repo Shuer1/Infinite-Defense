@@ -26,7 +26,6 @@ public class GameManager : MonoBehaviour
         UIManager.Instance.UpdateScore(score);
 
         DataManager.SaveInt(DataManager.HighScoreKey, score);
-
     }
 
     public void GameOver()
@@ -34,13 +33,13 @@ public class GameManager : MonoBehaviour
         if (isGameOver) return;
         Debug.Log("Game Over UI Appears");
         isGameOver = true;
-
-        DataManager.FlushSave();            //全部数据统一保存
+        DataManager.FlushSave();
         UIManager.Instance.ShowGameOver();
     }
 
     public void Restart()
     {
+        DataManager.FlushSave();
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
     
