@@ -238,11 +238,13 @@ public class UpgradeManager : MonoBehaviour
                     Debug.LogError("explosiveBulletPrefab未赋值", this);
                     return;
                 }
+
                 explosiveBulletPrefab.explosionDamage += extraDamageValue;
+                playerController.explosiveBulletChance += 2;
                 UpdateAllPooledBulletsDamage(BulletType.ExplosiveBullet, PoolType.ExplosiveBulletPool, explosiveBulletPrefab.explosionDamage);
 
                 DataManager.SaveInt(DataManager.ExplosiveDamageKey, explosiveBulletPrefab.explosionDamage);
-                DataManager.SaveInt(DataManager.ExplosiveBulletChanceKey,0);
+                DataManager.SaveInt(DataManager.ExplosiveBulletChanceKey,playerController.explosiveBulletChance);
                 Debug.Log($"爆炸子弹伤害提升至：{explosiveBulletPrefab.explosionDamage}");
                 break;
             case SpecialBulletType.Frost:
@@ -251,10 +253,13 @@ public class UpgradeManager : MonoBehaviour
                     Debug.LogError("frostBulletPrefab未赋值", this);
                     return;
                 }
-                frostBulletPrefab.frostDamage += extraDamageValue;
-                UpdateAllPooledBulletsDamage(BulletType.FrostBullet, PoolType.FrostBulletPool, frostBulletPrefab.damage);
 
-                DataManager.SaveInt(DataManager.FrostDamageKey,frostBulletPrefab.frostDamage);
+                frostBulletPrefab.frostDamage += extraDamageValue;
+                playerController.normalBulletChance -= 1;
+                UpdateAllPooledBulletsDamage(BulletType.FrostBullet, PoolType.FrostBulletPool, frostBulletPrefab.damage);
+                
+                DataManager.SaveInt(DataManager.FrostDamageKey, frostBulletPrefab.frostDamage);
+                DataManager.SaveInt(DataManager.NormalBulletChanceKey, playerController.normalBulletChance, isGreater:false);
                 Debug.Log($"冰冻子弹伤害提升至：{frostBulletPrefab.damage}");
                 break;
         }
