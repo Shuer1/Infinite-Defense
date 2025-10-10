@@ -15,7 +15,7 @@ public class Bullet : MonoBehaviour
 
     void Start()
     {
-        DataManager.GetInt(DataManager.BaseBulletDamageKey);  //初始化
+        damage = DataManager.GetInt(DataManager.BaseBulletDamageKey);  //初始化
     }
     void Update()
     {

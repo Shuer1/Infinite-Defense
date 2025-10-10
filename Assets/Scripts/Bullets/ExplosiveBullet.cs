@@ -91,7 +91,7 @@ public class ExplosiveBullet : Bullet
 
     void SyncExplosiveBulletData()
     {
-        DataManager.GetInt(DataManager.ExplosiveDamageKey);
-        DataManager.GetFloat(DataManager.ExplosionRangeKey);
+        explosionDamage = DataManager.GetInt(DataManager.ExplosiveDamageKey);
+        explosionRadius = DataManager.GetFloat(DataManager.ExplosionRangeKey);
     }
 }
