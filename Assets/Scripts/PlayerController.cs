@@ -23,8 +23,16 @@ public class PlayerController : MonoBehaviour
     public bool isDead = false;
     private bool isMoving = false;
     private float moveThreshold = 0.01f;
+
     [Header("虚拟移动轮盘")]
     public VirtualJoystick joystick;
+
+    [Header("自动锁敌设置")]
+    public float lockOnRange = 10f;
+    public float targetCheckInterval = 0.5f; //检测频率
+    private float targetCheckTimer = 0f;
+    private EnemyBase currentTarget;
+    private EnemyManager enemyManager;
 
     private Rigidbody rb;
     private Animator animator;
@@ -39,6 +47,10 @@ public class PlayerController : MonoBehaviour
     [Range(0, 100)]
     public int explosiveBulletChance = 0; //Data6
 
+    void Awake()
+    {
+        enemyManager = FindObjectOfType<EnemyManager>();
+    }
     void Start()
     {
         SyncPlayerData(); //同步初始化玩家数据
@@ -91,19 +103,32 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        // 射击（控制间隔）
+        // 射击（计时器更新，自动攻击）
         fireTimer += Time.deltaTime;
+        /*取消手动鼠标按下攻击
         if (Input.GetMouseButton(0) && fireTimer >= fireRate)
         {
-            Shoot();
-            shootSound.Play();
+            Shoot(firePoint.rotation);
             fireTimer = 0f;
+        }
+        */
+        AutoLockAndShoot();
+        // 始终朝向目标
+        if (currentTarget != null)
+        {
+            Vector3 targetDirection = currentTarget.transform.position - transform.position;
+            targetDirection.y = 0; // 保持Y轴不变，避免上下旋转
+            if (targetDirection.sqrMagnitude > 0.01f) // 确保有距离才旋转
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
+                transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
+            }
         }
 
         AnimatorFunc();
     }
 
-    void SyncPlayerData()  //初始化玩家相关信息
+    void SyncPlayerData()  //初始化玩家数据
     {
         //玩家自身数据
         health = DataManager.GetInt(DataManager.PlayerMaxHealthKey);
@@ -114,15 +139,14 @@ public class PlayerController : MonoBehaviour
         normalBulletChance = DataManager.GetInt(DataManager.NormalBulletChanceKey);
         explosiveBulletChance = DataManager.GetInt(DataManager.ExplosiveBulletChanceKey);
 
-        Debug.Log("初始化玩家信息完成!True!");
+        Debug.Log("初始化玩家信息完成!");
     }
 
-    void Shoot()
+    void Shoot(Quaternion bulletRotation)
     {
         ClampProbabilities(); // 每次射击前强制修正概率，确保合法性
 
         int randomValue = Random.Range(0, 100);
-
         int cumulativeProbability = 0;
 
         // 普通子弹
@@ -134,7 +158,8 @@ public class PlayerController : MonoBehaviour
                 Debug.LogError("普通子弹池未初始化!请检查BulletPool的Instance设置");
                 return;
             }
-            BulletPool.Instance.GetBullet(firePoint.position, firePoint.rotation);
+            BulletPool.Instance.GetBullet(firePoint.position, bulletRotation);
+            shootSound.Play();
             return;
         }
 
@@ -147,7 +172,8 @@ public class PlayerController : MonoBehaviour
                 Debug.LogError("爆炸子弹池未初始化!请检查ExplosiveBulletPool的Instance设置");
                 return;
             }
-            ExplosiveBulletPool.Instance.GetBullet(firePoint.position, firePoint.rotation);
+            ExplosiveBulletPool.Instance.GetBullet(firePoint.position, bulletRotation);
+            shootSound.Play();
             return;
         }
 
@@ -157,14 +183,14 @@ public class PlayerController : MonoBehaviour
             Debug.LogError("冰冻子弹池未初始化!请检查FrostBulletPool的Instance设置");
             return;
         }
-        FrostBulletPool.Instance.GetBullet(firePoint.position, firePoint.rotation);
+        FrostBulletPool.Instance.GetBullet(firePoint.position, bulletRotation);
+        shootSound.Play();
     }
 
     public void TakeDamage(int damage)
     {
         Debug.Log($"玩家受到伤害: {damage}");
         animator.SetTrigger("Hit");
-        // Original Method : currentHealth -= damage;
         currentHealth = Mathf.Max(currentHealth - damage, 0);
         UIManager.Instance.UpdateAndShowPlayerHP(currentHealth, health);
         if (currentHealth <= 0)
@@ -190,11 +216,11 @@ public class PlayerController : MonoBehaviour
         level++;
         experience = 0;
         experienceToNextLevel += 50; // 每次升级需要更多经验：应优化为使用非线性增长，前期较容易，后期越来越难
-        //升级刷新回复血量
+        //升级刷新恢复血量
         currentHealth = health;
         UIManager.Instance.UpdateAndShowPlayerHP(currentHealth, health);
         UpgradeManager.Instance.ShowUpgradeOptions();
-
+        //保存数据
         DataManager.SaveInt(DataManager.PlayerLevelKey, level);
         DataManager.SaveInt(DataManager.NextLevelExpKey,experienceToNextLevel);
     }
@@ -204,19 +230,17 @@ public class PlayerController : MonoBehaviour
 
         isDead = true;
         animator.SetTrigger("Die");
-        //enemyBase.playerisdied = isDead;
         Debug.Log("Player Died");
-        // 这里可以添加死亡动画或效果
         GameManager.Instance.GameOver();
     }
 
     void AnimatorFunc()
     {
         animator.SetBool("Run", rb.velocity.magnitude > 0);
-        animator.SetBool("Shoot", Input.GetMouseButton(0));
+        animator.SetBool("Shoot", currentTarget != null && fireTimer >= fireRate);
     }
 
-    public void ResetLive() //复活功能 - 用于激励广告！提高游戏宽容度!
+    public void ResetLive() //❌待实现：复活功能 - 用于激励广告！提高游戏宽容度!
     {
         Debug.Log("选择复活!");
     }
@@ -248,11 +272,82 @@ public class PlayerController : MonoBehaviour
                 explosiveBulletChance = newPercentage;
                 break;
             case BulletType.Frost:
-                int delta = (100 - normalBulletChance - explosiveBulletChance) - newPercentage;
+                int delta = 100 - normalBulletChance - explosiveBulletChance - newPercentage;
                 explosiveBulletChance += delta;
                 break;
         }
         ClampProbabilities(); // 确保修正
+    }
+
+    private void AutoLockAndShoot()
+    {
+        targetCheckTimer += Time.deltaTime;
+        if (targetCheckTimer >= targetCheckInterval)
+        {
+            UpdateTarget();
+            targetCheckTimer = 0f;
+        }
+
+        if (currentTarget != null && fireTimer >= fireRate)
+        {
+            Vector3 targetDirection = currentTarget.transform.position - firePoint.position;
+            targetDirection.y = 0;
+            Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
+            Shoot(targetRotation);
+            fireTimer = 0f;
+        }
+    }
+
+    private void UpdateTarget()
+    {
+        if (IsTargetValid(currentTarget))
+        {
+            return;
+        }
+
+        currentTarget = FindBestTarget();
+    }
+
+    private bool IsTargetValid(EnemyBase target)
+    {
+        if (target == null) return false;
+        if (!target.gameObject.activeInHierarchy) return false;
+
+        // 使用平方距离判断，避免开方运算
+        float sqrDistance = (target.transform.position - transform.position).sqrMagnitude;
+        return sqrDistance <= lockOnRange * lockOnRange;
+    }
+    
+    // 寻找最佳目标（范围内最近的敌人）
+    private EnemyBase FindBestTarget()
+    {
+        if (enemyManager == null || enemyManager.activeEnemies.Count == 0)
+        {
+            return null;
+        }
+
+        float closestSqrDistance = lockOnRange * lockOnRange;
+        EnemyBase closestEnemy = null;
+        Vector3 playerPos = transform.position;
+
+        // 遍历活跃敌人（EnemyManager已维护有效列表）
+        foreach (var enemy in enemyManager.activeEnemies)
+        {
+            if (enemy == null || !enemy.gameObject.activeInHierarchy)
+                continue;
+
+            // 计算平方距离（性能更优）
+            float sqrDistance = (enemy.transform.position - playerPos).sqrMagnitude;
+
+            // 只记录范围内更近的敌人
+            if (sqrDistance < closestSqrDistance)
+            {
+                closestSqrDistance = sqrDistance;
+                closestEnemy = enemy;
+            }
+        }
+
+        return closestEnemy;
     }
 }
 

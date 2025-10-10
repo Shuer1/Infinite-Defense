@@ -16,7 +16,7 @@ public class EnemyManager : MonoBehaviour
     // 对象池：key=怪物类型，value=待复用的怪物队列
     private Dictionary<EnemyType, Queue<EnemyBase>> enemyPools = new();
     // 当前活跃的怪物列表
-    private List<EnemyBase> activeEnemies = new();
+    public List<EnemyBase> activeEnemies = new(); //默认是private
 
     // 所有怪物被清空时触发（用于波数更新）
     public event System.Action OnAllEnemiesCleared;
