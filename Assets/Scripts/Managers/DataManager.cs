@@ -195,10 +195,6 @@ public static class DataManager
             _isDirty = false;
             Debug.Log("数据已保存到本地"); // 调试用，发布时可注释
         }
-        else
-        {
-            Debug.Log("Nothing Updated...");
-        }
     }
 
     // --------------- 辅助功能：清空所有保存数据 ---------------

@@ -240,7 +240,7 @@ public class UpgradeManager : MonoBehaviour
                 }
 
                 explosiveBulletPrefab.explosionDamage += extraDamageValue;
-                playerController.explosiveBulletChance += 2;
+                playerController.AdjustBulletChances(0,2);
                 UpdateAllPooledBulletsDamage(BulletType.ExplosiveBullet, PoolType.ExplosiveBulletPool, explosiveBulletPrefab.explosionDamage);
 
                 DataManager.SaveInt(DataManager.ExplosiveDamageKey, explosiveBulletPrefab.explosionDamage);
@@ -255,7 +255,7 @@ public class UpgradeManager : MonoBehaviour
                 }
 
                 frostBulletPrefab.frostDamage += extraDamageValue;
-                playerController.normalBulletChance -= 1;
+                playerController.AdjustBulletChances(-1,0);
                 UpdateAllPooledBulletsDamage(BulletType.FrostBullet, PoolType.FrostBulletPool, frostBulletPrefab.damage);
                 
                 DataManager.SaveInt(DataManager.FrostDamageKey, frostBulletPrefab.frostDamage);
