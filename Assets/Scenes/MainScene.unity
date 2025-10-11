@@ -4205,6 +4205,7 @@ MonoBehaviour:
   joystick: {fileID: 473153303}
   lockOnRange: 10
   targetCheckInterval: 0.5
+  enemyManager: {fileID: 1031757754}
   moveSound: {fileID: 754927731}
   shootSound: {fileID: 1050021791}
   btn_ResetLive: {fileID: 1260621336}

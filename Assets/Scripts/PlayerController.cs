@@ -32,7 +32,7 @@ public class PlayerController : MonoBehaviour
     public float targetCheckInterval = 0.5f; //检测频率
     private float targetCheckTimer = 0f;
     private EnemyBase currentTarget;
-    private EnemyManager enemyManager;
+    [SerializeField] private EnemyManager enemyManager;
 
     private Rigidbody rb;
     private Animator animator;
@@ -50,7 +50,10 @@ public class PlayerController : MonoBehaviour
 
     void Awake()
     {
-        enemyManager = FindObjectOfType<EnemyManager>();
+        if (enemyManager == null)
+        {
+            enemyManager = FindObjectOfType<EnemyManager>();
+        }
     }
     void Start()
     {
@@ -126,13 +129,14 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        AnimatorFunc();
+        animator.SetBool("Run", rb.velocity.magnitude > 0);
+        animator.SetBool("Shoot", currentTarget != null && fireTimer >= fireRate);
     }
 
     void SyncPlayerData()  //初始化玩家数据
     {
         //玩家自身数据
-        health = DataManager.GetInt(DataManager.PlayerMaxHealthKey);
+        health = DataManager.GetInt(DataManager.PlayerMaxHealthKey,PlayerInitialConfig.MaxHealth);
         level = DataManager.GetInt(DataManager.PlayerLevelKey);
         experienceToNextLevel = DataManager.GetInt(DataManager.NextLevelExpKey);
         fireRate = DataManager.GetFloat(DataManager.PlayerShootSpeedKey);
@@ -217,11 +221,10 @@ public class PlayerController : MonoBehaviour
     {
         level++;
         experience = 0;
-        experienceToNextLevel += 50; // 每次升级需要更多经验：应优化为使用非线性增长，前期较容易，后期越来越难
-        //升级刷新恢复血量
-        currentHealth = health;
-        UIManager.Instance.UpdateAndShowPlayerHP(currentHealth, health);
-        UpgradeManager.Instance.ShowUpgradeOptions();
+        experienceToNextLevel = Mathf.RoundToInt(100 * Mathf.Pow(1.2f, level - 1)); // 每次升级需要更多经验：应优化为使用非线性增长，前期较容易，后期越来越难
+        currentHealth = health; //升级刷新恢复血量
+        UIManager.Instance?.UpdateAndShowPlayerHP(currentHealth, health);
+        UpgradeManager.Instance?.ShowUpgradeOptions();
         //保存数据
         DataManager.SaveInt(DataManager.PlayerLevelKey, level);
         DataManager.SaveInt(DataManager.NextLevelExpKey,experienceToNextLevel);
@@ -234,23 +237,19 @@ public class PlayerController : MonoBehaviour
         animator.SetTrigger("Die");
         animator.SetBool("ResetLive",false);
         Debug.Log("Player Died");
-        GameManager.Instance.GameOver();
+        GameManager.Instance?.GameOver();
     }
-
-    void AnimatorFunc()
-    {
-        animator.SetBool("Run", rb.velocity.magnitude > 0);
-        animator.SetBool("Shoot", currentTarget != null && fireTimer >= fireRate);
-    }
-
     public void ResetLive()
     {
         Debug.Log("选择复活!");
         currentHealth = health;
+        animator.ResetTrigger("Die");
+        experience /= 2; // 复活损失一半经验
         isDead = false;
         isMoving = false;
 
         GameManager.Instance?.Restart();
+        animator.ResetTrigger("Die");
         animator.SetBool("ResetLive", true);
 
         if (rb != null)
@@ -262,8 +261,9 @@ public class PlayerController : MonoBehaviour
         fireTimer = 0f;
         currentTarget = null;
         // 复活后立即强制更新目标，避免等待检测间隔
-        UpdateTarget(); 
-        UIManager.Instance?.UpdateAndShowPlayerHP(currentHealth, health);
+        UpdateTarget();
+        UIManager.Instance?.UpdateAndShowPlayerHP(currentHealth,health);
+        UIManager.Instance?.ShowAndUpdatePlayerExp(experience,experienceToNextLevel);
 
         StartCoroutine(InvincibilityTime(2f));
     }
