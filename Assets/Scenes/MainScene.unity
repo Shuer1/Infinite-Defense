@@ -4000,10 +4000,10 @@ RectTransform:
   - {fileID: 716986206}
   - {fileID: 2112960736}
   - {fileID: 473153302}
-  - {fileID: 1493371821}
   - {fileID: 1587025738}
   - {fileID: 1933156926}
   - {fileID: 1323571303}
+  - {fileID: 1493371821}
   - {fileID: 1844707739}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5102,6 +5102,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 1493371820}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 942823808}
         m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
         m_MethodName: ResetLive

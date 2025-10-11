@@ -31,7 +31,7 @@ public class GameManager : MonoBehaviour
     public void GameOver()
     {
         if (isGameOver) return;
-        Debug.Log("Game Over UI Appears");
+
         isGameOver = true;
         DataManager.FlushSave();
         UIManager.Instance.ShowGameOver();

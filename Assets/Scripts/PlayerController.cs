@@ -243,6 +243,9 @@ public class PlayerController : MonoBehaviour
     public void ResetLive() //❌待实现：复活功能 - 用于激励广告！提高游戏宽容度!
     {
         Debug.Log("选择复活!");
+        currentHealth = health;
+        isDead = false;
+        animator.SetTrigger("ResetLive");
     }
     private void ClampProbabilities()
     {
