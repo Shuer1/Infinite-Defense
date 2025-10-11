@@ -4200,7 +4200,7 @@ MonoBehaviour:
   experienceToNextLevel: 100
   firePoint: {fileID: 1050021790}
   fireRate: 0.5
-  moveSpeed: 2.4
+  moveSpeed: 2.5
   isDead: 0
   joystick: {fileID: 473153303}
   lockOnRange: 10
