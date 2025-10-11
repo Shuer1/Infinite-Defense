@@ -130,8 +130,18 @@ public abstract class EnemyBase : MonoBehaviour
     // 移动到玩家的通用方法
     private void MoveTowardsPlayer()
     {
-        Vector3 dir = (player.position - transform.position).normalized;
-        transform.position += dir * moveSpeed * Time.deltaTime;
+        if (player == null) return; // 避免空引用错误
+        
+        // 计算指向玩家的方向，但强制Y轴分量为0（仅在XZ平面移动）
+        Vector3 dir = player.position - transform.position;
+        dir.y = 0; // 忽略Y轴差异，确保方向仅在水平平面
+        dir.Normalize(); // 重新归一化方向向量（因为Y轴归零后长度会变化）
+        
+        // 计算新位置时，保持当前Y坐标不变
+        Vector3 newPosition = transform.position + dir * moveSpeed * Time.deltaTime;
+        newPosition.y = transform.position.y; // 强制Y轴位置与移动前一致
+        
+        transform.position = newPosition;
         transform.LookAt(player);
     }
 

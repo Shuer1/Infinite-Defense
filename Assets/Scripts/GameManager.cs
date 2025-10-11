@@ -39,8 +39,11 @@ public class GameManager : MonoBehaviour
 
     public void Restart()
     {
+        isGameOver = false;
+        /*
         DataManager.FlushSave();
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        */
     }
     
     // 初始化玩家相关数据

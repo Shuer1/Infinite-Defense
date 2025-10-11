@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using UnityEditor;
-
+using System.Collections;
 //using Unity.PlasticSCM.Editor.WebApi;
 //using Unity.VisualScripting;
 using UnityEngine;
@@ -36,6 +36,7 @@ public class PlayerController : MonoBehaviour
 
     private Rigidbody rb;
     private Animator animator;
+    private bool isInvincible = false;
     [Header("玩家音效")]
     public AudioSource moveSound;
     public AudioSource shootSound;
@@ -189,6 +190,7 @@ public class PlayerController : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
+        if (isInvincible) return;
         Debug.Log($"玩家受到伤害: {damage}");
         animator.SetTrigger("Hit");
         currentHealth = Mathf.Max(currentHealth - damage, 0);
@@ -227,9 +229,10 @@ public class PlayerController : MonoBehaviour
 
     void Die()
     {
-
         isDead = true;
+        animator.ResetTrigger("Hit");
         animator.SetTrigger("Die");
+        animator.SetBool("ResetLive",false);
         Debug.Log("Player Died");
         GameManager.Instance.GameOver();
     }
@@ -240,12 +243,29 @@ public class PlayerController : MonoBehaviour
         animator.SetBool("Shoot", currentTarget != null && fireTimer >= fireRate);
     }
 
-    public void ResetLive() //❌待实现：复活功能 - 用于激励广告！提高游戏宽容度!
+    public void ResetLive()
     {
         Debug.Log("选择复活!");
         currentHealth = health;
         isDead = false;
-        animator.SetTrigger("ResetLive");
+        isMoving = false;
+
+        GameManager.Instance?.Restart();
+        animator.SetBool("ResetLive", true);
+
+        if (rb != null)
+        {
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+
+        fireTimer = 0f;
+        currentTarget = null;
+        // 复活后立即强制更新目标，避免等待检测间隔
+        UpdateTarget(); 
+        UIManager.Instance?.UpdateAndShowPlayerHP(currentHealth, health);
+
+        StartCoroutine(InvincibilityTime(2f));
     }
     private void ClampProbabilities()
     {
@@ -255,7 +275,6 @@ public class PlayerController : MonoBehaviour
         explosiveBulletChance = Mathf.Clamp(explosiveBulletChance, 0, 100 - normalBulletChance);
         // 此时冰冻子弹概率自动为非负且总和为100
     }
-
     /// 调整子弹概率（用于升级系统）
     public void AdjustBulletChances(int normalDelta, int explosiveDelta)
     {
@@ -320,7 +339,7 @@ public class PlayerController : MonoBehaviour
         float sqrDistance = (target.transform.position - transform.position).sqrMagnitude;
         return sqrDistance <= lockOnRange * lockOnRange;
     }
-    
+
     // 寻找最佳目标（范围内最近的敌人）
     private EnemyBase FindBestTarget()
     {
@@ -351,6 +370,15 @@ public class PlayerController : MonoBehaviour
         }
 
         return closestEnemy;
+    }
+    
+    // 可选：复活无敌时间（优化体验，避免刚复活就被秒杀）
+    private IEnumerator InvincibilityTime(float duration)
+    {
+        isInvincible = true;
+        yield return new WaitForSeconds(duration);
+        isInvincible = false;
+        Debug.Log("无敌时间结束");
     }
 }
 
