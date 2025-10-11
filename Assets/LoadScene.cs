@@ -5,6 +5,7 @@ using System.Collections;
 public class LoadScene : MonoBehaviour
 {
     [SerializeField] private GameObject pauseMenu;
+    [SerializeField] private GameObject helpMenu;
     [SerializeField] private AudioSource clickedSound;
     bool isPausing = false;
 
@@ -17,7 +18,13 @@ public class LoadScene : MonoBehaviour
     public void PauseGame()
     {
         isPausing = true;
-        StartCoroutine(PauseWithSlowMotion(pauseMenu,0.5f));
+        StartCoroutine(PauseWithSlowMotion(pauseMenu, 0.5f));
+    }
+    
+    public void ShowHelp()
+    {
+        isPausing = true;
+        StartCoroutine(PauseWithSlowMotion(helpMenu,0.5f));
     }
     
     public IEnumerator PauseWithSlowMotion(GameObject pauseMenu, float duration = 0.5f)
