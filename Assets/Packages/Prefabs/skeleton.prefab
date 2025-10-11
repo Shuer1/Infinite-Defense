@@ -1330,7 +1330,7 @@ MonoBehaviour:
   maxHealth: 100
   currentHealth: 0
   damage: 10
-  moveSpeed: 1
+  moveSpeed: 1.5
   originalMoveSpeed: 1
   expReward: 25
   scoreReward: 3
