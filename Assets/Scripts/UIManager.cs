@@ -11,6 +11,7 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI maxHPText;
     public TextMeshProUGUI attack;
     public TextMeshProUGUI exp;
+    public TextMeshProUGUI propCount;
     [Header("Game Over Info")]
     public GameObject gameOverPanel;
 
@@ -21,7 +22,7 @@ public class UIManager : MonoBehaviour
 
     void Start()
     {
-        InitiateUIInfo();
+        ShowhighScore();
     }
 
     public void UpdateScore(int score)
@@ -56,16 +57,12 @@ public class UIManager : MonoBehaviour
         int current_highScore = DataManager.GetInt(DataManager.HighScoreKey);
         highScoreText.text = "High Score: " + current_highScore;
     }
-    private void ShowMaxHP()
+
+    public void ShowAndUpdatePropCount(int currentPropCount)
     {
-        int maxHP = DataManager.GetInt(DataManager.PlayerMaxHealthKey);
+        propCount.text = currentPropCount.ToString();
     }
 
-    private void InitiateUIInfo()
-    {
-        ShowhighScore();
-    }
-    
     public void ShowGameOver()
     {
         gameOverPanel.SetActive(true);

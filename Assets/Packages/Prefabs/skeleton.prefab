@@ -1330,8 +1330,8 @@ MonoBehaviour:
   maxHealth: 100
   currentHealth: 0
   damage: 10
-  moveSpeed: 1.5
-  originalMoveSpeed: 1
+  moveSpeed: 2
+  originalMoveSpeed: 2
   expReward: 25
   scoreReward: 3
   isDead: 0

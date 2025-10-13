@@ -12,6 +12,7 @@ public static class DataManager
     public const string PlayerLevelKey = "PlayerLevel";
     public const string NextLevelExpKey = "NextLevelExp";
     public const string PlayerShootSpeedKey = "PlayerShootSpeed";
+    public const string CurrentPropCountKey = "CurrentPropCount";
 
     // 敌人数据（Int）✅
     public const string Enemy1MaxHealthKey = "BaseEnemyMaxHealth";

@@ -6,6 +6,7 @@ public static class PlayerInitialConfig
     public const int Level = 1;             // 初始等级
     public const int NextLevelExp = 100;    // 初始下一级经验
     public const float ShootInterval = 0.3f; // 初始发射周期
+    public const int CurrentPropCount = 1; // 道具数量初始值
 }
 
 public static class BulletsInitialConfig

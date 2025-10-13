@@ -5,13 +5,13 @@ using System;
 using System.Collections;
 using UnityEngine.SceneManagement;
 
-public class AdsManager : MonoBehaviour
+public class AdsManager : MonoBehaviour //单例
 {
     public static AdsManager Instance;
 
     private AppOpenAd appOpenAd;
     private BannerView bannerView;
-    private RewardedAd rewardedAd;  // 新增：激励广告实例
+    private RewardedAd rewardedAd;
     private bool isInitialized = false;
     private bool hasShownFirstOpenAd = false;
     private bool isShowingAppOpenAd = false;
@@ -49,7 +49,7 @@ public class AdsManager : MonoBehaviour
         if (Instance == null) 
         { 
             Instance = this; 
-            DontDestroyOnLoad(gameObject); 
+            DontDestroyOnLoad(gameObject);
         }
         else 
         { 
@@ -217,7 +217,7 @@ public class AdsManager : MonoBehaviour
 
         if (bannerView == null)
         {
-            bannerView = new BannerView(BANNER_ID, AdSize.Banner, AdPosition.Top);
+            bannerView = new BannerView(BANNER_ID, AdSize.Banner, AdPosition.Bottom);
             bannerView.OnBannerAdLoaded += HandleBannerLoaded;
             bannerView.OnBannerAdLoadFailed += HandleBannerFailed;
         }
