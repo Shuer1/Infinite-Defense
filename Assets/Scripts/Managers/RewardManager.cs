@@ -144,7 +144,7 @@ public class RewardManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("AdsManager未初始化，无法注册广告回调事件！");
+            Debug.LogError("AdsManager未初始化,无法注册广告回调事件！");
         }
     }
 
