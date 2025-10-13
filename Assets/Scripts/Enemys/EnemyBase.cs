@@ -163,7 +163,7 @@ public abstract class EnemyBase : MonoBehaviour
         if (isDead) return; // 已死亡不接受伤害
 
         currentHealth -= dmg;
-        Debug.Log($"敌人受到伤害: {dmg}, 剩余生命值: {currentHealth}");
+        //Debug.Log($"敌人受到伤害: {dmg}, 剩余生命值: {currentHealth}");
 
         if (currentHealth <= 0)
         {

@@ -54,6 +54,17 @@ public class RewardManager : MonoBehaviour
         // 点击后禁用按钮，防止重复点击
         rewardButton.interactable = false;
 
+        //道具使用逻辑，可封装成方法调用
+        if (currentPropCount > 0)
+        {
+            currentPropCount -= 1;
+            UIManager.Instance.ShowAndUpdatePropCount(currentPropCount);
+            DataManager.SaveIntForce(DataManager.CurrentPropCountKey, currentPropCount);
+            Debug.Log("使用道具！");
+            EnableButton();
+            return;
+        }
+
         // 调用AdsManager显示激励广告
         bool isAdShown = AdsManager.Instance.ShowRewardedAd();
         if (!isAdShown)

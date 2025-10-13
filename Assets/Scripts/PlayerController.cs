@@ -207,7 +207,6 @@ public class PlayerController : MonoBehaviour
 
     public void GainExp(int exp)
     {
-        Debug.Log($"获得经验: {exp}");
         experience += exp;
         if (experience >= experienceToNextLevel)
         {
@@ -222,8 +221,10 @@ public class PlayerController : MonoBehaviour
         level++;
         experience = 0;
         experienceToNextLevel = Mathf.RoundToInt(100 * Mathf.Pow(1.2f, level - 1)); // 每次升级需要更多经验：应优化为使用非线性增长，前期较容易，后期越来越难
-        currentHealth = health; //升级刷新恢复血量
+        currentHealth = health; 
+        //升级刷新恢复血量和更新等级
         UIManager.Instance?.UpdateAndShowPlayerHP(currentHealth, health);
+        UIManager.Instance?.ShowLevel(level);
         UpgradeManager.Instance?.ShowUpgradeOptions();
         //保存数据
         DataManager.SaveInt(DataManager.PlayerLevelKey, level);

@@ -11,6 +11,7 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI maxHPText;
     public TextMeshProUGUI attack;
     public TextMeshProUGUI exp;
+    public TextMeshProUGUI level;
     public TextMeshProUGUI propCount;
     [Header("Game Over Info")]
     public GameObject gameOverPanel;
@@ -22,7 +23,7 @@ public class UIManager : MonoBehaviour
 
     void Start()
     {
-        ShowhighScore();
+        InitUI();
     }
 
     public void UpdateScore(int score)
@@ -42,6 +43,18 @@ public class UIManager : MonoBehaviour
         playerHP.value = hpPercentage;
     }
 
+    private void ShowMaxHP()
+    {
+        int current_MaxHP = DataManager.GetInt(DataManager.PlayerMaxHealthKey);
+        maxHPText.text = current_MaxHP.ToString();
+    }
+
+    private void ShowhighScore()
+    {
+        int current_highScore = DataManager.GetInt(DataManager.HighScoreKey);
+        highScoreText.text = "High Score: " + current_highScore;
+    }
+
     public void ShowAndUpdatePlayerAttack(int newAttack) //统一更新和显示玩家额外信息方法
     {
         attack.text = newAttack.ToString();
@@ -52,15 +65,28 @@ public class UIManager : MonoBehaviour
         exp.text = currentExp.ToString() + " / " + nextLevelExp.ToString();
     }
 
-    private void ShowhighScore()  //用于初始化显示历史最高分数
-    {
-        int current_highScore = DataManager.GetInt(DataManager.HighScoreKey);
-        highScoreText.text = "High Score: " + current_highScore;
-    }
-
     public void ShowAndUpdatePropCount(int currentPropCount)
     {
         propCount.text = currentPropCount.ToString();
+    }
+
+    public void ShowLevel(int level_value)
+    {
+        level.text = "LEVEL: " + level_value;
+    }
+
+    private void InitUI()
+    {
+        ShowMaxHP();
+        ShowhighScore();
+        int level_value = DataManager.GetInt(DataManager.PlayerLevelKey);
+        ShowLevel(level_value);
+        int current_Attack = DataManager.GetInt(DataManager.BaseBulletDamageKey);
+        ShowAndUpdatePlayerAttack(current_Attack);
+        int current_Exp = DataManager.GetInt(DataManager.NextLevelExpKey);
+        ShowAndUpdatePlayerExp(0, current_Exp);
+        int current_PropCount = DataManager.GetInt(DataManager.CurrentPropCountKey);
+        ShowAndUpdatePropCount(current_PropCount);
     }
 
     public void ShowGameOver()
