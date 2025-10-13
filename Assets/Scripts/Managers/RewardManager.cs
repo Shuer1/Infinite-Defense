@@ -2,76 +2,234 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// 奖励管理器 - 处理道具获取、使用及冷却逻辑
+/// </summary>
 public class RewardManager : MonoBehaviour
 {
     [Header("奖励配置")]
-    public int currentPropCount; //拥有道具数量（本地保存）
-    [SerializeField] private Button rewardButton; // 获取道具按钮
+    [Tooltip("当前拥有的道具数量（本地持久化）")]
+    public int currentPropCount; 
+    
+    [Tooltip("道具使用后的冷却间隔（秒）")]
+    public float propUsedCooldownInterval = 15f; 
+
+    [Tooltip("获取道具的按钮组件")]
+    [SerializeField] private Button rewardButton; 
+    
+    [Tooltip("冷却进度遮罩图片")]
+    [SerializeField] private Image cooldownMask;
+
+    private float _cooldownTimer; // 冷却计时器
+    private bool _isInCooldown;   // 是否处于冷却中
+
     private void Awake()
     {
-        // 获取按钮组件
-        if (rewardButton == null)
-        {
-            Debug.Log("道具获取按钮未绑定！尝试自动寻找添加组件！");
-            rewardButton = GetComponent<Button>();
-        }
-
+        InitComponents();
     }
-    
-    void Start()
+
+    private void Start()
     {
-        currentPropCount = DataManager.GetInt(DataManager.CurrentPropCountKey, PlayerInitialConfig.CurrentPropCount); //初始化道具数量
+        InitPropCount();
+    }
+
+    private void Update()
+    {
+        UpdateCooldownLogic();
     }
 
     private void OnEnable()
     {
-        // 注册按钮点击事件
-        rewardButton.onClick.AddListener(OnFreeRewardClicked);
-        // 注册广告完成回调（注意：每次启用时注册，避免重复）
+        RegisterEvents();
+    }
+
+    private void OnDisable()
+    {
+        UnregisterEvents();
+    }
+
+    /// <summary>
+    /// 初始化组件引用
+    /// </summary>
+    private void InitComponents()
+    {
+        // 自动获取按钮组件（如果未手动绑定）
+        if (rewardButton == null)
+        {
+            Debug.LogWarning("道具获取按钮未绑定，尝试自动获取...");
+            rewardButton = GetComponent<Button>();
+            
+            if (rewardButton == null)
+            {
+                Debug.LogError("自动获取按钮组件失败，请手动绑定！");
+            }
+        }
+
+        // 初始化冷却遮罩
+        if (cooldownMask != null)
+        {
+            cooldownMask.fillAmount = 0;
+            cooldownMask.gameObject.SetActive(false);
+        }
+        else
+        {
+            Debug.LogWarning("未设置冷却遮罩图片，冷却效果将无法显示");
+        }
+    }
+
+    /// <summary>
+    /// 初始化道具数量（从本地数据读取）
+    /// </summary>
+    private void InitPropCount()
+    {
+        currentPropCount = DataManager.GetInt(DataManager.CurrentPropCountKey, PlayerInitialConfig.CurrentPropCount);
+    }
+
+    /// <summary>
+    /// 更新冷却逻辑
+    /// </summary>
+    private void UpdateCooldownLogic()
+    {
+        if (!_isInCooldown) return;
+
+        _cooldownTimer += Time.deltaTime;
+        UpdateCooldownUI();
+
+        // 冷却结束
+        if (_cooldownTimer >= propUsedCooldownInterval)
+        {
+            EndCooldown();
+        }
+    }
+
+    /// <summary>
+    /// 更新冷却UI显示
+    /// </summary>
+    private void UpdateCooldownUI()
+    {
+        if (cooldownMask == null) return;
+
+        float fillRatio = 1 - (_cooldownTimer / propUsedCooldownInterval);
+        cooldownMask.fillAmount = Mathf.Clamp01(fillRatio);
+    }
+
+    /// <summary>
+    /// 结束冷却状态
+    /// </summary>
+    private void EndCooldown()
+    {
+        _isInCooldown = false;
+        EnableButton();
+
+        if (cooldownMask != null)
+        {
+            cooldownMask.fillAmount = 0;
+            cooldownMask.gameObject.SetActive(false);
+        }
+    }
+
+    /// <summary>
+    /// 注册事件监听
+    /// </summary>
+    private void RegisterEvents()
+    {
+        if (rewardButton != null)
+        {
+            rewardButton.onClick.AddListener(OnFreeRewardClicked);
+        }
+
         if (AdsManager.Instance != null)
         {
             AdsManager.Instance.OnRewardedAdCompleted += OnAdRewardCompleted;
         }
         else
         {
-            Debug.LogError("AdsManager.Instance为null!未初始化或初始化未完成!");
+            Debug.LogError("AdsManager未初始化，无法注册广告回调事件！");
         }
-
-    }
-
-    private void OnDisable()
-    {
-        // 取消注册，防止内存泄漏
-        rewardButton.onClick.RemoveListener(OnFreeRewardClicked);
-        AdsManager.Instance.OnRewardedAdCompleted -= OnAdRewardCompleted;
     }
 
     /// <summary>
-    /// 按钮点击事件：触发激励广告
+    /// 注销事件监听（防止内存泄漏）
+    /// </summary>
+    private void UnregisterEvents()
+    {
+        if (rewardButton != null)
+        {
+            rewardButton.onClick.RemoveListener(OnFreeRewardClicked);
+        }
+
+        if (AdsManager.Instance != null)
+        {
+            AdsManager.Instance.OnRewardedAdCompleted -= OnAdRewardCompleted;
+        }
+    }
+
+    /// <summary>
+    /// 免费奖励按钮点击事件
     /// </summary>
     private void OnFreeRewardClicked()
     {
-        // 点击后禁用按钮，防止重复点击
+        if (rewardButton == null) return;
+
+        // 禁用按钮防止重复点击
         rewardButton.interactable = false;
 
-        //道具使用逻辑，可封装成方法调用
+        // 有道具则直接使用
         if (currentPropCount > 0)
         {
-            currentPropCount -= 1;
-            UIManager.Instance.ShowAndUpdatePropCount(currentPropCount);
-            DataManager.SaveIntForce(DataManager.CurrentPropCountKey, currentPropCount);
-            Debug.Log("使用道具！");
-            EnableButton();
+            UseProp();
             return;
         }
 
-        // 调用AdsManager显示激励广告
+        // 无道具则显示激励广告
+        ShowRewardedAdForReward();
+    }
+
+    /// <summary>
+    /// 使用道具逻辑
+    /// </summary>
+    private void UseProp()
+    {
+        currentPropCount--;
+        UpdatePropUIAndSave();
+        Debug.Log("使用1个道具，剩余: " + currentPropCount);
+
+        // 启动冷却
+        StartCooldown();
+    }
+
+    /// <summary>
+    /// 显示激励广告以获取奖励
+    /// </summary>
+    private void ShowRewardedAdForReward()
+    {
+        if (AdsManager.Instance == null)
+        {
+            Debug.LogError("AdsManager为空，无法显示广告！");
+            EnableButtonDelayed(1f);
+            return;
+        }
+
         bool isAdShown = AdsManager.Instance.ShowRewardedAd();
         if (!isAdShown)
         {
-            Debug.Log("广告加载失败！等待重新启动按钮！");
-            // 1秒后重新启用按钮
-            Invoke(nameof(EnableButton), 1f);
+            Debug.LogWarning("广告加载未完成，1秒后重新启用按钮");
+            EnableButtonDelayed(1f);
+        }
+    }
+
+    /// <summary>
+    /// 启动冷却
+    /// </summary>
+    private void StartCooldown()
+    {
+        _isInCooldown = true;
+        _cooldownTimer = 0f;
+
+        if (cooldownMask != null)
+        {
+            cooldownMask.gameObject.SetActive(true);
+            cooldownMask.fillAmount = 1;
         }
     }
 
@@ -80,37 +238,66 @@ public class RewardManager : MonoBehaviour
     /// </summary>
     private void OnAdRewardCompleted(bool isSuccess)
     {
-        // 重新启用按钮
         EnableButton();
 
         if (isSuccess)
         {
-            // 广告成功完成：发放奖励
             GiveReward();
         }
         else
         {
-            Debug.Log("未获得奖励！");
+            Debug.Log("广告未完成，未获得奖励");
         }
     }
 
     /// <summary>
-    /// 发放奖励（对接游戏逻辑）
+    /// 发放奖励
     /// </summary>
     private void GiveReward()
     {
-        // 1. 增加道具
-        currentPropCount += 1;
-        // 2. 更新显示UI
-        UIManager.Instance.ShowAndUpdatePropCount(currentPropCount);
-        // 3. 保存数据（获取道具为递增）
-        DataManager.SaveInt(DataManager.CurrentPropCountKey,currentPropCount);
-        Debug.Log("奖励发放成功！");
+        currentPropCount++;
+        UpdatePropUIAndSave();
+        Debug.Log("奖励发放成功，当前道具数量: " + currentPropCount);
     }
 
-    // 辅助方法：启用按钮
+    /// <summary>
+    /// 更新道具UI并保存数据
+    /// </summary>
+    private void UpdatePropUIAndSave()
+    {
+        // 更新UI显示
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.ShowAndUpdatePropCount(currentPropCount);
+        }
+        else
+        {
+            Debug.LogError("UIManager未初始化，无法更新道具UI！");
+        }
+
+        DataManager.SaveInt(DataManager.CurrentPropCountKey, currentPropCount);
+    }
+
+    /// <summary>
+    /// 启用按钮
+    /// </summary>
     private void EnableButton()
     {
-        rewardButton.interactable = true;
+        if (rewardButton != null)
+        {
+            rewardButton.interactable = true;
+        }
+    }
+
+    /// <summary>
+    /// 延迟启用按钮
+    /// </summary>
+    private void EnableButtonDelayed(float delay)
+    {
+        if (rewardButton != null)
+        {
+            CancelInvoke(nameof(EnableButton)); // 取消可能存在的延迟调用，避免冲突
+            Invoke(nameof(EnableButton), delay);
+        }
     }
 }

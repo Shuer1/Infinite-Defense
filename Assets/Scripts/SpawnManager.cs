@@ -4,7 +4,11 @@ using UnityEngine;
 public class SpawnManager : MonoBehaviour
 {
     public EnemyManager enemyManager;  // 引用敌人管理器
-    public float spawnRadius = 10f;    // 生成范围
+    public Transform spawn_LineFiled;
+
+    [Header("X轴范围设置")]
+    public float xMin = -5f;
+    public float xMax = 5f;
 
     [Header("波数设置")]
     public int baseEnemyCount = 5;     // 第1波基础数量
@@ -12,7 +16,7 @@ public class SpawnManager : MonoBehaviour
     public float heavyEnemyBaseChance = 0.1f; // 第1波重型怪物概率
     public float heavyExtraChancePerWave = 0.05f;  // 每波增加的重型概率
 
-    private int currentWave;
+    private int currentWave = 1;
 
     void Start()
     {
@@ -34,10 +38,13 @@ public class SpawnManager : MonoBehaviour
         // 生成该波所有怪物
         for (int i = 0; i < enemyCount; i++)
         {
-            // 随机生成位置（平面上）
-            Vector3 spawnPos = UnityEngine.Random.onUnitSphere * spawnRadius;
-            spawnPos.y = 0;
-
+            // 在线型区域上生成
+            Vector3 spawnPos = new Vector3(
+                UnityEngine.Random.Range(xMin, xMax),
+                spawn_LineFiled.position.y,
+                spawn_LineFiled.position.z
+            );
+            
             // 随机决定怪物类型
             EnemyType type = UnityEngine.Random.value < heavyChance ? EnemyType.Heavy : EnemyType.Basic;
 
