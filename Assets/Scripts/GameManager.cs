@@ -55,7 +55,7 @@ public class GameManager : MonoBehaviour
         DataManager.InitializeIntData(DataManager.PlayerLevelKey, 1);
         DataManager.InitializeIntData(DataManager.NextLevelExpKey, 100);
         DataManager.InitializeFloatData(DataManager.PlayerShootSpeedKey, 0.5f);
-        DataManager.InitializeIntData(DataManager.CurrentPropCountKey,10);
+        DataManager.InitializeIntData(DataManager.CurrentPropCountKey,3);
     }
 
     // 初始化敌人相关数据
