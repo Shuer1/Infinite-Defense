@@ -1,93 +1,197 @@
 using TMPro;
+using UnityEditor.EditorTools;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
 /// <summary>
-/// 奖励管理器 - 处理道具获取、使用及冷却逻辑
+/// 奖励管理器 - 处理道具获取、使用及冷却逻辑（支持拖动释放）
 /// </summary>
 public class RewardManager : MonoBehaviour
 {
     [Header("奖励配置")]
     [Tooltip("当前拥有的道具数量（本地持久化）")]
-    public int currentPropCount; 
-    
+    public int currentPropCount;
+
     [Tooltip("道具使用后的冷却间隔（秒）")]
-    public float propUsedCooldownInterval = 15f; 
+    public float propUsedCooldownInterval = 15f;
 
     [Tooltip("获取道具的按钮组件")]
-    [SerializeField] private Button rewardButton; 
-    
+    [SerializeField] private Button rewardButton;
+
     [Tooltip("冷却进度遮罩图片")]
     [SerializeField] private Image cooldownMask;
 
-    private float _cooldownTimer; // 冷却计时器
-    private bool _isInCooldown;   // 是否处于冷却中
+    private float _cooldownTimer;
+    private bool _isInCooldown;
 
-    private void Awake()
-    {
-        InitComponents();
-    }
+    [Header("道具拖动释放配置")]
+    [Tooltip("爆炸范围指示器(圆形UI,设置为Filled Mode)")]
+    [SerializeField] private RectTransform bombRangeIndicator;
+    [Tooltip("道具爆炸属性")]
+    [SerializeField] private int ult_Damage = 200;
+    [SerializeField] private float bombRange = 5f;
+    [SerializeField] private GameObject bombEffectPrefab;
 
-    private void Start()
-    {
-        InitPropCount();
-    }
+    [Tooltip("UI相机(默认使用MainCamera)")]
+    [SerializeField] private Camera uiCamera;
 
-    private void Update()
-    {
-        UpdateCooldownLogic();
-    }
+    private bool _isDraggingProp;
+    private Vector2 _dragStartPos;
+    private const float _dragThreshold = 20f;
 
-    private void OnEnable()
-    {
-        RegisterEvents();
-    }
+    private void Awake() => InitComponents();
+    private void Start() => InitPropCount();
+    private void Update() => UpdateCooldownLogic();
 
-    private void OnDisable()
-    {
-        UnregisterEvents();
-    }
+    private void OnEnable() => RegisterEvents();
+    private void OnDisable() => UnregisterEvents();
 
-    /// <summary>
-    /// 初始化组件引用
-    /// </summary>
     private void InitComponents()
     {
-        // 自动获取按钮组件（如果未手动绑定）
         if (rewardButton == null)
         {
-            Debug.LogWarning("道具获取按钮未绑定，尝试自动获取...");
             rewardButton = GetComponent<Button>();
-            
             if (rewardButton == null)
-            {
-                Debug.LogError("自动获取按钮组件失败，请手动绑定！");
-            }
+                Debug.LogError("Reward button 未绑定！");
         }
 
-        // 初始化冷却遮罩
         if (cooldownMask != null)
         {
             cooldownMask.fillAmount = 0;
             cooldownMask.gameObject.SetActive(false);
         }
-        else
+
+        InitDragComponents();
+    }
+
+    private void InitDragComponents()
+    {
+        if (bombRangeIndicator != null)
         {
-            Debug.LogWarning("未设置冷却遮罩图片，冷却效果将无法显示");
+            bombRangeIndicator.gameObject.SetActive(false);
+            bombRangeIndicator.sizeDelta = new Vector2(bombRange * 2, bombRange * 2);
+        }
+
+        if (uiCamera == null)
+            uiCamera = Camera.main ?? FindObjectOfType<Camera>();
+
+        // 添加拖动事件系统
+        if (rewardButton != null)
+        {
+            var trigger = rewardButton.GetComponent<EventTrigger>() ?? rewardButton.gameObject.AddComponent<EventTrigger>();
+            AddDragEvent(trigger, EventTriggerType.PointerDown, OnPropPointerDown);
+            AddDragEvent(trigger, EventTriggerType.Drag, OnPropDragging);
+            AddDragEvent(trigger, EventTriggerType.PointerUp, OnPropPointerUp);
         }
     }
 
-    /// <summary>
-    /// 初始化道具数量（从本地数据读取）
-    /// </summary>
-    private void InitPropCount()
+    private void AddDragEvent(EventTrigger trigger, EventTriggerType type, UnityAction<BaseEventData> action)
     {
-        currentPropCount = DataManager.GetInt(DataManager.CurrentPropCountKey, PlayerInitialConfig.CurrentPropCount);
+        var entry = new EventTrigger.Entry { eventID = type };
+        entry.callback.AddListener(action);
+        trigger.triggers.Add(entry);
     }
 
-    /// <summary>
-    /// 更新冷却逻辑
-    /// </summary>
+    private void OnPropPointerDown(BaseEventData data)
+    {
+        if (currentPropCount <= 0 || _isInCooldown) return;
+
+        var pointerData = (PointerEventData)data;
+        _dragStartPos = pointerData.position;
+        _isDraggingProp = true;
+
+        if (bombRangeIndicator != null)
+        {
+            bombRangeIndicator.gameObject.SetActive(true);
+            bombRangeIndicator.position = pointerData.position;
+        }
+    }
+
+    private void OnPropDragging(BaseEventData data)
+    {
+        if (!_isDraggingProp) return;
+
+        var pointerData = (PointerEventData)data;
+
+        // 平滑插值指示器位置（跟随鼠标/手指）
+        if (bombRangeIndicator != null)
+        {
+            Vector3 targetPos = pointerData.position;
+            bombRangeIndicator.position = Vector3.Lerp(bombRangeIndicator.position, targetPos, 0.3f);
+        }
+    }
+
+    private void OnPropPointerUp(BaseEventData data)
+    {
+        if (!_isDraggingProp) return;
+
+        var pointerData = (PointerEventData)data;
+        float dragDistance = Vector2.Distance(_dragStartPos, pointerData.position);
+
+        if (dragDistance >= _dragThreshold)
+        {
+            Vector3 worldPos = ScreenToWorldPoint(pointerData.position);
+            ULT_Bomb(worldPos, bombRange);
+
+            currentPropCount--;
+            UpdatePropUIAndSave();
+            StartCooldown(); // ✅ 启动冷却并禁用按钮
+        }
+
+        _isDraggingProp = false;
+        if (bombRangeIndicator != null)
+            bombRangeIndicator.gameObject.SetActive(false);
+    }
+
+    private Vector3 ScreenToWorldPoint(Vector2 screenPos)
+    {
+        if (uiCamera == null) return Vector3.zero;
+
+        Ray ray = uiCamera.ScreenPointToRay(screenPos);
+        Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
+        if (groundPlane.Raycast(ray, out float enter))
+        {
+            return ray.GetPoint(enter);
+        }
+        return Vector3.zero;
+    }
+
+    private void ULT_Bomb(Vector3 position, float range)
+    {
+        Debug.Log($"导弹释放：位置={position}，范围={range}");
+        // ✅ 1. 可选：播放爆炸特效
+        if (bombEffectPrefab != null)
+        {
+            GameObject fx = Instantiate(bombEffectPrefab, position, Quaternion.identity);
+            Destroy(fx, 3f); // 自动销毁特效对象
+        }
+
+        // ✅ 2. 检测范围内敌人（3D物理）
+        Collider[] targets = Physics.OverlapSphere(position, range);
+
+        int hitCount = 0;
+
+        foreach (var target in targets)
+        {
+            if (target.CompareTag("Enemy"))
+            {
+                EnemyBase enemy = target.GetComponent<EnemyBase>();
+                if (enemy != null)
+                {
+                    enemy.TakeDamage(ult_Damage);
+                    hitCount++;
+                }
+            }
+        }
+
+        Debug.Log($"💥 爆炸命中敌人数量: {hitCount}，造成伤害: {ult_Damage}");
+    }
+
+    private void InitPropCount() =>
+        currentPropCount = DataManager.GetInt(DataManager.CurrentPropCountKey, PlayerInitialConfig.CurrentPropCount);
+
     private void UpdateCooldownLogic()
     {
         if (!_isInCooldown) return;
@@ -95,136 +199,25 @@ public class RewardManager : MonoBehaviour
         _cooldownTimer += Time.deltaTime;
         UpdateCooldownUI();
 
-        // 冷却结束
         if (_cooldownTimer >= propUsedCooldownInterval)
-        {
             EndCooldown();
-        }
     }
 
-    /// <summary>
-    /// 更新冷却UI显示
-    /// </summary>
     private void UpdateCooldownUI()
     {
         if (cooldownMask == null) return;
-
         float fillRatio = 1 - (_cooldownTimer / propUsedCooldownInterval);
         cooldownMask.fillAmount = Mathf.Clamp01(fillRatio);
     }
 
-    /// <summary>
-    /// 结束冷却状态
-    /// </summary>
-    private void EndCooldown()
-    {
-        _isInCooldown = false;
-        EnableButton();
-
-        if (cooldownMask != null)
-        {
-            cooldownMask.fillAmount = 0;
-            cooldownMask.gameObject.SetActive(false);
-        }
-    }
-
-    /// <summary>
-    /// 注册事件监听
-    /// </summary>
-    private void RegisterEvents()
-    {
-        if (rewardButton != null)
-        {
-            rewardButton.onClick.AddListener(OnFreeRewardClicked);
-        }
-
-        if (AdsManager.Instance != null)
-        {
-            AdsManager.Instance.OnRewardedAdCompleted += OnAdRewardCompleted;
-        }
-        else
-        {
-            Debug.LogError("AdsManager未初始化,无法注册广告回调事件！");
-        }
-    }
-
-    /// <summary>
-    /// 注销事件监听（防止内存泄漏）
-    /// </summary>
-    private void UnregisterEvents()
-    {
-        if (rewardButton != null)
-        {
-            rewardButton.onClick.RemoveListener(OnFreeRewardClicked);
-        }
-
-        if (AdsManager.Instance != null)
-        {
-            AdsManager.Instance.OnRewardedAdCompleted -= OnAdRewardCompleted;
-        }
-    }
-
-    /// <summary>
-    /// 免费奖励按钮点击事件
-    /// </summary>
-    private void OnFreeRewardClicked()
-    {
-        if (rewardButton == null) return;
-
-        // 禁用按钮防止重复点击
-        rewardButton.interactable = false;
-
-        // 有道具则直接使用
-        if (currentPropCount > 0)
-        {
-            UseProp();
-            return;
-        }
-
-        // 无道具则显示激励广告
-        ShowRewardedAdForReward();
-    }
-
-    /// <summary>
-    /// 使用道具逻辑
-    /// </summary>
-    private void UseProp()
-    {
-        currentPropCount--;
-        UpdatePropUIAndSave();
-        Debug.Log("使用1个道具，剩余: " + currentPropCount);
-
-        // 启动冷却
-        StartCooldown();
-    }
-
-    /// <summary>
-    /// 显示激励广告以获取奖励
-    /// </summary>
-    private void ShowRewardedAdForReward()
-    {
-        if (AdsManager.Instance == null)
-        {
-            Debug.LogError("AdsManager为空，无法显示广告！");
-            EnableButtonDelayed(1f);
-            return;
-        }
-
-        bool isAdShown = AdsManager.Instance.ShowRewardedAd();
-        if (!isAdShown)
-        {
-            Debug.LogWarning("广告加载未完成，1秒后重新启用按钮");
-            EnableButtonDelayed(1f);
-        }
-    }
-
-    /// <summary>
-    /// 启动冷却
-    /// </summary>
     private void StartCooldown()
     {
         _isInCooldown = true;
         _cooldownTimer = 0f;
+
+        // ✅ 禁用按钮交互，禁止在冷却期间再次点击或拖动
+        if (rewardButton != null)
+            rewardButton.interactable = false;
 
         if (cooldownMask != null)
         {
@@ -233,71 +226,111 @@ public class RewardManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 广告奖励完成回调
-    /// </summary>
-    private void OnAdRewardCompleted(bool isSuccess)
+    private void EndCooldown()
     {
+        _isInCooldown = false;
+
+        // ✅ 冷却结束重新启用按钮交互
         EnableButton();
 
-        if (isSuccess)
+        if (cooldownMask != null)
         {
-            GiveReward();
-        }
-        else
-        {
-            Debug.Log("广告未完成，未获得奖励");
+            cooldownMask.fillAmount = 0;
+            cooldownMask.gameObject.SetActive(false);
         }
     }
 
-    /// <summary>
-    /// 发放奖励
-    /// </summary>
+    private void RegisterEvents()
+    {
+        if (rewardButton != null)
+            rewardButton.onClick.AddListener(OnFreeRewardClicked);
+
+        if (AdsManager.Instance != null)
+            AdsManager.Instance.OnRewardedAdCompleted += OnAdRewardCompleted;
+    }
+
+    private void UnregisterEvents()
+    {
+        if (rewardButton != null)
+            rewardButton.onClick.RemoveListener(OnFreeRewardClicked);
+
+        if (AdsManager.Instance != null)
+            AdsManager.Instance.OnRewardedAdCompleted -= OnAdRewardCompleted;
+    }
+
+    private void OnFreeRewardClicked()
+    {
+        if (_isDraggingProp || _isInCooldown) return;
+        if (rewardButton == null) return;
+
+        rewardButton.interactable = false;
+
+        if (currentPropCount > 0)
+        {
+            UseProp();
+            return;
+        }
+
+        ShowRewardedAdForReward();
+    }
+
+    private void UseProp()
+    {
+        currentPropCount--;
+        UpdatePropUIAndSave();
+        StartCooldown();
+    }
+
+    private void ShowRewardedAdForReward()
+    {
+        if (AdsManager.Instance == null)
+        {
+            EnableButtonDelayed(1f);
+            return;
+        }
+
+        bool shown = AdsManager.Instance.ShowRewardedAd();
+        if (!shown)
+            EnableButtonDelayed(1f);
+    }
+
+    private void OnAdRewardCompleted(bool success)
+    {
+        // ✅ 若仍在冷却中，不恢复交互
+        if (!_isInCooldown)
+            EnableButton();
+
+        if (success)
+            GiveReward();
+    }
+
     private void GiveReward()
     {
+        // ✅ 若处于冷却，不允许获得新的道具
+        if (_isInCooldown) return;
+
         currentPropCount++;
         UpdatePropUIAndSave();
-        Debug.Log("奖励发放成功，当前道具数量: " + currentPropCount);
     }
 
-    /// <summary>
-    /// 更新道具UI并保存数据
-    /// </summary>
     private void UpdatePropUIAndSave()
     {
-        // 更新UI显示
         if (UIManager.Instance != null)
-        {
             UIManager.Instance.ShowAndUpdatePropCount(currentPropCount);
-        }
-        else
-        {
-            Debug.LogError("UIManager未初始化，无法更新道具UI！");
-        }
 
-        DataManager.SaveInt(DataManager.CurrentPropCountKey, currentPropCount);
+        DataManager.SaveIntForce(DataManager.CurrentPropCountKey, currentPropCount);
     }
 
-    /// <summary>
-    /// 启用按钮
-    /// </summary>
     private void EnableButton()
     {
         if (rewardButton != null)
-        {
             rewardButton.interactable = true;
-        }
     }
 
-    /// <summary>
-    /// 延迟启用按钮
-    /// </summary>
     private void EnableButtonDelayed(float delay)
     {
-        if (rewardButton != null)
-        {
-            CancelInvoke(nameof(EnableButton)); // 取消可能存在的延迟调用，避免冲突
-            Invoke(nameof(EnableButton), delay);
-        }
+        if (rewardButton == null) return;
+        CancelInvoke(nameof(EnableButton));
+        Invoke(nameof(EnableButton), delay);
     }
 }
