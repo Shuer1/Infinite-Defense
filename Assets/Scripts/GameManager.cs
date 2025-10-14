@@ -6,7 +6,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
     public int score = 0;
-    private bool isGameOver;
+    public bool isGameOver;
 
     void Awake()
     {
