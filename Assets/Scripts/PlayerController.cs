@@ -64,9 +64,16 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (GameManager.Instance.isGameOver) return;
+        if (GameManager.Instance.isGameOver)
+        {
+            if (isDead)
+            {
+                return;
+            }
+            
+            Die();
+        }
 
-        if (isDead) return;
         // 移动输入
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");

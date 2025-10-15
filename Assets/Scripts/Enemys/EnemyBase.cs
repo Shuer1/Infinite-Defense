@@ -106,10 +106,6 @@ public abstract class EnemyBase : MonoBehaviour
         if (defenseTower == null || defenseTower.currentHealth <= 0)
         {
             ChangeAniStatus(currentState, AnimIdle);
-            if (!GameManager.Instance.isGameOver)
-            {
-                GameManager.Instance.GameOver();
-            }
             return;
         }
 
@@ -146,10 +142,13 @@ public abstract class EnemyBase : MonoBehaviour
         dir.Normalize();
 
         Vector3 newPos = transform.position + dir * moveSpeed * Time.deltaTime;
-        newPos.y = transform.position.y;
-
+        newPos.y = 0;
         transform.position = newPos;
+
+        //看向目标后锁定X和Z
         transform.LookAt(target);
+        Vector3 currentRot = transform.localEulerAngles;
+        transform.localEulerAngles = new Vector3(0, currentRot.y, 0);
     }
 
     // =============================
@@ -213,8 +212,6 @@ public abstract class EnemyBase : MonoBehaviour
     {
         if (defenseTower != null && defenseTower.currentHealth > 0)
         {
-            if (CameraShakeController.Instance != null) CameraShakeController.Instance.CameraShake();
-             
             defenseTower.TakeDamage(damage);
         }
     }
@@ -250,7 +247,7 @@ public abstract class EnemyBase : MonoBehaviour
     // =============================
     public void ResetEnemyState(Vector3 spawnPos, Quaternion rotation)
     {
-        transform.position = spawnPos;
+        transform.position = new Vector3(spawnPos.x, 0, spawnPos.z); //强制锁定Y轴位置为0
         transform.rotation = rotation;
         gameObject.SetActive(true);
         gameObject.tag = "Enemy";

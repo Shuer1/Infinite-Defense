@@ -8,6 +8,7 @@ public class DefenseTowerController : MonoBehaviour
 
     //private Animator animator;
     [SerializeField] Camera mainCamera;
+    [SerializeField] PlayerController pc;
     private static DefenseTowerController instance;
 
     // 提供静态访问点，方便敌人查找
@@ -38,10 +39,11 @@ public class DefenseTowerController : MonoBehaviour
         if (currentHealth <= 0) return;
 
         currentHealth -= damage;
+
         Debug.Log($"防御塔受到 {damage} 点伤害，剩余生命值: {currentHealth}");
 
         // 触发受击动画
-        
+        if (CameraShakeController.Instance != null) CameraShakeController.Instance.TriggerShake();
 
         if (currentHealth <= 0)
         {
