@@ -7,6 +7,7 @@ public class DefenseTowerController : MonoBehaviour
     [Header("Tower Attributes")]
     public int maxHealth = 500;
     public int currentHealth;
+    private bool isInvincible = false;
 
     //private Animator animator;
     [SerializeField] Camera mainCamera;
@@ -38,7 +39,7 @@ public class DefenseTowerController : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        if (currentHealth <= 0) return;
+        if (currentHealth <= 0 || isInvincible) return;
 
         currentHealth -= damage;
 
@@ -84,12 +85,22 @@ public class DefenseTowerController : MonoBehaviour
     public void ResumeTower() //编辑器中点击复活按钮调用
     {
         currentHealth = maxHealth;
+        StartCoroutine(InvincibilityTime(5f));
     }
 
     private IEnumerator WaitOneSecond(Action onComplete) //等待时间
     {
         yield return new WaitForSeconds(1.5f);
         onComplete?.Invoke();
+    }
+
+    private IEnumerator InvincibilityTime(float duration)
+    {
+        isInvincible = true;
+        Debug.Log("当前处于无敌时间");
+        yield return new WaitForSeconds(duration);
+        isInvincible = false;
+        Debug.Log("无敌时间结束");
     }
 
 }
