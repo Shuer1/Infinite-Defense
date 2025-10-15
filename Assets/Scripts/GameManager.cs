@@ -33,11 +33,6 @@ public class GameManager : MonoBehaviour
 
     public void GameOver()
     {
-        /*
-        if (isGameOver) return;
-
-        isGameOver = true;
-        */
         DataManager.FlushSave();
         UIManager.Instance.ShowGameOver();
     }
