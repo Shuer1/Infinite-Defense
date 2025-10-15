@@ -14,6 +14,9 @@ public static class DataManager
     public const string PlayerShootSpeedKey = "PlayerShootSpeed";
     public const string CurrentPropCountKey = "CurrentPropCount";
 
+    // 城墙DefenseTower数据（Int）
+    public const string DefenseTowerMaxHPKey = "DefenseTowerMaxHP";
+
     // 敌人数据（Int）✅
     public const string Enemy1MaxHealthKey = "BaseEnemyMaxHealth";
     public const string Enemy1ExpRewardKey = "BaseEnemyExpEReward"; //经验奖励01，新增

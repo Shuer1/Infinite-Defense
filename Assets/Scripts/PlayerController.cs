@@ -234,6 +234,11 @@ public class PlayerController : MonoBehaviour
         //升级刷新恢复血量和更新等级
         UIManager.Instance?.UpdateAndShowPlayerHP(currentHealth, health);
         UIManager.Instance?.ShowLevel(level);
+        //⚠️新增
+        DefenseTowerController.Instance.currentHealth = Mathf.Min(DefenseTowerController.Instance.maxHealth,
+        DefenseTowerController.Instance.currentHealth + DefenseTowerController.Instance.maxHealth / 3);
+        UIManager.Instance?.UpdateAndShowTowerHP(DefenseTowerController.Instance.currentHealth, DefenseTowerController.Instance.maxHealth);
+
         UpgradeManager.Instance?.ShowUpgradeOptions();
         //保存数据
         DataManager.SaveInt(DataManager.PlayerLevelKey, level);

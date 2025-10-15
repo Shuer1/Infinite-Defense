@@ -32,7 +32,7 @@ public class DefenseTowerController : MonoBehaviour
 
     private void Start()
     {
-        currentHealth = maxHealth;
+        maxHealth = DataManager.GetInt(DataManager.DefenseTowerMaxHPKey);
         //animator = GetComponent<Animator>();
         gameObject.tag = "Tower";
     }
@@ -41,7 +41,8 @@ public class DefenseTowerController : MonoBehaviour
     {
         if (currentHealth <= 0 || isInvincible) return;
 
-        currentHealth -= damage;
+        currentHealth = Mathf.Max(currentHealth - damage ,0); //防止为负
+        UIManager.Instance?.UpdateAndShowTowerHP(currentHealth,maxHealth);
 
         Debug.Log($"防御塔受到 {damage} 点伤害，剩余生命值: {currentHealth}");
 
@@ -85,6 +86,7 @@ public class DefenseTowerController : MonoBehaviour
     public void ResumeTower() //复活逻辑：该方法在编辑器中绑定复活按钮使用
     {
         currentHealth = maxHealth;
+        UIManager.Instance?.UpdateAndShowTowerHP(currentHealth,maxHealth);
         StartCoroutine(InvincibilityTime(5f));
     }
 

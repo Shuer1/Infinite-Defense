@@ -40,10 +40,6 @@ public class GameManager : MonoBehaviour
     public void Restart()
     {
         isGameOver = false;
-        /*
-        DataManager.FlushSave();
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        */
     }
     
     // 初始化玩家相关数据
@@ -55,7 +51,10 @@ public class GameManager : MonoBehaviour
         DataManager.InitializeIntData(DataManager.PlayerLevelKey, 1);
         DataManager.InitializeIntData(DataManager.NextLevelExpKey, 100);
         DataManager.InitializeFloatData(DataManager.PlayerShootSpeedKey, 0.5f);
-        DataManager.InitializeIntData(DataManager.CurrentPropCountKey,3);
+        DataManager.InitializeIntData(DataManager.CurrentPropCountKey, 3);
+
+        // 新增：初始化城墙血量数据⚠️
+        DataManager.InitializeIntData(DataManager.DefenseTowerMaxHPKey,500);
     }
 
     // 初始化敌人相关数据
