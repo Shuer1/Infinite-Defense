@@ -160,10 +160,7 @@ public static class DataManager
         }
     }
 
-    // --------------- 新增：强制保存Int类型（忽略优劣判断） ---------------
-    /// <summary>
-    /// 强制保存Int类型数据（无论新旧值，直接更新）
-    /// </summary>
+    /// 强制保存Int类型数据（无比较，直接更新）
     public static void SaveIntForce(string key, int newValue)
     {
         // 直接更新PlayerPrefs和缓存，不判断优劣
@@ -172,10 +169,7 @@ public static class DataManager
         _isDirty = true; // 标记需要写入磁盘
     }
 
-    // --------------- 新增：强制保存Float类型（忽略优劣判断） ---------------
-    /// <summary>
-    /// 强制保存Float类型数据（无论新旧值，直接更新）
-    /// </summary>
+    /// 强制保存Float类型数据（无比较，直接更新）
     public static void SaveFloatForce(string key, float newValue)
     {
         PlayerPrefs.SetFloat(key, newValue);
@@ -185,9 +179,7 @@ public static class DataManager
 
 
     // --------------- 手动触发保存（关卡结束/玩家死亡/退出关卡时调用） ---------------
-    /// <summary>
     /// 将所有修改的数据写入本地磁盘（建议关卡结束、暂停时调用）
-    /// </summary>
     public static void FlushSave()
     {
         if (_isDirty)
@@ -199,9 +191,7 @@ public static class DataManager
     }
 
     // --------------- 辅助功能：清空所有保存数据 ---------------
-    /// <summary>
     /// 清空所有保存的本地数据（谨慎使用）
-    /// </summary>
     public static void ClearAllData()
     {
         PlayerPrefs.DeleteAll();

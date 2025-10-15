@@ -39,7 +39,7 @@ public class RewardManager : MonoBehaviour
 
     private bool _isDraggingProp;
     private Vector2 _dragStartPos;
-    private const float _dragThreshold = 20f;
+    private const float _dragThreshold = 100f;
 
     private void Awake() => InitComponents();
     private void Start() => InitPropCount();
@@ -258,7 +258,7 @@ public class RewardManager : MonoBehaviour
 
     private void OnFreeRewardClicked()
     {
-        if (_isDraggingProp || _isInCooldown || rewardButton == null) return;
+        if (_isDraggingProp || _isInCooldown || rewardButton == null || currentPropCount > 0) return;
 
         rewardButton.interactable = false;
 
