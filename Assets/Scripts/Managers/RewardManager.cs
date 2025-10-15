@@ -135,9 +135,7 @@ public class RewardManager : MonoBehaviour
             Vector3 worldPos = ScreenToWorldPoint(pointerData.position);
             ULT_Bomb(worldPos, bombRange);
 
-            currentPropCount--;
-            UpdatePropUIAndSave();
-            StartCooldown(); // ✅ 启动冷却并禁用按钮
+            UseProp();
         }
 
         _isDraggingProp = false;
@@ -260,16 +258,9 @@ public class RewardManager : MonoBehaviour
 
     private void OnFreeRewardClicked()
     {
-        if (_isDraggingProp || _isInCooldown) return;
-        if (rewardButton == null) return;
+        if (_isDraggingProp || _isInCooldown || rewardButton == null) return;
 
         rewardButton.interactable = false;
-
-        if (currentPropCount > 0)
-        {
-            UseProp();
-            return;
-        }
 
         ShowRewardedAdForReward();
     }
