@@ -7,10 +7,13 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
     public int score = 0;
     public bool isGameOver;
+    [SerializeField] private GameObject upgradePanel;
 
     void Awake()
     {
         if (Instance == null) Instance = this;
+
+        upgradePanel?.SetActive(true);
 
         InitializePlayerData();
         InitializeEnemyData();
