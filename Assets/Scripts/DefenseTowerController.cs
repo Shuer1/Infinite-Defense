@@ -82,7 +82,7 @@ public class DefenseTowerController : MonoBehaviour
         
     }
 
-    public void ResumeTower() //编辑器中点击复活按钮调用
+    public void ResumeTower() //复活逻辑：该方法在编辑器中绑定复活按钮使用
     {
         currentHealth = maxHealth;
         StartCoroutine(InvincibilityTime(5f));
