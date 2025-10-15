@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 5292748509150375382}
   - component: {fileID: 1785049326314402981}
-  - component: {fileID: 7799637828933849035}
   m_Layer: 0
   m_Name: RockWall
   m_TagString: Tower
@@ -55,21 +54,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 11.5, y: 3.8, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &7799637828933849035
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7791607975242654719}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 318caf519fa8445af8a5d33750ac090e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHealth: 500
-  currentHealth: 500
-  mainCamera: {fileID: 0}
 --- !u!1001 &5659980503759132830
 PrefabInstance:
   m_ObjectHideFlags: 0

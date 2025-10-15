@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using UnityEngine;
 
 public class DefenseTowerController : MonoBehaviour
@@ -53,11 +55,15 @@ public class DefenseTowerController : MonoBehaviour
 
     private void TowerBreaken()
     {
-        Debug.Log("防御塔被摧毁！游戏失败");
-        //animator?.SetTrigger("Die");
+        if (GameManager.Instance.isGameOver)
+        {
+            return;
+        }
 
-        // 调用游戏管理器的游戏结束方法
-        GameManager.Instance?.GameOver();
+        GameManager.Instance.isGameOver = true;
+
+        Debug.Log("防御塔被摧毁！游戏失败");
+        //animator?.SetTrigger("Break");
 
         // 禁用塔的碰撞体，防止继续被攻击
         Collider collider = GetComponent<Collider>();
@@ -65,10 +71,25 @@ public class DefenseTowerController : MonoBehaviour
         {
             collider.enabled = false;
         }
+
+        // 调用游戏管理器的游戏结束方法
+        StartCoroutine(WaitOneSecond(() =>
+        {
+            GameManager.Instance?.GameOver();
+        }));
+        //GameManager.Instance?.GameOver();
+        
     }
 
-    public void ResumeTower()
+    public void ResumeTower() //编辑器中点击复活按钮调用
     {
         currentHealth = maxHealth;
     }
+
+    private IEnumerator WaitOneSecond(Action onComplete) //等待时间
+    {
+        yield return new WaitForSeconds(1.5f);
+        onComplete?.Invoke();
+    }
+
 }

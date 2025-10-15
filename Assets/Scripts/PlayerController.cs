@@ -240,14 +240,14 @@ public class PlayerController : MonoBehaviour
         DataManager.SaveInt(DataManager.NextLevelExpKey,experienceToNextLevel);
     }
 
-    void Die()
+    void Die() //玩家Die只能是GameOver来触发
     {
         isDead = true;
         animator.ResetTrigger("Hit");
         animator.SetTrigger("Die");
         animator.SetBool("ResetLive",false);
         Debug.Log("Player Died");
-        GameManager.Instance?.GameOver();
+        //GameManager.Instance?.GameOver();
     }
     public void ResetLive()
     {
