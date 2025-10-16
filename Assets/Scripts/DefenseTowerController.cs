@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class DefenseTowerController : MonoBehaviour
 {
+    private static DefenseTowerController instance;
+    
     [Header("Tower Attributes")]
     public int maxHealth = 500;
     public int currentHealth;
@@ -12,7 +14,6 @@ public class DefenseTowerController : MonoBehaviour
     //private Animator animator;
     [SerializeField] Camera mainCamera;
     [SerializeField] PlayerController pc;
-    private static DefenseTowerController instance;
 
     // 提供静态访问点，方便敌人查找
     public static DefenseTowerController Instance => instance;

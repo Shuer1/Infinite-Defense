@@ -14,6 +14,8 @@ public class UpgradeManager : MonoBehaviour
 
     [Tooltip("拖入玩家控制器实例")]
     public PlayerController playerController;
+    [Tooltip("城墙血量提升倍数因子")]
+    public int multiFactor = 5;
 
     [Tooltip("拖入子弹预制体")]
     public Bullet bulletPrefab;
@@ -214,18 +216,25 @@ public class UpgradeManager : MonoBehaviour
 
     private void ApplyMaxHealthUpgrade(int value) //提升最大生命值 实现保存✅
     {
-        if (playerController == null)
+        DefenseTowerController dTController = DefenseTowerController.Instance;
+        if (playerController == null || dTController == null)
         {
-            Debug.LogError("playerController为null", this);
+            Debug.LogError("playerController和DefenseTowerController为null", this);
             return;
         }
 
         playerController.health += value;
         playerController.currentHealth = Mathf.Min(playerController.currentHealth + value, playerController.health);
-        UIManager.Instance?.UpdateAndShowPlayerHP(playerController.currentHealth, playerController.health);
 
-        DataManager.SaveInt(DataManager.PlayerMaxHealthKey,playerController.health);
-        Debug.Log($"最大生命值提升至：{playerController.health}");
+        dTController.maxHealth += value * multiFactor;
+        dTController.currentHealth = Mathf.Min(dTController.currentHealth + value * multiFactor, dTController.maxHealth);
+
+        UIManager.Instance?.UpdateAndShowPlayerHP(playerController.currentHealth, playerController.health);
+        UIManager.Instance?.UpdateAndShowTowerHP(dTController.currentHealth, dTController.maxHealth);
+
+        DataManager.SaveInt(DataManager.PlayerMaxHealthKey, playerController.health);
+        DataManager.SaveInt(DataManager.DefenseTowerMaxHPKey, dTController.maxHealth);
+        Debug.Log($"玩家最大生命值提升至：{playerController.health}" + ";" + $"城墙最大生命值提升至：{dTController.maxHealth}");
     }
 
     private void GetOrAddSpecialBullet(SpecialBulletType type, int extraDamageValue) //获得特殊子弹/增加伤害 实现保存✅

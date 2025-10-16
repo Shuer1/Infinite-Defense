@@ -7341,6 +7341,7 @@ MonoBehaviour:
     value: 1
     type: 6
   playerController: {fileID: 942823808}
+  multiFactor: 5
   bulletPrefab: {fileID: 741479308755480698, guid: 440645d6786d7401bb64687ebbea99be, type: 3}
   explosiveBulletPrefab: {fileID: 6415290478015143737, guid: 4898056eac8fe4ed4b6a013151ee4642, type: 3}
   frostBulletPrefab: {fileID: 5092929290123476697, guid: a7f7c92e4227049f5b634ae1c99edcb2, type: 3}
@@ -9434,8 +9435,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 3.01, y: 3.2, z: 2.87}
-  m_Center: {x: 0, y: 0.96, z: 0.34}
+  m_Size: {x: 1.8, y: 3, z: 1.8}
+  m_Center: {x: 0, y: 1, z: 0.34}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -9451,6 +9452,6 @@ SceneRoots:
   - {fileID: 1031757753}
   - {fileID: 1683609181}
   - {fileID: 232166977}
+  - {fileID: 4237741262077510}
   - {fileID: 830243907}
   - {fileID: 574606342}
-  - {fileID: 4237741262077510}
