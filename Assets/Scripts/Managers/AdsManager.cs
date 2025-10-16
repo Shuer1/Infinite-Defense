@@ -26,7 +26,7 @@ public class AdsManager : MonoBehaviour //单例
 
     [Header("UI 绑定")]
     [SerializeField] private Button closeBannerButton;
-    [SerializeField] private string mainSceneName = "UIScene";
+    public const string mainSceneName = "UIScene";
 
 #if UNITY_ANDROID
     #if UNITY_EDITOR || DEVELOPMENT_BUILD

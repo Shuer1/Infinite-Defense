@@ -7,12 +7,19 @@ public class LoadScene : MonoBehaviour
     [SerializeField] private GameObject pauseMenu;
     [SerializeField] private GameObject helpMenu;
     [SerializeField] private AudioSource clickedSound;
-    bool isPausing = false;
+    public bool isPausing = false;
 
     public void LoadStartUIScene()
     {
         clickedSound.Play();
-        SceneManager.LoadScene("StartGameUI", LoadSceneMode.Single);
+        if (SceneLoadManager.Instance != null)
+        {
+            SceneLoadManager.Instance.LoadSceneAsync("StartGameUI",true);
+        }
+        else
+        {
+            Debug.LogError("SceneLoadManager实例不存在,无法加载场景！");
+        }
     }
 
     public void PauseGame()

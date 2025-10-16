@@ -44,7 +44,12 @@ public class SceneLoadManager : MonoBehaviour
         maxValue = progressBar.maxValue;
         // 初始化加载UI（默认隐藏）
         if (loadingUI != null)
+        {
             loadingUI.SetActive(false);
+
+            loadingUI.transform.SetParent(null);
+            DontDestroyOnLoad(loadingUI);
+        }
 
         // 初始化黑色遮罩
         if (blackMask != null)
@@ -78,6 +83,7 @@ public class SceneLoadManager : MonoBehaviour
     {
         // 重置状态
         _isFadeToBlackComplete = false;
+        Time.timeScale = 1f;
 
         // 显示加载界面
         if (loadingUI != null && showLoadingUI)
@@ -133,6 +139,11 @@ public class SceneLoadManager : MonoBehaviour
         {
             progressBar.value = maxValue;
             progressText.text = "Loading : 100%";
+        }
+
+        if (blackMask == null)
+        {
+            _isFadeToBlackComplete = true;
         }
 
         // 等待遮罩完全变黑
