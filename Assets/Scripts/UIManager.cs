@@ -49,7 +49,7 @@ public class UIManager : MonoBehaviour
         playerHP.value = hpPercentage;
     }
 
-    public void UpdateAndShowTowerHP(int currentTowerHP,int towerMaxHP) //⚠️新增
+    public void UpdateAndShowTowerHP(int currentTowerHP,int towerMaxHP)
     {
         int tempTowerMaxHP = towerMaxHP;
         towerMaxHPText.text = tempTowerMaxHP.ToString();
@@ -158,7 +158,7 @@ public class UIManager : MonoBehaviour
             yield break;
         }
 
-        tempCurrentWaveTMP.text = $"Wave {waveOrderTMP}";
+        tempCurrentWaveTMP.text = /*waveOrderTMP.ToString();*/ $": {waveOrderTMP}";
 
         Color originalImgColor = uiImg.color;
         Color originalTxtColor = tempCurrentWaveTMP.color;
