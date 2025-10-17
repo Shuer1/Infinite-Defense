@@ -1,4 +1,6 @@
 using System;
+using Microsoft.Unity.VisualStudio.Editor;
+using TMPro;
 using UnityEngine;
 
 public class SpawnManager : MonoBehaviour
@@ -16,7 +18,9 @@ public class SpawnManager : MonoBehaviour
     public float heavyEnemyBaseChance = 0.1f; // 第1波重型怪物概率
     public float heavyExtraChancePerWave = 0.05f;  // 每波增加的重型概率
 
+    [Header("进度UI信息配置")]
     private int currentWave = 1;
+    public UnityEngine.UI.Image uiPartImg;
 
     void Start()
     {
@@ -26,12 +30,21 @@ public class SpawnManager : MonoBehaviour
         enemyManager.OnAllEnemiesCleared += StartNextWave;
         // 启动当前波
         StartWave(currentWave);
+
     }
 
     // 启动指定波数
     private void StartWave(int wave)
     {
         Debug.Log($"开始第{wave}波！");
+        if (UIManager.Instance == null)
+        {
+            Debug.LogError("UIManager.Instance is null!");
+            return;
+        }
+
+        UIManager.Instance.AutoShowCurrentWaveUI(uiPartImg, wave);
+
         int enemyCount = CalculateEnemyCount(wave);
         float heavyChance = CalculateHeavyChance(wave);
 

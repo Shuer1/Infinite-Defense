@@ -318,10 +318,6 @@ public static class SaveManager_test
                 Debug.LogError($"数据持久化失败: {e.Message}");
             }
         }
-        else
-        {
-            Debug.Log("无数据需要更新");
-        }
     }
 
     // --------------- 数据清理 ---------------
