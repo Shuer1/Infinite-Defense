@@ -158,7 +158,7 @@ public class UIManager : MonoBehaviour
             yield break;
         }
 
-        tempCurrentWaveTMP.text = /*waveOrderTMP.ToString();*/ $": {waveOrderTMP}";
+        tempCurrentWaveTMP.text = $"' {waveOrderTMP} '";
 
         Color originalImgColor = uiImg.color;
         Color originalTxtColor = tempCurrentWaveTMP.color;
