@@ -9677,6 +9677,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4354133238701182}
   - component: {fileID: 108290319325190064}
+  - component: {fileID: 108290319325190065}
   m_Layer: 9
   m_Name: Point light
   m_TagString: Untagged
@@ -10291,7 +10292,7 @@ Light:
   m_Type: 2
   m_Shape: 0
   m_Color: {r: 0.50735295, g: 0.73619545, b: 1, a: 1}
-  m_Intensity: 2
+  m_Intensity: 3
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.802082
@@ -10341,6 +10342,25 @@ Light:
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!114 &108290319325190065
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1139699290091416}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3bc2d914bad64169a19273af7a5c22d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  towerController: {fileID: 3693298205752246073}
+  minRange: 2
+  maxRange: 5
+  minIntensity: 1
+  maxIntensity: 3
+  breathDuration: 2
+  dangerColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!114 &3693298205752246073
 MonoBehaviour:
   m_ObjectHideFlags: 0

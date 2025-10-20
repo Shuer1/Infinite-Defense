@@ -60,10 +60,10 @@ public class GameManager : MonoBehaviour
     // 初始化敌人相关数据
     private void InitializeEnemyData()
     {
-        DataManager.InitializeIntData(DataManager.Enemy1MaxHealthKey, 150);
-        DataManager.InitializeIntData(DataManager.Enemy2MaxHealthKey, 200);
-        DataManager.InitializeIntData(DataManager.Enemy1DamageKey, 20);
-        DataManager.InitializeIntData(DataManager.Enemy2DamageKey, 35);
+        DataManager.InitializeIntData(DataManager.Enemy1MaxHealthKey, EnemysInitialConfig.Enemy1MaxHealth);
+        DataManager.InitializeIntData(DataManager.Enemy2MaxHealthKey, EnemysInitialConfig.Enemy2MaxHealth);
+        DataManager.InitializeIntData(DataManager.Enemy1DamageKey, EnemysInitialConfig.Enemy1Damage);
+        DataManager.InitializeIntData(DataManager.Enemy2DamageKey, EnemysInitialConfig.Enemy2Damage);
     }
 
     // 初始化子弹相关数据
