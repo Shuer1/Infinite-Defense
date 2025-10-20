@@ -227,7 +227,7 @@ public class UpgradeManager : MonoBehaviour
         playerController.currentHealth = Mathf.Min(playerController.currentHealth + value, playerController.health);
 
         dTController.maxHealth += value * multiFactor;
-        dTController.currentHealth = Mathf.Min(dTController.currentHealth + value * multiFactor, dTController.maxHealth);
+        dTController.currentHealth = dTController.maxHealth;
 
         UIManager.Instance?.UpdateAndShowPlayerHP(playerController.currentHealth, playerController.health);
         UIManager.Instance?.UpdateAndShowTowerHP(dTController.currentHealth, dTController.maxHealth);
