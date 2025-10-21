@@ -21,15 +21,25 @@ public class UIManager : MonoBehaviour
     private Coroutine _currentShowCoroutine;
     [Header("Game Over Info")]
     public GameObject gameOverPanel;
+    [Header("倒计时UI配置")]
+    public Image[] countdownImages;
 
     void Awake()
     {
-        Instance = this;
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     void Start()
     {
         InitUI();
+        HideAllCountdownImages();
     }
 
     public void UpdateScore(int score)
@@ -148,6 +158,85 @@ public class UIManager : MonoBehaviour
     {
         gameOverPanel.SetActive(true);
     }
+
+    public void UpdateCountdownUI(int countdown)
+    {
+        // 先隐藏全部（保证只有一个显示）
+        HideAllCountdownImages();
+
+        // 只处理 1~3
+        if (countdown < 1 || countdown > 3)
+        {
+            Debug.Log($"UpdateCountdownUI: 忽略无效倒计时值 {countdown}");
+            return;
+        }
+
+        // 调试：打印传入的倒计时，方便在控制台确认实际传值
+        Debug.Log($"UpdateCountdownUI: countdown = {countdown}");
+
+        // 映射（确保 inspector 中的顺序是： index0->“3秒图”， index1->“2秒图”， index2->“1秒图”）
+        int indexToShow = -1;
+        switch (countdown)
+        {
+            case 3:
+                indexToShow = 0; // 第3秒显示第0张图
+                break;
+            case 2:
+                indexToShow = 1; // 第2秒显示第1张图
+                break;
+            case 1:
+                indexToShow = 2; // 第1秒显示第2张图
+                break;
+            default:
+                indexToShow = -1;
+                break;
+        }
+
+        if (indexToShow >= 0)
+        {
+            if (countdownImages == null)
+            {
+                Debug.LogWarning("UpdateCountdownUI: countdownImages 为 null");
+                return;
+            }
+
+            if (countdownImages.Length <= indexToShow)
+            {
+                Debug.LogWarning($"UpdateCountdownUI: countdownImages 长度为 {countdownImages.Length}，但需要索引 {indexToShow}");
+                return;
+            }
+
+            if (countdownImages[indexToShow] == null)
+            {
+                Debug.LogWarning($"UpdateCountdownUI: countdownImages[{indexToShow}] 为 null");
+                return;
+            }
+
+            // 激活并确保对象处于激活状态
+            countdownImages[indexToShow].gameObject.SetActive(true);
+            Debug.Log($"UpdateCountdownUI: 已显示 index {indexToShow} 对应的图片（倒计时 {countdown}）");
+        }
+    }
+
+    public void HideAllCountdownImages()
+    {
+        if (countdownImages == null)
+        {
+            Debug.LogWarning("HideAllCountdownImages: countdownImages 为 null");
+            return;
+        }
+
+        for (int i = 0; i < countdownImages.Length; i++)
+        {
+            if (countdownImages[i] != null && countdownImages[i].gameObject.activeSelf)
+            {
+                countdownImages[i].gameObject.SetActive(false);
+                // 可选日志：方便排查频繁调用时的状态
+                // Debug.Log($"HideAllCountdownImages: 隐藏 index {i}");
+            }
+        }
+    }
+
     private IEnumerator ShowWaveUIFade(Image uiImg, int waveOrderTMP)
     {
         if (uiImg == null || tempCurrentWaveTMP == null)

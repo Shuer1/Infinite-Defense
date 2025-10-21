@@ -144,7 +144,6 @@ public class EnemyManager : MonoBehaviour
     {
         if (enemy == null) return;
 
-        activeEnemies.Remove(enemy);
         // 先禁用对象，等待动画播放完成后再放入对象池
         StartCoroutine(DisableAfterAnimation(enemy));
     }
