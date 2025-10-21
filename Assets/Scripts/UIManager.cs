@@ -148,7 +148,6 @@ public class UIManager : MonoBehaviour
     {
         gameOverPanel.SetActive(true);
     }
-
     private IEnumerator ShowWaveUIFade(Image uiImg, int waveOrderTMP)
     {
         if (uiImg == null || tempCurrentWaveTMP == null)
