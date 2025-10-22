@@ -1036,6 +1036,7 @@ GameObject:
   m_Component:
   - component: {fileID: 232166977}
   - component: {fileID: 232166978}
+  - component: {fileID: 232166979}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -1073,6 +1074,22 @@ MonoBehaviour:
   score: 0
   isGameOver: 0
   upgradePanel: {fileID: 1135337740}
+--- !u!114 &232166979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 232166976}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b5e5114c439b4879a8e8ca9999d97c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  revivePanel: {fileID: 1493371820}
+  reviveWithAdButton: {fileID: 1260621336}
+  gameOverButton: {fileID: 436568602}
+  coinCostForRevive: 100
 --- !u!1 &260743837
 GameObject:
   m_ObjectHideFlags: 0

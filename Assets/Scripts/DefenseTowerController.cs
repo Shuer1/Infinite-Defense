@@ -63,9 +63,8 @@ public class DefenseTowerController : MonoBehaviour
             return;
         }
 
-        GameManager.Instance.isGameOver = true;
-
-        Debug.Log("防御塔被摧毁！游戏失败");
+        // 不再直接设置游戏结束，而是给玩家复活的机会
+        Debug.Log("防御塔被摧毁！玩家有机会复活");
         //animator?.SetTrigger("Break");
 
         // 禁用塔的碰撞体，防止继续被攻击
@@ -75,13 +74,8 @@ public class DefenseTowerController : MonoBehaviour
             collider.enabled = false;
         }
 
-        // 调用游戏管理器的游戏结束方法
-        StartCoroutine(WaitOneSecond(() =>
-        {
-            GameManager.Instance?.GameOver();
-        }));
-        //GameManager.Instance?.GameOver();
-        
+        // 通知复活管理器防御塔已被摧毁
+        PlayerReviveManager.Instance?.OnPlayerDied();
     }
 
     public void ResumeTower() //复活逻辑：该方法在编辑器中绑定复活按钮使用

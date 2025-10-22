@@ -252,7 +252,9 @@ public class PlayerController : MonoBehaviour
         animator.SetTrigger("Die");
         animator.SetBool("ResetLive",false);
         Debug.Log("Player Died");
-        //GameManager.Instance?.GameOver();
+        
+        // 通知复活管理器玩家已死亡
+        PlayerReviveManager.Instance?.OnPlayerDied();
     }
     public void ResetLive()
     {
