@@ -1,110 +1,140 @@
+using System;
+using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
-using UnityEngine.AddressableAssets.ResourceLocators;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using UnityEngine.SceneManagement;
+using Cysharp.Threading.Tasks;
 
 /// <summary>
-/// 初始化远程资源下载的组件
-/// 在游戏启动时下载和缓存必要的远程资源文件
+/// 0-GC 并行下载远程 Addressable 资源并平滑汇报进度
 /// </summary>
 public class InitialRemoteFetch : MonoBehaviour
 {
-    // 想一次性下载完的标签，可空
+    public static InitialRemoteFetch Instance { get; private set; }
+
+    [Header("首包必须下载的标签")]
     public string[] initLabels = { "char", "scene" };
-    
-    /// <summary>
-    /// 进度更新事件
-    /// 参数1: 进度值 (0.0 - 1.0)，-1表示错误
-    /// 参数2: 状态消息
-    /// </summary>
-    public delegate void ProgressUpdate(float progress, string message);  //委托方法
-    public static event ProgressUpdate OnProgressUpdate;
+
+    [Header("首场景（Addressable 地址）")]
+    public AssetReference mainScene;   // 拖拽赋值，避免硬编码字符串
+
+    // 对外只暴露一个事件：0~1 进度 + 状态
+    public static event Action<float, string> OnProgress;
+
+    private CancellationTokenSource _cts;
+
+    private void Awake()
+    {
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
 
     async void Start()
     {
-        try 
-        {
-            // 1. 强制更新远程目录（必须）
-            OnProgressUpdate?.Invoke(0.1f, "正在初始化资源系统...");
-            AsyncOperationHandle<IResourceLocator> init = Addressables.InitializeAsync();
-            await init.Task;
-
-            // 2. 下载并缓存所有指定标签的 Bundle（无本地缓存或版本变化时会自动拉新）
-            float progressPerLabel = 0.8f / initLabels.Length;
-            float currentProgress = 0.1f;
-            
-            List<Task> downloadTasks = new List<Task>();
-            
-            foreach (string lbl in initLabels)
-            {
-                OnProgressUpdate?.Invoke(currentProgress, $"正在检查资源: {lbl}");
-                
-                AsyncOperationHandle<long> getSize = Addressables.GetDownloadSizeAsync(lbl);
-                await getSize.Task;
-                
-                if (getSize.Result > 0)
-                {
-                    // 并行下载所有标签资源
-                    var downloadTask = DownloadLabelAsync(lbl, currentProgress, progressPerLabel);
-                    downloadTasks.Add(downloadTask);
-                }
-                
-                currentProgress += progressPerLabel;
-            }
-            
-            // 等待所有下载任务完成
-            await Task.WhenAll(downloadTasks);
-            
-            // 3. 到这里资源已全部进入本地缓存，可正常加载
-            OnProgressUpdate?.Invoke(0.95f, "资源准备完成，正在加载场景...");
-            Debug.Log("远程美术资源就绪，进入首场景！");
-            Addressables.LoadSceneAsync("Assets/Scenes/Main.unity");
-        }
-        catch (System.Exception ex)
-        {
-            Debug.LogError($"资源初始化过程中出现异常: {ex.Message}");
-            OnProgressUpdate?.Invoke(-1, $"资源初始化失败: {ex.Message}");
-        }
-    }
-    
-    private async Task DownloadLabelAsync(string label, float baseProgress, float progressRange)
-    {
+        _cts = new CancellationTokenSource();
         try
         {
-            OnProgressUpdate?.Invoke(baseProgress, $"正在下载资源: {label}");
-            
-            AsyncOperationHandle download = Addressables.DownloadDependenciesAsync(label, false);
-            
-            // 监控下载进度
-            while (!download.IsDone)
-            {
-                if (download.IsValid())
-                {
-                    OnProgressUpdate?.Invoke(
-                        baseProgress + download.PercentComplete * progressRange, 
-                        $"正在下载 {label}: {Mathf.RoundToInt(download.PercentComplete * 100)}%"
-                    );
-                }
-                await Task.Yield();
-            }
-            
-            await download.Task;
-            
-            if (download.Status != AsyncOperationStatus.Succeeded)
-            {
-                Debug.LogError($"下载 {label} 失败: {download.OperationException}");
-                OnProgressUpdate?.Invoke(-1, $"下载 {label} 失败");
-            }
-            
-            // 释放句柄
-            Addressables.Release(download);
+            await FetchAllAsync(_cts.Token);
         }
-        catch (System.Exception ex)
+        catch (OperationCanceledException)
         {
-            Debug.LogError($"下载 {label} 时发生异常: {ex.Message}");
-            OnProgressUpdate?.Invoke(-1, $"下载 {label} 异常");
+            Debug.Log("[InitialRemoteFetch] 用户取消下载");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            OnProgress?.Invoke(-1f, ex.Message);
         }
     }
+
+    // 供 UI 重试
+    public async UniTaskVoid RestartAsync(CancellationToken token)
+    {
+        await FetchAllAsync(token);
+    }
+
+    // 核心逻辑：初始化 → 并行下载 → 加载场景
+    private async UniTask FetchAllAsync(CancellationToken token)
+    {
+        OnProgress?.Invoke(0.05f, "初始化资源系统…");
+        await Addressables.InitializeAsync().ToUniTask(cancellationToken: token);
+
+        long totalBytes = 0;
+        foreach (var lbl in initLabels)
+        {
+            long size = await Addressables.GetDownloadSizeAsync(lbl)
+                                          .ToUniTask(cancellationToken: token);
+            totalBytes += size;
+        }
+
+        if (totalBytes == 0)
+        {
+            OnProgress?.Invoke(1f, "无需下载，进入场景…");
+        }
+        else
+        {
+            var progress = new Progress<float>(p => OnProgress?.Invoke(
+                                                 0.05f + p * 0.90f, "下载中…"));
+            await DownloadDependenciesParallelAsync(initLabels, totalBytes,
+                                                   progress, token);
+        }
+
+        OnProgress?.Invoke(0.95f, "加载场景…");
+        await Addressables.LoadSceneAsync(mainScene.RuntimeKey.ToString(),
+                                          LoadSceneMode.Single)
+                          .ToUniTask(cancellationToken: token);
+    }
+
+    // 并行下载多个标签，整体汇报一个 0~1 进度
+    private async UniTask DownloadDependenciesParallelAsync(
+        IReadOnlyList<string> labels,
+        long totalBytes,
+        IProgress<float> progress,
+        CancellationToken token)
+    {
+        var tasks = new UniTask[labels.Count];
+        long downloaded = 0;
+
+        for (int i = 0; i < labels.Count; ++i)
+        {
+            string lbl = labels[i];
+            long labelSize = GetLabelSize(lbl);          // 缓存大小
+            tasks[i] = DownloadLabelAsync(lbl,
+                new Progress<float>(p =>
+                {
+                    long prev = Interlocked.Read(ref downloaded);
+                    long add = (long)(p * labelSize);
+                    Interlocked.Add(ref downloaded, add - prev);
+                    progress.Report((float)downloaded / totalBytes);
+                }), token);
+        }
+
+        await UniTask.WhenAll(tasks);
+    }
+
+    // 单个标签下载
+    private async UniTask DownloadLabelAsync(string label,
+                                           IProgress<float> progress,
+                                           CancellationToken token)
+    {
+        var handle = Addressables.DownloadDependenciesAsync(label, false);
+        await handle.ToUniTask(progress, cancellationToken: token);
+        Addressables.Release(handle);
+    }
+
+    // 缓存标签大小
+    private readonly Dictionary<string, long> _sizeCache = new();
+    private long GetLabelSize(string label)
+    {
+        if (!_sizeCache.TryGetValue(label, out var size))
+        {
+            size = Addressables.GetDownloadSizeAsync(label).WaitForCompletion();
+            _sizeCache[label] = size;
+        }
+        return size;
+    }
+
+    private void OnDestroy() => _cts?.Cancel();
 }
