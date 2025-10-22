@@ -214,7 +214,7 @@ public class UIManager : MonoBehaviour
 
             // 激活并确保对象处于激活状态
             countdownImages[indexToShow].gameObject.SetActive(true);
-            Debug.Log($"UpdateCountdownUI: 已显示 index {indexToShow} 对应的图片（倒计时 {countdown}）");
+            Debug.Log($"UpdateCountdownUI: 已显示 index {indexToShow} 对应的图片（倒计时 {countdown})");
         }
     }
 
