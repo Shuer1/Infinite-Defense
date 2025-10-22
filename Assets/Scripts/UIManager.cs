@@ -231,8 +231,6 @@ public class UIManager : MonoBehaviour
             if (countdownImages[i] != null && countdownImages[i].gameObject.activeSelf)
             {
                 countdownImages[i].gameObject.SetActive(false);
-                // 可选日志：方便排查频繁调用时的状态
-                // Debug.Log($"HideAllCountdownImages: 隐藏 index {i}");
             }
         }
     }

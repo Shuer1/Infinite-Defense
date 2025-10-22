@@ -262,6 +262,7 @@ public abstract class EnemyBase : MonoBehaviour
         {
             animator.SetBool(AnimDie, false);
             animator.SetBool(AnimIdle, true);
+            animator.speed = originalAnimSpeed; // 重置动画播放速度
         }
         currentState = AnimIdle;
 

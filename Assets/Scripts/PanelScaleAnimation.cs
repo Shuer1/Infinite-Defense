@@ -72,7 +72,6 @@ public class PanelScaleAnimation : MonoBehaviour
 
         isAnimating = true;
         float elapsedTime = 0f;
-        LogDebug($"动画开始: 从 {startScale} 到 {targetScale}，持续 {animationDuration} 秒");
 
         EnsureCanvasGroupExists();
         float startAlpha = isOpening ? 0f : 1f;  // 强制透明度起始值

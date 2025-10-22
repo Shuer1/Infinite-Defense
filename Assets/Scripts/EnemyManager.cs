@@ -94,14 +94,15 @@ public class EnemyManager : MonoBehaviour
             enemy = Instantiate(type == EnemyType.Basic ? basicEnemyPrefab : heavyEnemyPrefab, transform);
             enemy.enemyType = type;
             RegisterEnemyDeathCallback(enemy);
+            // 对新实例化的敌人也要进行完整的状态重置
+            enemy.ResetEnemyState(spawnPos, rotation);
         }
         else
         {
             enemy = pool.Dequeue();
+            // 调用状态重置方法
+            enemy.ResetEnemyState(spawnPos, rotation);
         }
-
-        //调用状态重置方法
-        enemy.ResetEnemyState(spawnPos, rotation);
 
         RegisterEnemy(enemy); // 注册到活跃列表
         return enemy;
@@ -157,6 +158,9 @@ public class EnemyManager : MonoBehaviour
         // 再次检查敌人是否为空（防止中途被销毁的极端情况）
         if (enemy != null && enemy.gameObject != null)
         {
+            // 在回收前彻底重置敌人状态，使用当前位置作为临时位置
+            // 真正的位置会在下次从对象池取出时设置
+            enemy.ResetEnemyState(enemy.transform.position, enemy.transform.rotation);
             enemy.gameObject.SetActive(false);
             
             // 回收至对应类型的对象池

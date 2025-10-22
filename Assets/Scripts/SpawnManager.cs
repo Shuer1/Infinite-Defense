@@ -36,40 +36,6 @@ public class SpawnManager : MonoBehaviour
 
     }
 
-    /*
-    // 启动指定波数
-    private void StartWave(int wave)
-    {
-        Debug.Log($"开始第{wave}波！");
-        if (UIManager.Instance == null)
-        {
-            Debug.LogError("UIManager.Instance is null!");
-            return;
-        }
-
-        UIManager.Instance.AutoShowCurrentWaveUI(uiPartImg, wave);
-
-        int enemyCount = CalculateEnemyCount(wave);
-        float heavyChance = CalculateHeavyChance(wave);
-
-        // 生成该波所有怪物
-        for (int i = 0; i < enemyCount; i++)
-        {
-            // 在线型区域上生成
-            Vector3 spawnPos = new Vector3(
-                UnityEngine.Random.Range(xMin, xMax),
-                spawn_LineFiled.position.y,
-                spawn_LineFiled.position.z
-            );
-
-            // 随机决定怪物类型
-            EnemyType type = UnityEngine.Random.value < heavyChance ? EnemyType.Heavy : EnemyType.Basic;
-
-            // 从对象池获取怪物
-            enemyManager.GetEnemy(type, spawnPos, Quaternion.identity);
-        }
-    }
-    */
     private void StartWave(int wave) //新增
     {
         Debug.Log($"开始第{wave}波！");
