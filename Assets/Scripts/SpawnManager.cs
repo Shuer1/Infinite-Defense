@@ -72,6 +72,7 @@ public class SpawnManager : MonoBehaviour
     */
     private void StartWave(int wave) //新增
     {
+        Debug.Log($"开始第{wave}波！");
         if (waveStartCoroutine != null)
             StopCoroutine(waveStartCoroutine);
         waveStartCoroutine = StartCoroutine(StartWaveCoroutine(wave));
