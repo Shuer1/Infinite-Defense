@@ -19,7 +19,7 @@ public class InitialRemoteFetch : MonoBehaviour
     /// 参数1: 进度值 (0.0 - 1.0)，-1表示错误
     /// 参数2: 状态消息
     /// </summary>
-    public delegate void ProgressUpdate(float progress, string message);
+    public delegate void ProgressUpdate(float progress, string message);  //委托方法
     public static event ProgressUpdate OnProgressUpdate;
 
     async void Start()
