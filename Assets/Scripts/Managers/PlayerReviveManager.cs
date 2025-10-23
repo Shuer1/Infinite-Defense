@@ -9,7 +9,7 @@ public class PlayerReviveManager : MonoBehaviour
     [Header("UI References")]
     [SerializeField] private GameObject revivePanel;
     [SerializeField] private Button reviveWithAdButton;
-    //[SerializeField] private Button reviveWithCoinsButton;
+    //[SerializeField] private Button reviveWithCoinsButton; //消耗金币复活
     [SerializeField] private Button gameOverButton;
     /*
     [Header("复活消耗")]
@@ -17,7 +17,9 @@ public class PlayerReviveManager : MonoBehaviour
     */
 
     private PlayerController playerController;
-    private bool hasRevived = false;
+    private int reviveCount = 0;
+    private int maxReviveCount = 3;
+    private bool allowToRevive = true;
 
     private void Awake()
     {
@@ -41,7 +43,7 @@ public class PlayerReviveManager : MonoBehaviour
             reviveWithAdButton.onClick.AddListener(OnReviveWithAdClicked);
         }
 
-        /*
+        /* 金币复活逻辑
         if (reviveWithCoinsButton != null)
         {
             reviveWithCoinsButton.onClick.AddListener(OnReviveWithCoinsClicked);
@@ -79,14 +81,14 @@ public class PlayerReviveManager : MonoBehaviour
         // 检查是否有可用的激励广告
         if (AdsManager.Instance != null)
         {
-            AdsManager.Instance.OnRewardedAdCompleted += OnRewardedAdCompleted;
-            bool adShown = AdsManager.Instance.ShowRewardedAd();
+            AdsManager.Instance.OnReviveRewardedAdCompleted += OnRewardedAdCompleted;
+            bool adShown = AdsManager.Instance.ShowReviveRewardedAd();
             
             if (!adShown)
             {
                 Debug.LogWarning("[PlayerReviveManager] 无法显示激励广告，使用备选复活方案");
                 PerformRevive();
-                AdsManager.Instance.OnRewardedAdCompleted -= OnRewardedAdCompleted;
+                AdsManager.Instance.OnReviveRewardedAdCompleted -= OnRewardedAdCompleted;
             }
         }
         else
@@ -99,11 +101,11 @@ public class PlayerReviveManager : MonoBehaviour
     private void OnRewardedAdCompleted(bool success)
     {
         Debug.Log($"[PlayerReviveManager] 激励广告完成，success={success}");
-        
+
         // 取消监听事件
         if (AdsManager.Instance != null)
         {
-            AdsManager.Instance.OnRewardedAdCompleted -= OnRewardedAdCompleted;
+            AdsManager.Instance.OnReviveRewardedAdCompleted -= OnRewardedAdCompleted;
         }
 
         if (success)
@@ -117,14 +119,16 @@ public class PlayerReviveManager : MonoBehaviour
         }
     }
 
+    /* 点击金币复活方法
     private void OnReviveWithCoinsClicked()
     {
         Debug.Log("[PlayerReviveManager] 玩家选择通过金币复活");
-        
+
         // 这里应该检查玩家是否有足够的金币
         // 暂时跳过检查逻辑，直接复活
         PerformRevive();
     }
+    */
 
     private void OnGameOverClicked()
     {
@@ -143,16 +147,23 @@ public class PlayerReviveManager : MonoBehaviour
         }
     }
 
-    private void PerformRevive()
+    private void PerformRevive() //允许复活3次
     {
-        if (hasRevived)
+        if (allowToRevive == false)
         {
             Debug.LogWarning("[PlayerReviveManager] 玩家已经复活过一次，不能再次复活");
+            reviveWithAdButton.interactable = false;
+            // 可补充UI提示
             return;
         }
 
-        hasRevived = true;
+        reviveCount++;
         HideRevivePanel();
+
+        if (reviveCount >= maxReviveCount)
+        {
+            allowToRevive = false;
+        }
 
         // 执行复活逻辑
         if (playerController != null)
@@ -164,13 +175,36 @@ public class PlayerReviveManager : MonoBehaviour
         {
             Debug.LogError("[PlayerReviveManager] 无法找到PlayerController，复活失败");
         }
+        
+        // 同时复活防御塔
+        if (DefenseTowerController.Instance != null)
+        {
+            DefenseTowerController.Instance.ResumeTower();
+            Debug.Log("[PlayerReviveManager] 防御塔成功复活");
+        }
+        else
+        {
+            Debug.LogError("[PlayerReviveManager] 无法找到DefenseTowerController，防御塔复活失败");
+        }
+        
+        // 通知所有敌人更新防御塔引用
+        EnemyManager enemyManager = FindObjectOfType<EnemyManager>();
+        if (enemyManager != null)
+        {
+            foreach (EnemyBase enemy in enemyManager.activeEnemies)
+            {
+                if (enemy != null && enemy.gameObject.activeInHierarchy)
+                {
+                    // 直接更新敌人的防御塔引用
+                    enemy.ResetEnemyState(enemy.transform.position, enemy.transform.rotation);
+                }
+            }
+        }
     }
 
     // 当玩家死亡时调用此方法
     public void OnPlayerDied()
     {
-        hasRevived = false; // 重置复活标记
-        
         // 显示复活面板
         ShowRevivePanel();
     }

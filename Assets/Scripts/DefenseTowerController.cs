@@ -34,6 +34,7 @@ public class DefenseTowerController : MonoBehaviour
     private void Start()
     {
         maxHealth = DataManager.GetInt(DataManager.DefenseTowerMaxHPKey);
+        currentHealth = maxHealth;
         //animator = GetComponent<Animator>();
         gameObject.tag = "Tower";
     }

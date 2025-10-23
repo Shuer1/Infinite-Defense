@@ -23,6 +23,8 @@ public class AdsManager : MonoBehaviour //单例
 
     // 新增：激励广告回调
     public event Action<bool> OnRewardedAdCompleted;
+    // 新增：用于复活的激励广告回调
+    public event Action<bool> OnReviveRewardedAdCompleted;
 
     [Header("UI 绑定")]
     [SerializeField] private Button closeBannerButton;
@@ -357,10 +359,29 @@ public class AdsManager : MonoBehaviour //单例
     }
 
     /// <summary>
-    /// 显示激励广告
+    /// 显示激励广告（用于道具奖励）
     /// </summary>
     /// <returns>是否成功调用显示</returns>
     public bool ShowRewardedAd()
+    {
+        return ShowRewardedAdInternal(false);
+    }
+
+    /// <summary>
+    /// 显示激励广告（用于复活）
+    /// </summary>
+    /// <returns>是否成功调用显示</returns>
+    public bool ShowReviveRewardedAd()
+    {
+        return ShowRewardedAdInternal(true);
+    }
+
+    /// <summary>
+    /// 显示激励广告的内部实现
+    /// </summary>
+    /// <param name="isForRevive">是否用于复活</param>
+    /// <returns>是否成功调用显示</returns>
+    private bool ShowRewardedAdInternal(bool isForRevive)
     {
         if (!isInitialized)
         {
@@ -380,7 +401,14 @@ public class AdsManager : MonoBehaviour //单例
             rewardedAd.Show((reward) => 
             {
                 Debug.Log($"[AdsManager] 🏆 激励广告奖励发放: {reward.Amount} {reward.Type}");
-                OnRewardedAdCompleted?.Invoke(true);
+                if (isForRevive)
+                {
+                    OnReviveRewardedAdCompleted?.Invoke(true);
+                }
+                else
+                {
+                    OnRewardedAdCompleted?.Invoke(true);
+                }
             });
             Debug.Log("[AdsManager] 🚀 激励广告开始展示");
             return true;
@@ -388,7 +416,14 @@ public class AdsManager : MonoBehaviour //单例
         catch (Exception ex)
         {
             Debug.LogError("[AdsManager] 显示激励广告发生异常: " + ex);
-            OnRewardedAdCompleted?.Invoke(false);
+            if (isForRevive)
+            {
+                OnReviveRewardedAdCompleted?.Invoke(false);
+            }
+            else
+            {
+                OnRewardedAdCompleted?.Invoke(false);
+            }
             LoadRewardedAd();
             return false;
         }
@@ -426,7 +461,9 @@ public class AdsManager : MonoBehaviour //单例
     private void HandleRewardedAdFailed(AdError error)
     {
         Debug.LogWarning($"[AdsManager] 激励广告展示失败: {error?.ToString()}");
+        // 通知两个可能的监听者广告失败
         OnRewardedAdCompleted?.Invoke(false);
+        OnReviveRewardedAdCompleted?.Invoke(false);
         UnregisterRewardedAdEvents();
         LoadRewardedAd(); // 失败后重新加载
     }

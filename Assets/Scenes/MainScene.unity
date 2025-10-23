@@ -313,7 +313,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Score:'
+  m_text: Score:0
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7b35ae760fa814bff964b2046ccce445, type: 2}
   m_sharedMaterial: {fileID: -8927926491640832478, guid: 7b35ae760fa814bff964b2046ccce445, type: 2}
@@ -1089,7 +1089,6 @@ MonoBehaviour:
   revivePanel: {fileID: 1493371820}
   reviveWithAdButton: {fileID: 1260621336}
   gameOverButton: {fileID: 436568602}
-  coinCostForRevive: 100
 --- !u!1 &260743837
 GameObject:
   m_ObjectHideFlags: 0
@@ -6293,43 +6292,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1260621337}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1493371820}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 942823808}
-        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
-        m_MethodName: ResetLive
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 3693298205752246073}
-        m_TargetAssemblyTypeName: DefenseTowerController, Assembly-CSharp
-        m_MethodName: ResumeTower
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1260621337
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -247,28 +247,52 @@ public abstract class EnemyBase : MonoBehaviour
     // =============================
     public void ResetEnemyState(Vector3 spawnPos, Quaternion rotation)
     {
+        // 重置位置和旋转
         transform.position = new Vector3(spawnPos.x, 0, spawnPos.z); //强制锁定Y轴位置为0
         transform.rotation = rotation;
+        
+        // 重新激活对象
         gameObject.SetActive(true);
         gameObject.tag = "Enemy";
 
+        // 重置基本状态
         currentHealth = maxHealth;
         isDead = false;
         moveSpeed = originalMoveSpeed;
+        
+        // 停止所有协程并重置攻击计时器
         StopAllCoroutines();
         lastAttackTime = 0f;
+        
+        // 重置冻结状态
+        isFrozen = false;
 
+        // 重置动画状态机
         if (animator != null)
         {
+            // 清除所有动画状态
             animator.SetBool(AnimDie, false);
+            animator.SetBool(AnimRun, false);
+            animator.SetBool(AnimAttack, false);
             animator.SetBool(AnimIdle, true);
             animator.speed = originalAnimSpeed; // 重置动画播放速度
         }
         currentState = AnimIdle;
 
+        // 重新获取防御塔引用（重要：确保引用的是当前有效的防御塔实例）
         defenseTower = DefenseTowerController.Instance;
         if (defenseTower == null)
             Debug.LogWarning("未找到 DefenseTowerController.Instance", this);
+            
+        // 重新获取玩家引用
+        if (pc == null) 
+        {
+            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+            if (playerObj != null)
+            {
+                pc = playerObj.GetComponent<PlayerController>();
+            }
+        }
     }
 
     // =============================
