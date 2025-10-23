@@ -64,12 +64,12 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (isDead) return;
+
+        // 当游戏结束时触发玩家死亡动画（仅执行一次）
         if (GameManager.Instance.isGameOver)
         {
-            if (isDead)
-            {
-                return;
-            }
+            if (isDead) return;
             
             Die();
         }
@@ -245,21 +245,28 @@ public class PlayerController : MonoBehaviour
         DataManager.SaveInt(DataManager.NextLevelExpKey,experienceToNextLevel);
     }
 
-    void Die() //玩家Die只能是GameOver来触发
+    public void Die()
     {
+        if (isDead) return;
+
         isDead = true;
         animator.ResetTrigger("Hit");
         animator.SetTrigger("Die");
-        animator.SetBool("ResetLive",false);
+        animator.SetBool("ResetLive", false);
+        animator.SetBool("Shoot", false);
+        animator.SetBool("Run", false);
+
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
         Debug.Log("Player Died");
-        
-        // 通知复活管理器玩家已死亡
-        PlayerReviveManager.Instance?.OnPlayerDied();
+
+        // ❌ 不再调用 GameOver，由防御塔/复活管理器控制
     }
     public void ResetLive()
     {
         Debug.Log("选择复活!");
         currentHealth = health;
+        isDead = false; // 重置死亡状态
         animator.ResetTrigger("Die");
         experience /= 2; // 复活损失一半经验
         isDead = false;

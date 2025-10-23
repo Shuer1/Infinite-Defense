@@ -103,7 +103,7 @@ public abstract class EnemyBase : MonoBehaviour
         if (isDead) return;
 
         // ✅ 塔不存在或死亡时 → 停止行动并触发游戏结束
-        if (defenseTower == null || defenseTower.currentHealth <= 0)
+        if (defenseTower == null || defenseTower.currentHealth <= 0 || defenseTower.isBroken)
         {
             ChangeAniStatus(currentState, AnimIdle);
             return;

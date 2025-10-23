@@ -35,6 +35,9 @@ public class RewardManager : MonoBehaviour
 
     [Tooltip("UI相机(默认使用MainCamera)")]
     [SerializeField] private Camera uiCamera;
+    
+    //[Tooltip("世界空间到Canvas空间的转换因子")]
+    //[SerializeField] private float worldToCanvasScale = 100f;
 
     private bool _isDraggingProp;
     private Vector2 _dragStartPos;
@@ -70,7 +73,8 @@ public class RewardManager : MonoBehaviour
         if (bombRangeIndicator != null)
         {
             bombRangeIndicator.gameObject.SetActive(false);
-            bombRangeIndicator.sizeDelta = new Vector2(bombRange * 2, bombRange * 2);
+            // Initialize with a default size, will be adjusted dynamically
+            bombRangeIndicator.sizeDelta = new Vector2(100, 100);
         }
 
         if (uiCamera == null)
@@ -105,6 +109,7 @@ public class RewardManager : MonoBehaviour
         {
             bombRangeIndicator.gameObject.SetActive(true);
             bombRangeIndicator.position = pointerData.position;
+            UpdateIndicatorSize();
         }
     }
 
@@ -119,7 +124,29 @@ public class RewardManager : MonoBehaviour
         {
             Vector3 targetPos = pointerData.position;
             bombRangeIndicator.position = Vector3.Lerp(bombRangeIndicator.position, targetPos, 0.3f);
+            UpdateIndicatorSize();
         }
+    }
+    
+    /// <summary>
+    /// Updates the bomb range indicator size to match the actual bomb range in world space
+    /// </summary>
+    private void UpdateIndicatorSize()
+    {
+        if (bombRangeIndicator == null || uiCamera == null) return;
+        
+        // Calculate world position at a standard distance from camera
+        Vector3 testWorldPos = new Vector3(0, 0, 10); // Point 10 units away from camera
+        
+        // Convert two world points to screen positions to determine scale
+        Vector3 screenPoint1 = uiCamera.WorldToScreenPoint(testWorldPos);
+        Vector3 screenPoint2 = uiCamera.WorldToScreenPoint(testWorldPos + new Vector3(bombRange, 0, 0));
+        
+        // Calculate the screen distance that represents the bomb range
+        float screenRange = Vector3.Distance(screenPoint1, screenPoint2);
+        
+        // Apply the size (diameter = radius * 2)
+        bombRangeIndicator.sizeDelta = new Vector2(screenRange * 2, screenRange * 2);
     }
 
     private void OnPropPointerUp(BaseEventData data)

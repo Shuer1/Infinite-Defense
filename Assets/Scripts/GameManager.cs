@@ -14,25 +14,24 @@ public class GameManager : MonoBehaviour
         if (Instance == null) Instance = this;
 
         upgradePanel?.SetActive(true);
-
         InitializePlayerData();
         InitializeEnemyData();
         InitializeBulletData();
 
         DataManager.FlushSave();
-        Debug.Log("[GameManager]所有数据初始化完成,已统一保存");
+        Debug.Log("[GameManager] 所有数据初始化完成");
     }
 
     public void AddScore(int value)
     {
         score += value;
         UIManager.Instance.UpdateScore(score);
-
         DataManager.SaveInt(DataManager.HighScoreKey, score);
     }
 
     public void GameOver()
     {
+        isGameOver = true;
         DataManager.FlushSave();
         UIManager.Instance.ShowGameOver();
     }
@@ -41,8 +40,7 @@ public class GameManager : MonoBehaviour
     {
         isGameOver = false;
     }
-    
-    // 初始化玩家相关数据
+
     private void InitializePlayerData()
     {
         DataManager.InitializeIntData(DataManager.HighScoreKey, 0);
@@ -52,12 +50,9 @@ public class GameManager : MonoBehaviour
         DataManager.InitializeIntData(DataManager.NextLevelExpKey, 100);
         DataManager.InitializeFloatData(DataManager.PlayerShootSpeedKey, 0.5f);
         DataManager.InitializeIntData(DataManager.CurrentPropCountKey, 3);
-
-        // 新增：初始化城墙血量数据⚠️
-        DataManager.InitializeIntData(DataManager.DefenseTowerMaxHPKey,500);
+        DataManager.InitializeIntData(DataManager.DefenseTowerMaxHPKey, 500);
     }
 
-    // 初始化敌人相关数据
     private void InitializeEnemyData()
     {
         DataManager.InitializeIntData(DataManager.Enemy1MaxHealthKey, EnemysInitialConfig.Enemy1MaxHealth);
@@ -66,7 +61,6 @@ public class GameManager : MonoBehaviour
         DataManager.InitializeIntData(DataManager.Enemy2DamageKey, EnemysInitialConfig.Enemy2Damage);
     }
 
-    // 初始化子弹相关数据
     private void InitializeBulletData()
     {
         DataManager.InitializeIntData(DataManager.BaseBulletDamageKey, 50);
@@ -74,7 +68,6 @@ public class GameManager : MonoBehaviour
         DataManager.InitializeIntData(DataManager.FrostDamageKey, 5);
         DataManager.InitializeIntData(DataManager.NormalBulletChanceKey, 100);
         DataManager.InitializeIntData(DataManager.ExplosiveBulletChanceKey, 0);
-        
         DataManager.InitializeFloatData(DataManager.ExplosionRangeKey, 1.0f);
         DataManager.InitializeFloatData(DataManager.FrostFreezeDurationKey, 1.0f);
     }
