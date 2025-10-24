@@ -34,7 +34,7 @@ public class PlaneSwitchManager : MonoBehaviour
     
     private void Start()
     {
-        int randomSpriteOrder = Random.Range(0, spriteTextures.Length);
+        int randomSpriteOrder = Random.Range(0, spriteTextures.Length); //左闭右开
         SwitchToTexture(randomSpriteOrder);
     }
 
