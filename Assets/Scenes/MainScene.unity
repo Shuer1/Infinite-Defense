@@ -2581,8 +2581,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0455db2c827b7420a996a770b7986ec6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  plane_Material: {fileID: 0}
-  plane_SpriteTextures: []
+  targetMaterial: {fileID: 2100000, guid: 7f5aacae541744ee9a93bac3c5a0edb4, type: 2}
+  spriteTextures:
+  - {fileID: 21300000, guid: 3caf8af410d1048ed92201db81b836b8, type: 3}
+  - {fileID: 21300000, guid: c61948e42336c4c4681ed0b71ce0627a, type: 3}
+  - {fileID: 21300000, guid: 6591defcf52d64df5b82c6b333c183cb, type: 3}
+  - {fileID: 21300000, guid: a6ff29d7b2e4941bd977393367ab3891, type: 3}
+  - {fileID: 21300000, guid: 5831063690da64453a71457da53b7b38, type: 3}
+  - {fileID: 21300000, guid: 9d80b9689abd54b38a517fa619e25013, type: 3}
+  - {fileID: 21300000, guid: 0baa7d2511b1e4c8d836ddc446a7a6c0, type: 3}
+  - {fileID: 21300000, guid: 0d27b1ab1a67e4c1bb84d238f15de13c, type: 3}
 --- !u!1 &598921564
 GameObject:
   m_ObjectHideFlags: 0
