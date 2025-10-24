@@ -15,38 +15,12 @@ public class EntireBgmManager : MonoBehaviour
     [Header("初始播放设置")]
     [SerializeField] private int initialOrder = 0;      // 初始播放的背景音乐索引
     public float initialVolume = 1f;  // 初始音量(0-1)
-
     [SerializeField] private Slider soundVolume;
-
-    private static EntireBgmManager instance;           // 单例实例
     private int currentPlayingIndex = -1;               // 当前播放的背景音乐索引(-1表示未播放)
-
-    /// <summary>
-    /// 单例访问点
-    /// </summary>
-    public static EntireBgmManager Instance
-    {
-        get
-        {
-            if (instance == null)
-            {
-                Debug.LogError("EntireBgmManager instance not found! Please ensure there's one in the scene.");
-            }
-            return instance;
-        }
-    }
 
     private void Awake()
     {
-        // 单例模式实现：确保全局只有一个实例
-        if (instance != null && instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        instance = this;
-        DontDestroyOnLoad(gameObject);  // 跨场景保留
+        //DontDestroyOnLoad(gameObject);  // 跨场景保留
         InitializeBgms();
     }
 

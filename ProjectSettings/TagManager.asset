@@ -9,6 +9,8 @@ TagManager:
   - Obstacle
   - Bullet
   - Tower
+  - RevivePanel
+  - MainUI
   layers:
   - Default
   - TransparentFX
