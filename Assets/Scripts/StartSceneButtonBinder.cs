@@ -26,7 +26,7 @@ public class StartSceneButtonBinder : MonoBehaviour
         if (startGameButton != null)
         {
             startGameButton.onClick.RemoveAllListeners();
-            startGameButton.onClick.AddListener(() => 
+            startGameButton.onClick.AddListener(() =>
             {
                 // 替换为你的游戏场景名称
                 SceneLoadManager.Instance.LoadSceneAsync("MainScene", true);

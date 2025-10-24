@@ -21,7 +21,6 @@ public class GameManager : MonoBehaviour
         DataManager.FlushSave();
         Debug.Log("[GameManager] 所有数据初始化完成");
     }
-
     public void AddScore(int value)
     {
         score += value;

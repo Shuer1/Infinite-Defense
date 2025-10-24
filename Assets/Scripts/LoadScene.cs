@@ -8,7 +8,6 @@ public class LoadScene : MonoBehaviour
     [SerializeField] private GameObject helpMenu;
     [SerializeField] private AudioSource clickedSound;
     public bool isPausing = false;
-
     public void LoadStartUIScene()
     {
         clickedSound.Play();

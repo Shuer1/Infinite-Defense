@@ -1036,7 +1036,6 @@ GameObject:
   m_Component:
   - component: {fileID: 232166977}
   - component: {fileID: 232166978}
-  - component: {fileID: 232166979}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -1074,21 +1073,7 @@ MonoBehaviour:
   score: 0
   isGameOver: 0
   upgradePanel: {fileID: 1135337740}
---- !u!114 &232166979
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 232166976}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b5e5114c439b4879a8e8ca9999d97c8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  revivePanel: {fileID: 1493371820}
-  reviveWithAdButton: {fileID: 1260621336}
-  gameOverButton: {fileID: 436568602}
+  pc: {fileID: 942823808}
 --- !u!1 &260743837
 GameObject:
   m_ObjectHideFlags: 0
@@ -2379,10 +2364,10 @@ MonoBehaviour:
   target: {fileID: 754504812}
   offset: {x: 0, y: 18, z: -5}
   smoothSpeed: 3
-  enableBoundaryLimit: 0
+  enableBoundaryLimit: 1
   boundaryMargin: {x: 5, y: 5}
-  boundaryCenter: {x: 0, y: 0}
-  boundarySize: {x: 20, y: 20}
+  boundaryCenter: {x: 0, y: -15}
+  boundarySize: {x: 13.5, y: 13.5}
   shakeOffset: {x: 0, y: 0, z: 0}
 --- !u!114 &536803970
 MonoBehaviour:
@@ -2691,7 +2676,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 574606338}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 10.1}
+  m_LocalPosition: {x: 0, y: 0, z: 10}
   m_LocalScale: {x: 1.5, y: 0.5, z: 5}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -9897,6 +9882,53 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &2135707039
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2135707041}
+  - component: {fileID: 2135707040}
+  m_Layer: 0
+  m_Name: PlayerReviveManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2135707040
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2135707039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b5e5114c439b4879a8e8ca9999d97c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  revivePanel: {fileID: 1493371820}
+  reviveWithAdButton: {fileID: 1260621336}
+  gameOverButton: {fileID: 436568602}
+--- !u!4 &2135707041
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2135707039}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.82281286, y: 0.72463, z: 0.026544996}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1011319814982338
 GameObject:
   m_ObjectHideFlags: 0
@@ -10679,6 +10711,7 @@ SceneRoots:
   - {fileID: 1037700546}
   - {fileID: 1031757753}
   - {fileID: 1683609181}
+  - {fileID: 2135707041}
   - {fileID: 232166977}
   - {fileID: 4237741262077510}
   - {fileID: 830243907}

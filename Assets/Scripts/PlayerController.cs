@@ -58,8 +58,10 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         SyncPlayerData(); //同步初始化玩家数据
+        currentHealth = health;
         rb = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
+        ResetLive();                            //每次进入游戏，重置玩家状态
     }
 
     void Update()
