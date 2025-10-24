@@ -1,6 +1,7 @@
 using Unity.VisualScripting;
 using UnityEngine;
 using System.Collections;
+using TMPro;
 
 /// <summary>
 /// 敌人基础类（最终正式版）
@@ -172,6 +173,9 @@ public abstract class EnemyBase : MonoBehaviour
     {
         if (isDead) return;
 
+        // 显示伤害数字（通过管理器）
+        DamageTextManager.Instance?.ShowDamageText(dmg, transform.position);
+        
         currentHealth -= dmg;
         if (currentHealth <= 0)
         {

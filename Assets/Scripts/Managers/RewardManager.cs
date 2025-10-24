@@ -3,6 +3,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using System.Collections.Generic;
+using System;
 
 /// <summary>
 /// 奖励管理器 - 处理道具获取、使用及冷却逻辑（支持拖动释放）
@@ -42,6 +44,13 @@ public class RewardManager : MonoBehaviour
     private bool _isDraggingProp;
     private Vector2 _dragStartPos;
     private const float _dragThreshold = 100f;
+    
+    // 添加炸弹位置和范围的字段
+    private Vector3 bombPosition;
+    private float bombRangeSaved;
+
+    // 存储延迟执行的动作
+    private Dictionary<string, Action> delayedActions = new Dictionary<string, Action>();
 
     private void Awake() => InitComponents();
     private void Start() => InitPropCount();
@@ -185,13 +194,44 @@ public class RewardManager : MonoBehaviour
     private void ULT_Bomb(Vector3 position, float range)
     {
         Debug.Log($"导弹释放：位置={position}，范围={range}");
+        
         // ✅ 1. 可选：播放爆炸特效
         if (bombEffectPrefab != null)
         {
             GameObject fx = Instantiate(bombEffectPrefab, position, Quaternion.identity);
-            Destroy(fx, 3f); // 自动销毁特效对象
+            ParticleSystem[] particleSystems = fx.GetComponentsInChildren<ParticleSystem>();
+            
+            float longestDuration = 0f;
+            foreach (var ps in particleSystems)
+            {
+                var main = ps.main;
+                if (main.duration > longestDuration)
+                    longestDuration = main.duration;
+            }
+            
+            // 存储位置和范围以便稍后使用
+            bombPosition = position;
+            bombRangeSaved = range;
+            
+            // 在特效播放完成后触发伤害
+            Invoke(nameof(TriggerBombDamage), longestDuration);
+            
+            Destroy(fx, longestDuration + 0.5f); // 留出一些缓冲时间再销毁特效对象
         }
-
+        else
+        {
+            // 如果没有特效，则立即触发伤害
+            TriggerBombDamageAtPosition(position, range);
+        }
+    }
+    
+    private void TriggerBombDamage()
+    {
+        TriggerBombDamageAtPosition(bombPosition, bombRangeSaved);
+    }
+    
+    private void TriggerBombDamageAtPosition(Vector3 position, float range)
+    {
         // ✅ 2. 检测范围内敌人（3D物理）
         Collider[] targets = Physics.OverlapSphere(position, range);
 
@@ -338,6 +378,38 @@ public class RewardManager : MonoBehaviour
         DataManager.SaveIntForce(DataManager.CurrentPropCountKey, currentPropCount);
     }
 
+    /// <summary>
+    /// 带参数的Invoke调用
+    /// </summary>
+    /// <param name="methodName">方法名称（用于标识）</param>
+    /// <param name="action">要执行的操作</param>
+    /// <param name="delay">延迟时间</param>
+    private void InvokeWithParameters(string methodName, Action action, float delay)
+    {
+        // 将动作存储在字典中
+        delayedActions[methodName] = action;
+        
+        // 创建一个包装方法来调用存储的动作
+        System.Action wrapper = () => {
+            if (delayedActions.ContainsKey(methodName)) {
+                delayedActions[methodName]?.Invoke();
+                delayedActions.Remove(methodName);
+            }
+        };
+        
+        // 使用Invoke调用包装方法
+        Invoke(nameof(ExecuteDelayedAction), delay);
+    }
+    
+    /// <summary>
+    /// 执行延迟动作的中间方法
+    /// </summary>
+    private void ExecuteDelayedAction()
+    {
+        // 这是一个占位方法，实际不会被直接调用
+        // 真正的调用会通过InvokeWithParameters创建的包装器进行
+    }
+    
     private void EnableButton()
     {
         if (rewardButton != null)
