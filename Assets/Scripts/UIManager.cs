@@ -86,7 +86,7 @@ public class UIManager : MonoBehaviour
     private void ShowhighScore()
     {
         int current_highScore = DataManager.GetInt(DataManager.HighScoreKey);
-        highScoreText.text = "High Score: " + current_highScore;
+        highScoreText.text = current_highScore.ToString();
     }
 
     public void ShowAndUpdatePlayerAttack(int newAttack) //统一更新和显示玩家额外信息方法
