@@ -102,7 +102,8 @@ public class UpgradeManager : MonoBehaviour
 
         if (upgradePanelScaleAnim != null)
         {
-            upgradePanelScaleAnim.OpenPanel();
+            //upgradePanelScaleAnim.OpenPanel();
+            UIManager.Instance.ShowUpgradePanel();
         }
         else
         {

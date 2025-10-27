@@ -16,10 +16,10 @@ public class EnemyManager : MonoBehaviour
     // 对象池：key=怪物类型，value=待复用的怪物队列
     private Dictionary<EnemyType, Queue<EnemyBase>> enemyPools = new();
     // 当前活跃的怪物列表
-    public List<EnemyBase> activeEnemies = new(); //默认是private
+    public List<EnemyBase> activeEnemies = new();
 
     // 所有怪物被清空时触发（用于波数更新）
-    public event System.Action OnAllEnemiesCleared;
+    public event System.Action OnAllEnemiesCleared; //event关键字。表示限制：该委托只能在声明其的类内部被触发，外部类通过+=和-=来添加或移除委托
 
     // 关键修改：将初始化从Start移到Awake（Awake在Start之前执行）
     void Awake()

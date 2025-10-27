@@ -906,7 +906,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   score: 0
   isGameOver: 0
-  upgradePanel: {fileID: 1135337740}
 --- !u!1 &260743837
 GameObject:
   m_ObjectHideFlags: 0
@@ -4589,6 +4588,7 @@ MonoBehaviour:
   level: {fileID: 260743839}
   propCount: {fileID: 1179928485}
   tempCurrentWaveTMP: {fileID: 1132425220}
+  upgradePanelAnim: {fileID: 1135337745}
   gameOverPanel: {fileID: 1493371820}
   countdownImages:
   - {fileID: 324855884}

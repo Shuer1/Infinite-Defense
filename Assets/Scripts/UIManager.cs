@@ -19,6 +19,8 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI propCount;
     public TextMeshProUGUI tempCurrentWaveTMP;
     private Coroutine _currentShowCoroutine;
+    [Header("Upgrade Panel")]
+    [SerializeField] private PanelScaleAnimation upgradePanelAnim;
     [Header("Game Over Info")]
     public GameObject gameOverPanel;
     [Header("倒计时UI配置")]
@@ -40,6 +42,48 @@ public class UIManager : MonoBehaviour
     {
         InitUI();
         HideAllCountdownImages();
+        InitializeUpgradePanel();
+    }
+
+    private void InitializeUpgradePanel()
+    {
+        if (upgradePanelAnim == null)
+        {
+            Debug.LogError("PanelScaleAnimation: 未找到升级面板引用！");
+            return;
+        }
+
+        // ✅ 保证目标面板先被激活（防止StartCoroutine在inactive对象上报错）
+        var panelObj = upgradePanelAnim.gameObject;
+        if (!panelObj.activeSelf)
+        {
+            panelObj.SetActive(true);
+            Debug.Log("[UIManager] 初始化：强制激活升级面板对象");
+        }
+
+        // ✅ 调用其初始化方法（内部会安全设置为关闭状态）
+        upgradePanelAnim.InitializePanelState();
+
+        // ✅ 初始化后隐藏
+        upgradePanelAnim.ClosePanelImmediate();
+    }
+
+    public void HideUpgradePanelImmediate()
+    {
+        if (upgradePanelAnim != null)
+        {
+            upgradePanelAnim.ClosePanelImmediate();
+        }
+    }
+
+    public void ShowUpgradePanel()
+    {
+        upgradePanelAnim.OpenPanel();
+    }
+
+    public void HideUpgradePanel()
+    {
+        upgradePanelAnim.ClosePanel();
     }
 
     public void UpdateScore(int score)

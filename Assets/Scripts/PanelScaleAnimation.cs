@@ -45,11 +45,16 @@ public class PanelScaleAnimation : MonoBehaviour
     public void ClosePanel()
     {
         LogDebug("尝试收起面板...");
-        
+
         if (targetPanel == null)
         {
             Debug.LogError("PanelScaleAnimation: targetPanel 未赋值！");
             return;
+        }
+
+        if (targetPanel != null && !targetPanel.gameObject.activeSelf)
+        {
+            targetPanel.gameObject.SetActive(true);
         }
 
         // 关键修复2：强制从打开状态开始关闭动画
@@ -128,13 +133,47 @@ public class PanelScaleAnimation : MonoBehaviour
             }
         }
 
-        // 初始化状态：强制为关闭状态
+        // 初始化状态：强制为开启状态
         targetPanel.gameObject.SetActive(true);
         targetPanel.localScale = closedScale;
         EnsureCanvasGroupExists();
         canvasGroup.alpha = 0f;
         LogDebug($"初始化完成: 初始scale={closedScale}, alpha=0");
     }
+
+    // ✅ 新增：无动画直接初始化关闭状态（供UIManager启动时调用）
+    public void InitializePanelState()
+    {
+        EnsureCanvasGroupExists();
+
+        if (targetPanel == null)
+        {
+            targetPanel = GetComponent<RectTransform>();
+        }
+
+        targetPanel.gameObject.SetActive(true); // 必须激活一次才能正确初始化
+        targetPanel.localScale = closedScale;
+        canvasGroup.alpha = 0f;
+
+        LogDebug("InitializePanelState: 初始化为关闭状态 (scale=0, alpha=0)");
+    }
+
+    // ✅ 新增：立即关闭，无动画（用于游戏开始初始化）
+    public void ClosePanelImmediate()
+    {
+        StopAllCoroutines();
+        EnsureCanvasGroupExists();
+
+        if (targetPanel == null) return;
+
+        targetPanel.localScale = closedScale;
+        canvasGroup.alpha = 0f;
+        targetPanel.gameObject.SetActive(false);
+
+        isAnimating = false;
+        LogDebug("ClosePanelImmediate: 已立即隐藏面板");
+    }
+
 
     private void LogDebug(string message)
     {

@@ -7,13 +7,16 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
     public int score = 0;
     public bool isGameOver;
-    [SerializeField] private GameObject upgradePanel;
 
     void Awake()
     {
-        if (Instance == null) Instance = this;
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
 
-        upgradePanel?.SetActive(true);
         InitializePlayerData();
         InitializeEnemyData();
         InitializeBulletData();
@@ -30,6 +33,8 @@ public class GameManager : MonoBehaviour
 
     public void GameOver()
     {
+        if (isGameOver) return; //避免重复触发
+
         isGameOver = true;
         DataManager.FlushSave();
         UIManager.Instance.ShowGameOver();
