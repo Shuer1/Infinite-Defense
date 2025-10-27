@@ -29,7 +29,7 @@ public class SafeAreaAdapter : MonoBehaviour
             AdaptToSafeArea();
     }
 
-    private void Update()
+    private void Update() //更新安全区域时，重新适配（如横置、旋转设备等）
     {
         if (enableAdaptation && Screen.safeArea != _lastSafeArea)
         {
