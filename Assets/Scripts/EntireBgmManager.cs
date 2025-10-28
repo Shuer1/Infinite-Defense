@@ -4,6 +4,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// 全局背景音乐控制器（支持多场景、音量持久化、主场景滑块绑定）
+/// </summary>
 public class EntireBgmManager : MonoBehaviour
 {
     public static EntireBgmManager Instance { get; private set; }
@@ -14,20 +17,25 @@ public class EntireBgmManager : MonoBehaviour
     [Header("初始播放设置")]
     [SerializeField] private int initialOrder = 0;
     public float initialVolume = 1f;
-    
+
     [Header("主场景音量滑块设置")]
     [SerializeField] private string mainSceneName = "StartGameUI"; // 主场景名称
-    [SerializeField] private string soundVolumeSliderName = "VolumeSlider"; // 滑块固定名为VolumeSlider
+    [SerializeField] private string soundVolumeSliderName = "VolumeSlider"; // 滑块固定名
     private Slider soundVolume;
     private int currentPlayingIndex = -1;
 
+    [Header("调试选项")]
+    [SerializeField] private bool debugMode = true;
+
     private void Awake()
     {
+        // 单例模式，防止重复实例
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
             return;
         }
+
         Instance = this;
         DontDestroyOnLoad(gameObject);
         InitializeBgms();
@@ -36,7 +44,8 @@ public class EntireBgmManager : MonoBehaviour
     private void OnEnable()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
-        // 初始场景如果是主场景，尝试查找滑块
+
+        // 如果当前场景已是主场景，尝试查找滑块
         if (SceneManager.GetActiveScene().name == mainSceneName)
         {
             FindSoundVolumeSlider();
@@ -51,6 +60,16 @@ public class EntireBgmManager : MonoBehaviour
 
     private void Start()
     {
+        float lastestVolume = DataManager.GetFloat(DataManager.LastestVolumeKey, 1);
+        if (soundVolume != null)
+        {
+            soundVolume.value = lastestVolume;
+        }
+        else
+        {
+            LogDebug("Start: 未找到滑块，稍后将在场景加载时绑定。");
+        }
+
         PlayBgm(initialOrder);
     }
 
@@ -59,7 +78,7 @@ public class EntireBgmManager : MonoBehaviour
     /// </summary>
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        UnbindSliderEvent(); // 先解绑之前的滑块
+        UnbindSliderEvent(); // 先解绑之前的滑块（防内存泄漏）
 
         if (scene.name == mainSceneName)
         {
@@ -68,45 +87,41 @@ public class EntireBgmManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 递归查找所有物体（包括子层级和未激活物体）中的目标滑块
+    /// 查找主场景中的音量滑块（包括未激活物体）
     /// </summary>
     private void FindSoundVolumeSlider()
     {
-        // 获取场景中所有根物体（包括未激活的）
+        if (soundVolume != null)
+        {
+            LogDebug("滑块已绑定，无需重复查找。");
+            return;
+        }
+
         GameObject[] rootObjects = SceneManager.GetActiveScene().GetRootGameObjects();
         foreach (var root in rootObjects)
         {
-            // 递归查找子物体中的Slider
             Slider targetSlider = FindSliderInChildren(root.transform, soundVolumeSliderName);
             if (targetSlider != null)
             {
                 soundVolume = targetSlider;
                 BindSliderEvent();
-                Debug.Log($"主场景找到滑块（子层级/未激活）：{soundVolume.name}，路径：{GetTransformPath(soundVolume.transform)}");
                 return;
             }
         }
-        Debug.LogWarning($"主场景未找到名为 {soundVolumeSliderName} 的滑块（检查名称和层级）");
+
+        Debug.LogWarning($"[EntireBgmManager] 主场景未找到名为 {soundVolumeSliderName} 的滑块（请检查名称和层级）");
     }
 
     /// <summary>
-    /// 递归遍历子物体查找Slider（支持未激活物体）
+    /// 遍历所有子物体查找目标滑块（包含未激活对象）
     /// </summary>
     private Slider FindSliderInChildren(Transform parent, string targetName)
     {
-        // 检查当前物体（即使未激活）
-        if (parent.gameObject.TryGetComponent<Slider>(out Slider slider) && parent.name == targetName)
+        foreach (Transform child in parent.GetComponentsInChildren<Transform>(true)) // true 包含未激活对象
         {
-            return slider;
-        }
-
-        // 递归检查所有子物体
-        for (int i = 0; i < parent.childCount; i++)
-        {
-            Slider childSlider = FindSliderInChildren(parent.GetChild(i), targetName);
-            if (childSlider != null)
+            if (child.name == targetName && child.TryGetComponent(out Slider slider))
             {
-                return childSlider;
+                return slider;
             }
         }
         return null;
@@ -119,12 +134,11 @@ public class EntireBgmManager : MonoBehaviour
     {
         if (soundVolume == null) return;
 
-        // 先移除旧事件，避免重复绑定
         soundVolume.onValueChanged.RemoveListener(OnVolumeSliderChanged);
         soundVolume.onValueChanged.AddListener(OnVolumeSliderChanged);
 
-        // 同步滑块值与当前音量（即使滑块未激活，值也会被正确设置）
         soundVolume.value = initialVolume;
+        LogDebug("已绑定音量滑块事件。");
     }
 
     /// <summary>
@@ -145,9 +159,14 @@ public class EntireBgmManager : MonoBehaviour
     private void OnVolumeSliderChanged(float value)
     {
         SetGlobalVolume(value);
+        DataManager.SaveFloatForce(DataManager.LastestVolumeKey, value);
+        LogDebug($"滑块调节音量：{value}");
+        // TODO: 可考虑未来增加延时保存（0.3秒后写入），避免频繁写入PlayerPrefs
     }
 
-    // 以下为原有核心逻辑（保持不变）
+    /// <summary>
+    /// 初始化所有BGM
+    /// </summary>
     private void InitializeBgms()
     {
         if (entireBgms == null || entireBgms.Length == 0)
@@ -165,8 +184,12 @@ public class EntireBgmManager : MonoBehaviour
                 bgm.loop = true;
             }
         }
+        LogDebug("所有BGM初始化完成。");
     }
 
+    /// <summary>
+    /// 播放指定索引的BGM
+    /// </summary>
     public void PlayBgm(int index)
     {
         if (entireBgms == null || entireBgms.Length == 0)
@@ -177,7 +200,7 @@ public class EntireBgmManager : MonoBehaviour
 
         if (index < 0 || index >= entireBgms.Length)
         {
-            Debug.LogError($"无效BGM索引：{index}（有效范围0-{entireBgms.Length - 1}）");
+            Debug.LogError($"无效BGM索引：{index}（有效范围 0-{entireBgms.Length - 1}）");
             return;
         }
 
@@ -190,14 +213,18 @@ public class EntireBgmManager : MonoBehaviour
         {
             entireBgms[index].Play();
             currentPlayingIndex = index;
+            LogDebug($"正在播放BGM索引 {index}");
         }
         else
         {
-            Debug.LogError($"索引{index}的BGM为空！");
+            Debug.LogError($"索引 {index} 的BGM为空！");
             currentPlayingIndex = -1;
         }
     }
 
+    /// <summary>
+    /// 设置全局音量（0~1）
+    /// </summary>
     private void SetGlobalVolume(float volume)
     {
         if (entireBgms == null) return;
@@ -212,25 +239,22 @@ public class EntireBgmManager : MonoBehaviour
                 bgm.volume = clampedVolume;
             }
         }
+
+        LogDebug($"全局音量设置为 {clampedVolume}");
     }
 
-    // 工具方法：获取Transform的完整路径（用于调试）
-    private string GetTransformPath(Transform target)
+    // 以下控制方法保持不变
+    public void StopCurrentBgm() { /* 预留接口 */ }
+    public void PauseCurrentBgm() { /* 预留接口 */ }
+    public void ResumeCurrentBgm() { /* 预留接口 */ }
+    public int GetCurrentPlayingIndex() => currentPlayingIndex;
+
+    // -------------------- 工具函数 --------------------
+    private void LogDebug(string msg)
     {
-        string path = target.name;
-        Transform parent = target.parent;
-        while (parent != null)
+        if (debugMode)
         {
-            path = $"{parent.name}/{path}";
-            parent = parent.parent;
+            Debug.Log($"[EntireBgmManager] {msg}");
         }
-        return path;
     }
-
-    // 原有控制方法（保持不变）
-    public void StopCurrentBgm() { /* 不变 */ }
-    public void PauseCurrentBgm() { /* 不变 */ }
-    public void ResumeCurrentBgm() { /* 不变 */ }
-    public int GetCurrentPlayingIndex() { return currentPlayingIndex; }
-    
 }

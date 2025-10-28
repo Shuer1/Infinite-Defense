@@ -1320,6 +1320,7 @@ GameObject:
   - component: {fileID: 345764839}
   - component: {fileID: 345764838}
   - component: {fileID: 345764840}
+  - component: {fileID: 345764841}
   m_Layer: 0
   m_Name: Upgrade_Panel
   m_TagString: Untagged
@@ -1401,6 +1402,18 @@ MonoBehaviour:
   panel: {fileID: 345764835}
   cardContainer: {fileID: 528124753}
   cardPrefab: {fileID: 3559245137149301019, guid: 80b4356e169f440049d3f562fd669801, type: 3}
+--- !u!225 &345764841
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 345764835}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &366818792
 GameObject:
   m_ObjectHideFlags: 0
@@ -4591,7 +4604,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_TargetDisplay: 0
 --- !u!224 &852916297
 RectTransform:

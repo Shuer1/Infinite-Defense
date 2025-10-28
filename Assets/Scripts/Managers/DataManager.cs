@@ -13,6 +13,7 @@ public static class DataManager
     public const string NextLevelExpKey = "NextLevelExp";
     public const string PlayerShootSpeedKey = "PlayerShootSpeed";
     public const string CurrentPropCountKey = "CurrentPropCount";
+    public const string LastestVolumeKey = "LastestVolume";
 
     // 城墙DefenseTower数据（Int）
     public const string DefenseTowerMaxHPKey = "DefenseTowerMaxHP";

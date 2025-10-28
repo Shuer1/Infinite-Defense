@@ -53,38 +53,18 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        // ✅ 保证目标面板先被激活（防止StartCoroutine在inactive对象上报错）
-        var panelObj = upgradePanelAnim.gameObject;
-        if (!panelObj.activeSelf)
-        {
-            panelObj.SetActive(true);
-            Debug.Log("[UIManager] 初始化：强制激活升级面板对象");
-        }
+        // ✅ 保证对象激活后初始化并立即隐藏
+        if (!upgradePanelAnim.gameObject.activeSelf)
+            upgradePanelAnim.gameObject.SetActive(true);
 
         // ✅ 调用其初始化方法（内部会安全设置为关闭状态）
         upgradePanelAnim.InitializePanelState();
-
         // ✅ 初始化后隐藏
         upgradePanelAnim.ClosePanelImmediate();
     }
 
-    public void HideUpgradePanelImmediate()
-    {
-        if (upgradePanelAnim != null)
-        {
-            upgradePanelAnim.ClosePanelImmediate();
-        }
-    }
-
-    public void ShowUpgradePanel()
-    {
-        upgradePanelAnim.OpenPanel();
-    }
-
-    public void HideUpgradePanel()
-    {
-        upgradePanelAnim.ClosePanel();
-    }
+    public void ShowUpgradePanel() => upgradePanelAnim?.OpenPanel();
+    public void HideUpgradePanel() => upgradePanelAnim?.ClosePanel();
 
     public void UpdateScore(int score)
     {
