@@ -44,6 +44,7 @@ MonoBehaviour:
   m_BuildAddressablesWithPlayerBuild: 0
   m_overridePlayerVersion: '[UnityEditor.PlayerSettings.bundleVersion]'
   m_GroupAssets:
+  - {fileID: 11400000, guid: 3079d9511b2184c3d9b1a5e44900bdc8, type: 2}
   - {fileID: 11400000, guid: 7d74c0fabf35442008c46f839c892ca5, type: 2}
   - {fileID: 11400000, guid: 31881f68ceb634c3ea25103d001befca, type: 2}
   - {fileID: 11400000, guid: f77141024eaa24d98897b597c2cc3191, type: 2}
@@ -59,9 +60,9 @@ MonoBehaviour:
       m_ProfileName: Default
       m_Values:
       - m_Id: 4d76dafcb0bbd4c5c8f5cf6646b583bf
-        m_Value: ServerData/[BuildTarget]
+        m_Value: '[UnityEngine.AddressableAssets.Addressables.BuildPath]/[BuildTarget]'
       - m_Id: 90d792680ece7476493696024191c8ae
-        m_Value: http://[PrivateIpAddress]:[HostingServicePort]
+        m_Value: '{UnityEngine.AddressableAssets.Addressables.RuntimePath}/[BuildTarget]'
       - m_Id: 9c7a910405fa34432acb3977a0fb8f21
         m_Value: '[UnityEngine.AddressableAssets.Addressables.BuildPath]/[BuildTarget]'
       - m_Id: a1b6148000ed6473e80d15f9af13022f
@@ -88,6 +89,11 @@ MonoBehaviour:
   m_LabelTable:
     m_LabelNames:
     - default
+    - char
+    - scene
+    - obj
+    - icon
+    - img
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: 6e85202087df1416e91b1238ad601527, type: 2}
