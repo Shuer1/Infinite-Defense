@@ -40,7 +40,7 @@ public class InitialRemoteFetch : MonoBehaviour
         }
         catch (OperationCanceledException)
         {
-            Debug.Log("[InitialRemoteFetch] 用户取消下载");
+            Debug.Log("[InitialRemoteFetch] User cancelled.");
         }
         catch (Exception ex)
         {
@@ -58,7 +58,7 @@ public class InitialRemoteFetch : MonoBehaviour
     // 核心逻辑：初始化 → 并行下载 → 加载场景
     private async UniTask FetchAllAsync(CancellationToken token)
     {
-        OnProgress?.Invoke(0.05f, "初始化资源系统…");
+        OnProgress?.Invoke(0.05f, "Initializing…");
         await Addressables.InitializeAsync().ToUniTask(cancellationToken: token);
 
         long totalBytes = 0;
@@ -71,17 +71,17 @@ public class InitialRemoteFetch : MonoBehaviour
 
         if (totalBytes == 0)
         {
-            OnProgress?.Invoke(1f, "无需下载，进入场景…");
+            OnProgress?.Invoke(1f, "Nothing to download.");
         }
         else
         {
             var progress = new Progress<float>(p => OnProgress?.Invoke(
-                                                 0.05f + p * 0.90f, "下载中…"));
+                                                 0.05f + p * 0.90f, "downloading…"));
             await DownloadDependenciesParallelAsync(initLabels, totalBytes,
                                                    progress, token);
         }
 
-        OnProgress?.Invoke(0.95f, "加载场景…");
+        OnProgress?.Invoke(0.95f, "Loading scene…");
         await Addressables.LoadSceneAsync(mainScene.RuntimeKey.ToString(),
                                           LoadSceneMode.Single)
                           .ToUniTask(cancellationToken: token);

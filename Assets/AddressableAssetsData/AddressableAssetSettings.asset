@@ -47,6 +47,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 3079d9511b2184c3d9b1a5e44900bdc8, type: 2}
   - {fileID: 11400000, guid: 7d74c0fabf35442008c46f839c892ca5, type: 2}
   - {fileID: 11400000, guid: 31881f68ceb634c3ea25103d001befca, type: 2}
+  - {fileID: 11400000, guid: 25ec85906c78741d189fa86b83f543d2, type: 2}
   - {fileID: 11400000, guid: f77141024eaa24d98897b597c2cc3191, type: 2}
   m_BuildSettings:
     m_CompileScriptsInVirtualMode: 0
@@ -64,7 +65,7 @@ MonoBehaviour:
       - m_Id: 90d792680ece7476493696024191c8ae
         m_Value: '{UnityEngine.AddressableAssets.Addressables.RuntimePath}/[BuildTarget]'
       - m_Id: 9c7a910405fa34432acb3977a0fb8f21
-        m_Value: '[UnityEngine.AddressableAssets.Addressables.BuildPath]/[BuildTarget]'
+        m_Value: ServerData/[BuildTarget]
       - m_Id: a1b6148000ed6473e80d15f9af13022f
         m_Value: '[UnityEditor.EditorUserBuildSettings.activeBuildTarget]'
       - m_Id: fbb4001b9dcb249139299e135f272a62
