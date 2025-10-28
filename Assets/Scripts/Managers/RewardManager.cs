@@ -195,7 +195,7 @@ public class RewardManager : MonoBehaviour
     {
         Debug.Log($"导弹释放：位置={position}，范围={range}");
         
-        // ✅ 1. 可选：播放爆炸特效
+        // ✅ 播放爆炸特效
         if (bombEffectPrefab != null)
         {
             GameObject fx = Instantiate(bombEffectPrefab, position, Quaternion.identity);

@@ -15,6 +15,7 @@ public class AdsManager : MonoBehaviour //单例
     private bool isInitialized = false;
     private bool hasShownFirstOpenAd = false;
     private bool isShowingAppOpenAd = false;
+    private bool isShowingFullScreenAd = false;
     private DateTime adExpireTime;
     private readonly TimeSpan APP_OPEN_AD_TIMEOUT = TimeSpan.FromHours(1);
 
@@ -186,6 +187,7 @@ public class AdsManager : MonoBehaviour //单例
         }
 
         isShowingAppOpenAd = true;
+        isShowingFullScreenAd = true;
         try
         {
             appOpenAd.Show();
@@ -398,6 +400,8 @@ public class AdsManager : MonoBehaviour //单例
 
         try
         {
+            isShowingFullScreenAd = true;
+
             rewardedAd.Show((reward) => 
             {
                 Debug.Log($"[AdsManager] 🏆 激励广告奖励发放: {reward.Amount} {reward.Type}");
@@ -416,6 +420,9 @@ public class AdsManager : MonoBehaviour //单例
         catch (Exception ex)
         {
             Debug.LogError("[AdsManager] 显示激励广告发生异常: " + ex);
+
+            isShowingFullScreenAd = false;
+
             if (isForRevive)
             {
                 OnReviveRewardedAdCompleted?.Invoke(false);
@@ -456,7 +463,11 @@ public class AdsManager : MonoBehaviour //单例
     }
 
     // 激励广告事件处理
-    private void HandleRewardedAdOpened() => Debug.Log("[AdsManager] 激励广告已打开");
+    private void HandleRewardedAdOpened()
+    {
+        Debug.Log("[AdsManager] 激励广告已打开");
+        isShowingFullScreenAd = true; //保险操作
+    }
     private void HandleRewardedAdImpression() => Debug.Log("[AdsManager] 激励广告展示记录");
     private void HandleRewardedAdFailed(AdError error)
     {
@@ -464,12 +475,18 @@ public class AdsManager : MonoBehaviour //单例
         // 通知两个可能的监听者广告失败
         OnRewardedAdCompleted?.Invoke(false);
         OnReviveRewardedAdCompleted?.Invoke(false);
+
+        isShowingFullScreenAd = false;
+
         UnregisterRewardedAdEvents();
         LoadRewardedAd(); // 失败后重新加载
     }
     private void HandleRewardedAdClosed()
     {
         Debug.Log("[AdsManager] 激励广告已关闭");
+
+        isShowingFullScreenAd = false;
+
         UnregisterRewardedAdEvents();
         LoadRewardedAd(); // 关闭后立即加载新的
     }
@@ -478,10 +495,17 @@ public class AdsManager : MonoBehaviour //单例
     #region 生命周期 / 清理
     private void OnApplicationPause(bool isPaused)
     {
-        if (!isPaused && hasShownFirstOpenAd)
+        if (isPaused)
         {
-            Debug.Log("[AdsManager] 应用回到前台，检查开屏");
-            ShowAppOpenAd();
+            Debug.Log("[AdsManager] 应用进入后台，检查开屏");
+            if (!isShowingFullScreenAd && hasShownFirstOpenAd)
+            {
+                ShowAppOpenAd();
+            }
+            else
+            {
+                Debug.Log("[AdsManager] 跳过开屏展示（当前正显示或刚显示完全屏广告）");
+            }
         }
     }
 
@@ -524,6 +548,7 @@ public class AdsManager : MonoBehaviour //单例
     {
         Debug.Log("[AdsManager] AppOpen 已关闭 -> 显示横幅");
         isShowingAppOpenAd = false;
+        isShowingFullScreenAd = false;//✅新增
         UnregisterAppOpenAdEvents();
         ShowBanner();
         LoadAppOpenAd();
@@ -533,6 +558,7 @@ public class AdsManager : MonoBehaviour //单例
     {
         Debug.LogWarning($"[AdsManager] AppOpen 展示失败: {error?.ToString()}");
         isShowingAppOpenAd = false;
+        isShowingFullScreenAd = false;//✅新增
         UnregisterAppOpenAdEvents();
         ShowBanner();
         LoadAppOpenAd();

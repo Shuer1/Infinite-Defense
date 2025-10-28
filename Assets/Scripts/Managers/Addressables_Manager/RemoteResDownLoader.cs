@@ -15,7 +15,7 @@ public class InitialRemoteFetch : MonoBehaviour
     public static InitialRemoteFetch Instance { get; private set; }
 
     [Header("首包必须下载的标签")]
-    public string[] initLabels = { "char", "scene" };
+    public string[] initLabels = { "char", "scene" , "img", "icon"};
 
     [Header("首场景（Addressable 地址）")]
     public AssetReference mainScene;   // 拖拽赋值，避免硬编码字符串
