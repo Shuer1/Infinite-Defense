@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEditor;
 
-public static class SaveManager_test
+public static class SaveManager_Test
 {
     // --------------- 数据键枚举（类型安全，避免字符串拼写错误） ---------------
     public enum DataKey

@@ -33,8 +33,10 @@ public static class EnemysInitialConfig
 {
     public const int Enemy1MaxHealth = 50;
     public const int Enemy1Damage = 20;
+    public const int Enemy1ExpReward = 10;
     public const int Enemy2MaxHealth = 120;
     public const int Enemy2Damage = 35;
+    public const int Enemy2ExpReward = 25;
 }
 
 public static class SettingIntialConfig

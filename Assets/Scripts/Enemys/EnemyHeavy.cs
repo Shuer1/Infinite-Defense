@@ -6,12 +6,12 @@ public class EnemyHeavy : EnemyBase
     {
         base.Start();
         SyncEnemyData();
+        currentHealth = maxHealth;
     }
 
     void SyncEnemyData()
     {
         maxHealth = DataManager.GetInt(DataManager.Enemy2MaxHealthKey);
-        currentHealth = maxHealth;
         damage = DataManager.GetInt(DataManager.Enemy2DamageKey);
     }
 }

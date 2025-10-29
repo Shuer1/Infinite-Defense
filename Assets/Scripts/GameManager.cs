@@ -63,6 +63,8 @@ public class GameManager : MonoBehaviour
         DataManager.InitializeIntData(DataManager.Enemy2MaxHealthKey, EnemysInitialConfig.Enemy2MaxHealth);
         DataManager.InitializeIntData(DataManager.Enemy1DamageKey, EnemysInitialConfig.Enemy1Damage);
         DataManager.InitializeIntData(DataManager.Enemy2DamageKey, EnemysInitialConfig.Enemy2Damage);
+        DataManager.InitializeIntData(DataManager.Enemy1ExpRewardKey, EnemysInitialConfig.Enemy1ExpReward);
+        DataManager.InitializeIntData(DataManager.Enemy2ExpRewardKey, EnemysInitialConfig.Enemy2ExpReward);
     }
 
     private void InitializeBulletData()
