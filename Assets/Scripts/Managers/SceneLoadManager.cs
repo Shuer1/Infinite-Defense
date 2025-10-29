@@ -12,6 +12,7 @@ public class SceneLoadManager : MonoBehaviour
 {
     // 单例实例
     public static SceneLoadManager Instance { get; private set; }
+    public static bool pauseAfterLoad = false; //加载后保持暂停
 
     // 加载进度（0~1）
     public float LoadProgress { get; private set; } = 0;
@@ -62,7 +63,7 @@ public class SceneLoadManager : MonoBehaviour
 
     public void LoadGameScene()
     {
-        LoadSceneAsync("MainScene", true);
+        LoadSceneAsync("MainScene", true, true);
     }
 
     public void LoadStartScene()
@@ -79,11 +80,12 @@ public class SceneLoadManager : MonoBehaviour
 #endif
     }
 
-    public void LoadSceneAsync(string sceneName, bool showLoadingUI = true)
+    public void LoadSceneAsync(string sceneName, bool showLoadingUI = true, bool keepPause = false)
     {
+        pauseAfterLoad = keepPause; //新增✅
         // 重置状态
         _isFadeToBlackComplete = false;
-        Time.timeScale = 1f;
+        //Time.timeScale = 1f;
 
         // 显示加载界面
         if (loadingUI != null && showLoadingUI)
@@ -161,6 +163,18 @@ public class SceneLoadManager : MonoBehaviour
             yield return null;
         }
 
+        if (sceneName == "StartGameUI")
+        {
+            pauseAfterLoad = false;
+        }
+
+        if (pauseAfterLoad) //新增✅
+        {
+            // 暂停游戏
+            Time.timeScale = 0f;
+            Debug.Log("保持暂停状态");
+        }
+
         // 加载完成：隐藏加载UI，触发回调
         if (loadingUI != null && showLoadingUI)
             loadingUI.SetActive(false);
@@ -182,7 +196,8 @@ public class SceneLoadManager : MonoBehaviour
 
         while (elapsedTime < fadeToBlackDuration)
         {
-            elapsedTime += Time.deltaTime;
+            //elapsedTime += Time.deltaTime;
+            elapsedTime += Time.unscaledDeltaTime;
             float t = Mathf.Clamp01(elapsedTime / fadeToBlackDuration);
             blackMask.color = Color.Lerp(originalColor, targetColor, t);
             yield return null;

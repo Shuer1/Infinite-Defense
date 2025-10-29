@@ -13,7 +13,7 @@ public class LoadScene : MonoBehaviour
         clickedSound.Play();
         if (SceneLoadManager.Instance != null)
         {
-            SceneLoadManager.Instance.LoadSceneAsync("StartGameUI",true);
+            SceneLoadManager.Instance.LoadSceneAsync("StartGameUI",true, true);
         }
         else
         {
