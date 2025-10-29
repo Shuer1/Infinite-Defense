@@ -13,7 +13,8 @@ public class SpawnManager : MonoBehaviour
     public float xMax = 5f;
 
     [Header("波数设置")]
-    public int baseEnemyCount = 5;     // 第1波基础数量
+    public int maxEnemyCount = 30;
+    public int baseEnemyCount = 3;     // 第1波基础数量
     public int enemiesPerWaveIncrease = 2; // 每波增加的数量
     public float heavyEnemyBaseChance = 0.1f; // 第1波重型怪物概率
     public float heavyExtraChancePerWave = 0.02f;  // 每波增加的重型概率
@@ -22,7 +23,7 @@ public class SpawnManager : MonoBehaviour
     private int currentWave = 1;
     public UnityEngine.UI.Image uiPartImg;
     [Header("波数间隔设置")]
-    public float waveStartDelay = 4f; //留出时间作为加载延迟造成的time waste...
+    public float waveStartDelay = 4f; //留出时间作为加载延迟造成的time waste
     private Coroutine waveStartCoroutine;
 
     void Start()
@@ -79,9 +80,10 @@ public class SpawnManager : MonoBehaviour
     }
 
     // 计算当前波怪物总数
-    private int CalculateEnemyCount(int wave)
+    private int CalculateEnemyCount(int wave) //限制敌人最大数量为30
     {
-        return baseEnemyCount + (wave - 1) * enemiesPerWaveIncrease;
+        int CalculateEnemyCount = baseEnemyCount + (wave - 1) * enemiesPerWaveIncrease;
+        return Mathf.Min(CalculateEnemyCount, maxEnemyCount);
     }
 
     // 计算当前波重型怪物概率（上限100%）
@@ -96,5 +98,11 @@ public class SpawnManager : MonoBehaviour
         currentWave++;
         DataManager.SaveInt(DataManager.CurrentWaveKey, currentWave);
         StartWave(currentWave);
+    }
+
+    private void OnDestroy()
+    {
+        if (enemyManager != null)
+            enemyManager.OnAllEnemiesCleared -= StartNextWave;
     }
 }
