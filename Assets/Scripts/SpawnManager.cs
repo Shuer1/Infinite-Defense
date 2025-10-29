@@ -54,7 +54,6 @@ public class SpawnManager : MonoBehaviour
 
         for (int count = 3; count >= 1; count--)
         {
-            Debug.Log($"SpawnManager 倒计时: {count}");
             UIManager.Instance.UpdateCountdownUI(count);
             yield return new WaitForSeconds(1f);
         }

@@ -195,9 +195,6 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        // 调试：打印传入的倒计时，方便在控制台确认实际传值
-        Debug.Log($"UpdateCountdownUI: countdown = {countdown}");
-
         // 映射（确保 inspector 中的顺序是： index0->“3秒图”， index1->“2秒图”， index2->“1秒图”）
         int indexToShow = -1;
         switch (countdown)
@@ -238,7 +235,6 @@ public class UIManager : MonoBehaviour
 
             // 激活并确保对象处于激活状态
             countdownImages[indexToShow].gameObject.SetActive(true);
-            Debug.Log($"UpdateCountdownUI: 已显示 index {indexToShow} 对应的图片（倒计时 {countdown})");
         }
     }
 

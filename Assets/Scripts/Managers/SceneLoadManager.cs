@@ -85,8 +85,6 @@ public class SceneLoadManager : MonoBehaviour
         pauseAfterLoad = keepPause; //新增✅
         // 重置状态
         _isFadeToBlackComplete = false;
-        //Time.timeScale = 1f;
-
         // 显示加载界面
         if (loadingUI != null && showLoadingUI)
         {
@@ -109,6 +107,7 @@ public class SceneLoadManager : MonoBehaviour
         {
             StartCoroutine(FadeToBlackCoroutine());
         }
+
     }
 
     // 异步加载协程
@@ -173,6 +172,10 @@ public class SceneLoadManager : MonoBehaviour
             // 暂停游戏
             Time.timeScale = 0f;
             Debug.Log("保持暂停状态");
+        }
+        else
+        {
+            Time.timeScale = 1f;
         }
 
         // 加载完成：隐藏加载UI，触发回调

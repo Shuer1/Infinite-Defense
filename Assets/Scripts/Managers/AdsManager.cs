@@ -230,7 +230,6 @@ public class AdsManager : MonoBehaviour //单例
         bannerView.LoadAd(request);
 
         bannerRefreshCount++;
-        Debug.Log($"[AdsManager] 🟩 第 {bannerRefreshCount} 次横幅加载请求");
 
         if (bannerRefreshRoutine == null)
         {
