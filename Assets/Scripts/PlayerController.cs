@@ -266,7 +266,7 @@ public class PlayerController : MonoBehaviour
     }
     public void ResetLive()
     {
-        Debug.Log("选择复活!");
+        Debug.Log("初始化状态 或 选择复活!");
         currentHealth = health;
         isDead = false; // 重置死亡状态
         animator.ResetTrigger("Die");
