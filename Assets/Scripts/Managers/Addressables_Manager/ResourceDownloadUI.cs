@@ -8,7 +8,7 @@ using System.Threading;
 /// 【资源下载 UI（增强版）】
 /// 增加了：网络状态提示、自动重试显示、缓存清理按钮。
 /// </summary>
-public class ResourceDownloadUI_Enhanced : MonoBehaviour
+public class ResourceDownloadUI : MonoBehaviour
 {
     [Header("UI 引用")]
     [SerializeField] private GameObject downloadPanel;
