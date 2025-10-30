@@ -7,6 +7,7 @@ public class GlobalDifficultyCurveController : MonoBehaviour
     public static GlobalDifficultyCurveController Instance;
     public EnemyManager eM;
     public int clearEnemyWaveCount = 0;
+    public event System.Action OnEnemiesLevelUp;
     [Header("升级增量配置")]
     [SerializeField] private int baseEnemyMaxHPDeltaValue = 50;
     [SerializeField] private int heavyEnemyMaxHPDeltaValue = 100;
@@ -46,6 +47,7 @@ public class GlobalDifficultyCurveController : MonoBehaviour
         {
             clearEnemyWaveCount = 0;
             UpdateData();
+            OnEnemiesLevelUp?.Invoke();
             Debug.Log("完成10波敌人的清除,敌人全部升级！");
 
             if (eM != null)

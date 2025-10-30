@@ -8,12 +8,13 @@ public class LoadScene : MonoBehaviour
     [SerializeField] private GameObject helpMenu;
     [SerializeField] private AudioSource clickedSound;
     public bool isPausing = false;
+
     public void LoadStartUIScene()
     {
         clickedSound.Play();
         if (SceneLoadManager.Instance != null)
         {
-            SceneLoadManager.Instance.LoadSceneAsync("StartGameUI",true, true);
+            SceneLoadManager.Instance.LoadSceneAsync("StartGameUI", true, true);
         }
         else
         {
@@ -24,15 +25,31 @@ public class LoadScene : MonoBehaviour
     public void PauseGame()
     {
         isPausing = true;
-        StartCoroutine(PauseWithSlowMotion(pauseMenu, 0.5f));
+        clickedSound.Play();
+
+        // ✅ 取消慢动作动画，改为点击立即显示菜单
+        // StartCoroutine(PauseWithSlowMotion(pauseMenu, 0.5f));
+
+        Time.timeScale = 0f;
+        if (pauseMenu != null)
+            pauseMenu.SetActive(true);
     }
-    
+
     public void ShowHelp()
     {
         isPausing = true;
-        StartCoroutine(PauseWithSlowMotion(helpMenu,0.5f));
+        clickedSound.Play();
+
+        // ✅ 取消慢动作动画，改为点击立即显示菜单
+        // StartCoroutine(PauseWithSlowMotion(helpMenu, 0.5f));
+
+        Time.timeScale = 0f;
+        if (helpMenu != null)
+            helpMenu.SetActive(true);
     }
-    
+
+    // ✅ 暂时停用的协程逻辑（保留供将来恢复使用）
+    /*
     public IEnumerator PauseWithSlowMotion(GameObject pauseMenu, float duration = 0.5f)
     {
         float startTime = Time.unscaledTime; // 记录开始时间（用真实时间，不受timeScale影响）
@@ -52,12 +69,15 @@ public class LoadScene : MonoBehaviour
             pauseMenu.SetActive(true);
         clickedSound.Play();
     }
+    */
 
     // 恢复游戏
     public void ResumeGame(GameObject pauseMenu)
     {
         clickedSound.Play();
-        pauseMenu.SetActive(false);
+        if (pauseMenu != null)
+            pauseMenu.SetActive(false);
+
         Time.timeScale = 1f;
         isPausing = false;
     }

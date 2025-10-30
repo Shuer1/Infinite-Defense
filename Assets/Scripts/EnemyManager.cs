@@ -186,30 +186,33 @@ public class EnemyManager : MonoBehaviour
     {
         Debug.Log("<color=cyan>统一刷新敌人属性...</color>");
 
-        int baseHP = DataManager.GetInt("BaseEnemyMaxHealth");
-        int baseDamage = DataManager.GetInt("BaseBulletDamage");
-        int baseExp = DataManager.GetInt("BaseEnemyExpEReward");
+        int enemiesLevel = DataManager.GetInt(DataManager.EnemiesLevelKey);
 
-        int heavyHP = DataManager.GetInt("HeavyEnemyMaxHealth");
-        int heavyDamage = DataManager.GetInt("HeavyEnemyDamage");
-        int heavyExp = DataManager.GetInt("HeavyEnemyExpEReward");
+        int baseHP = DataManager.GetInt(DataManager.Enemy1MaxHealthKey);
+        int baseDamage = DataManager.GetInt(DataManager.Enemy1DamageKey);
+        int baseExp = DataManager.GetInt(DataManager.Enemy1ExpRewardKey);
+
+        int heavyHP = DataManager.GetInt(DataManager.Enemy2MaxHealthKey);
+        int heavyDamage = DataManager.GetInt(DataManager.Enemy2DamageKey);
+        int heavyExp = DataManager.GetInt(DataManager.Enemy2ExpRewardKey);
 
         // 刷新池中敌人
         foreach (var kvp in enemyPools)
         {
             foreach (var enemy in kvp.Value)
-                ApplyUpdatedStats(enemy, baseHP, baseDamage, baseExp, heavyHP, heavyDamage, heavyExp);
+                ApplyUpdatedStats(enemy, enemiesLevel, baseHP, baseDamage, baseExp, heavyHP, heavyDamage, heavyExp);
         }
 
         // 刷新活跃敌人
         foreach (var enemy in activeEnemies)
-            ApplyUpdatedStats(enemy, baseHP, baseDamage, baseExp, heavyHP, heavyDamage, heavyExp);
+            ApplyUpdatedStats(enemy, enemiesLevel, baseHP, baseDamage, baseExp, heavyHP, heavyDamage, heavyExp);
     }
     
-    private void ApplyUpdatedStats(EnemyBase enemy, int baseHP, int baseDamage, int baseExp, int heavyHP, int heavyDamage, int heavyExp)
+    private void ApplyUpdatedStats(EnemyBase enemy, int level, int baseHP, int baseDamage, int baseExp, int heavyHP, int heavyDamage, int heavyExp)
     {
         if (enemy == null) return;
 
+        enemy.EnemiesLevel = level;
         if (enemy.enemyType == EnemyType.Basic)
         {
             enemy.maxHealth = baseHP;

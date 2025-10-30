@@ -18,6 +18,7 @@ public class SpawnManager : MonoBehaviour
     public int enemiesPerWaveIncrease = 2; // 每波增加的数量
     public float heavyEnemyBaseChance = 0.1f; // 第1波重型怪物概率
     public float heavyExtraChancePerWave = 0.02f;  // 每波增加的重型概率
+    public event Action OnWaveCompleted;
 
     [Header("进度UI信息配置")]
     private int currentWave = 1;
@@ -98,6 +99,7 @@ public class SpawnManager : MonoBehaviour
         currentWave++;
         DataManager.SaveInt(DataManager.CurrentWaveKey, currentWave);
         StartWave(currentWave);
+        OnWaveCompleted?.Invoke(); // 触发波数完成事件
     }
 
     private void OnDestroy()

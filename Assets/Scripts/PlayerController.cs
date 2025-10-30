@@ -29,7 +29,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("自动锁敌设置")]
     public float lockOnRange = 10f;
-    public float targetCheckInterval = 0.5f; //检测频率
+    private float targetCheckInterval = 0.2f; //检测频率
     private float targetCheckTimer = 0f;
     private EnemyBase currentTarget;
     [SerializeField] private EnemyManager enemyManager;

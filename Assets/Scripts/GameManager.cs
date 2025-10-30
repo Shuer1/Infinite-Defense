@@ -59,6 +59,7 @@ public class GameManager : MonoBehaviour
 
     private void InitializeEnemyData()
     {
+        DataManager.InitializeIntData(DataManager.EnemiesLevelKey, EnemysInitialConfig.EnemiesLevel);
         DataManager.InitializeIntData(DataManager.Enemy1MaxHealthKey, EnemysInitialConfig.Enemy1MaxHealth);
         DataManager.InitializeIntData(DataManager.Enemy2MaxHealthKey, EnemysInitialConfig.Enemy2MaxHealth);
         DataManager.InitializeIntData(DataManager.Enemy1DamageKey, EnemysInitialConfig.Enemy1Damage);

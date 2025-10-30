@@ -19,6 +19,7 @@ public static class DataManager
     public const string DefenseTowerMaxHPKey = "DefenseTowerMaxHP";
 
     // 敌人数据（Int）✅
+    public const string EnemiesLevelKey = "EnemiesLevel";
     public const string Enemy1MaxHealthKey = "BaseEnemyMaxHealth";
     public const string Enemy1ExpRewardKey = "BaseEnemyExpEReward"; //经验奖励01，新增
     public const string Enemy2MaxHealthKey = "HeavyEnemyMaxHealth";

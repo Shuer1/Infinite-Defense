@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System;
+using Unity.VisualScripting;
 
 public class UIManager : MonoBehaviour
 {
@@ -16,14 +17,19 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI attack;
     public TextMeshProUGUI exp;
     public TextMeshProUGUI level;
+    public TextMeshProUGUI currentWaveTMPInPause; //新增
+    private int currentWaveOrderInPause = 1;
+    public TextMeshProUGUI enemiesLevelTMPInPause; //新增
+    private int enemiesLevel = 1;
+    public SpawnManager spawnManager;
     public TextMeshProUGUI propCount;
     public TextMeshProUGUI tempCurrentWaveTMP;
     private Coroutine _currentShowCoroutine;
     [Header("Upgrade Panel")]
     [SerializeField] private PanelScaleAnimation upgradePanelAnim;
-    [Header("Game Over Info")]
+    [Header("GameOver Panel")]
     public GameObject gameOverPanel;
-    [Header("倒计时UI配置")]
+    [Header("倒计时UI图片配置")]
     public Image[] countdownImages;
 
     void Awake()
@@ -43,6 +49,21 @@ public class UIManager : MonoBehaviour
         InitUI();
         HideAllCountdownImages();
         InitializeUpgradePanel();
+
+        if (spawnManager != null)
+        {
+            spawnManager.OnWaveCompleted += UpdateWaveUI; //新增
+        }
+
+        if (GlobalDifficultyCurveController.Instance != null)
+        {
+            GlobalDifficultyCurveController.Instance.OnEnemiesLevelUp += UpdateEnemiesLevelUI;
+        }
+        else
+        {
+            Debug.LogError("GlobalDifficultyCurveController: 未找到全局难度曲线控制器！");
+            return;
+        }
     }
 
     private void InitializeUpgradePanel()
@@ -166,7 +187,7 @@ public class UIManager : MonoBehaviour
     private void InitUI()
     {
         ShowMaxHP();
-        ShowTowerMaxHP(); // 新增⚠️
+        ShowTowerMaxHP();
         ShowhighScore();
         int level_value = DataManager.GetInt(DataManager.PlayerLevelKey);
         ShowLevel(level_value);
@@ -176,11 +197,34 @@ public class UIManager : MonoBehaviour
         ShowAndUpdatePlayerExp(0, current_Exp);
         int current_PropCount = DataManager.GetInt(DataManager.CurrentPropCountKey);
         ShowAndUpdatePropCount(current_PropCount);
+        currentWaveOrderInPause = DataManager.GetInt(DataManager.CurrentWaveKey); //New Addition
+        currentWaveTMPInPause.text = $"CURRENT WAVE: {currentWaveOrderInPause}";
+        enemiesLevel = DataManager.GetInt(DataManager.EnemiesLevelKey);
+        enemiesLevelTMPInPause.text = $"ENEMIES LEVEL: {enemiesLevel}";
     }
 
     public void ShowGameOver()
     {
         gameOverPanel.SetActive(true);
+    }
+
+    public void UpdateWaveUI()
+    {
+        currentWaveOrderInPause++;
+        currentWaveTMPInPause.text = $"CURRENT WAVE: {currentWaveOrderInPause}";
+    }
+
+    public void UpdateEnemiesLevelUI()
+    {
+        enemiesLevel++;
+        enemiesLevelTMPInPause.text = $"ENEMIES LEVEL: {enemiesLevel}";
+        DataManager.SaveInt(DataManager.EnemiesLevelKey, enemiesLevel);
+    }
+
+    void OnDestroy()
+    {
+        spawnManager.OnWaveCompleted -= UpdateWaveUI;
+        GlobalDifficultyCurveController.Instance.OnEnemiesLevelUp -= UpdateEnemiesLevelUI;
     }
 
     public void UpdateCountdownUI(int countdown)

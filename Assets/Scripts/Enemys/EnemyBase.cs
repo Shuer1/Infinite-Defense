@@ -20,6 +20,7 @@ public abstract class EnemyBase : MonoBehaviour
 
     [Header("Enemy Attributes")]
     public EnemyType enemyType;
+    public int EnemiesLevel = 1;
     public int maxHealth;
     public int currentHealth;
     public int damage;
@@ -51,6 +52,7 @@ public abstract class EnemyBase : MonoBehaviour
     protected void Start()
     {
         gameObject.tag = "Enemy";
+        EnemiesLevel = DataManager.GetInt(DataManager.EnemiesLevelKey);
 
         if (moveSpeed <= 0)
         {

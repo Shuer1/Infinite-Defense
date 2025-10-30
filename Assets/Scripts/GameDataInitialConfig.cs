@@ -31,6 +31,7 @@ public static class BulletsChanceConfig
 
 public static class EnemysInitialConfig
 {
+    public const int EnemiesLevel = 1;
     public const int Enemy1MaxHealth = 50;
     public const int Enemy1Damage = 20;
     public const int Enemy1ExpReward = 10;
