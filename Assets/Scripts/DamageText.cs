@@ -7,7 +7,7 @@ public class DamageText : MonoBehaviour
     [Header("Text Settings")]
     public TMP_Text damageText;
     public float defaultFontSize = 32f;
-    public float moveSpeed = 1f;
+    public float moveDistance = 50f;
     public float fadeDuration = 1f;
     public float spread = 2f;
 
@@ -15,6 +15,9 @@ public class DamageText : MonoBehaviour
     private Color startColor;
     private RectTransform rectTransform;
     private bool isAnimating = false;
+
+    // 新增字段：当前正在播放的协程
+    private Coroutine currentAnimation;
 
     private void Awake()
     {
@@ -28,9 +31,12 @@ public class DamageText : MonoBehaviour
     /// </summary>
     public void Initialize(int damage, Vector3 worldPosition)
     {
-        // 避免重复播放动画
-        if (isAnimating)
-            return;
+        // 停止当前协程，防止冲突
+        if (currentAnimation != null)
+        {
+            StopCoroutine(currentAnimation);
+            currentAnimation = null;
+        }
 
         isAnimating = true;
 
@@ -58,20 +64,8 @@ public class DamageText : MonoBehaviour
 
         startColor = damageText != null ? damageText.color : Color.white;
 
-        // ✅ 安全启动动画
-        if (gameObject.activeInHierarchy)
-            StartCoroutine(AnimateAndRecycle());
-        else
-            StartCoroutine(WaitUntilActiveThenAnimate());
-    }
-
-    /// <summary>
-    /// 等待激活后再执行动画（兼容对象池）
-    /// </summary>
-    private IEnumerator WaitUntilActiveThenAnimate()
-    {
-        yield return new WaitUntil(() => gameObject.activeInHierarchy);
-        StartCoroutine(AnimateAndRecycle());
+        // 启动动画协程（独立管理）
+        currentAnimation = StartCoroutine(AnimateAndRecycle());
     }
 
     /// <summary>
@@ -81,27 +75,29 @@ public class DamageText : MonoBehaviour
     {
         float elapsedTime = 0f;
         Vector3 start = rectTransform.position;
-        Vector3 target = start + Vector3.up * 50f;
+        Vector3 target = start + Vector3.up * moveDistance;
 
         while (elapsedTime < fadeDuration)
         {
+            // 使用 unscaledDeltaTime，确保动画不受 Time.timeScale 影响
+            float t = elapsedTime / fadeDuration;
+
             // 移动
             if (rectTransform != null)
-                rectTransform.position = Vector3.Lerp(start, target, elapsedTime / fadeDuration);
+                rectTransform.position = Vector3.Lerp(start, target, t);
 
             // 渐隐
             if (damageText != null)
             {
                 Color c = startColor;
-                c.a = 1f - (elapsedTime / fadeDuration);
+                c.a = 1f - t;
                 damageText.color = c;
             }
 
-            elapsedTime += Time.deltaTime;
+            elapsedTime += Time.unscaledDeltaTime;
             yield return null;
         }
 
-        // 动画完成后回收
         Recycle();
     }
 
@@ -111,6 +107,7 @@ public class DamageText : MonoBehaviour
     private void Recycle()
     {
         isAnimating = false;
+        currentAnimation = null;
 
         // 重置透明度
         if (damageText != null)

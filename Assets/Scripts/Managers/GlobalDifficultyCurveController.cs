@@ -27,6 +27,7 @@ public class GlobalDifficultyCurveController : MonoBehaviour
     void Start()
     {
         SyncData();
+        clearEnemyWaveCount = 0;
 
         if(eM == null)
             eM = FindObjectOfType<EnemyManager>();

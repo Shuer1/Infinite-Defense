@@ -5,6 +5,8 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
 using System;
+using System.Linq;
+using System.Collections;
 
 /// <summary>
 /// 奖励管理器 - 处理道具获取、使用及冷却逻辑（支持拖动释放）
@@ -127,14 +129,25 @@ public class RewardManager : MonoBehaviour
         if (!_isDraggingProp) return;
 
         var pointerData = (PointerEventData)data;
+        Vector3 targetPos = pointerData.position;
 
         // 平滑插值指示器位置（跟随鼠标/手指）
         if (bombRangeIndicator != null)
         {
-            Vector3 targetPos = pointerData.position;
+            //Vector3 targetPos = pointerData.position;
             bombRangeIndicator.position = Vector3.Lerp(bombRangeIndicator.position, targetPos, 0.3f);
             UpdateIndicatorSize();
         }
+    }
+
+    public void CancelDraggingPropIfAny()
+    {
+        if (!_isDraggingProp) return;
+
+        _isDraggingProp = false;
+
+        if (bombRangeIndicator != null)
+            bombRangeIndicator.gameObject.SetActive(false);
     }
     
     /// <summary>
@@ -194,35 +207,58 @@ public class RewardManager : MonoBehaviour
     private void ULT_Bomb(Vector3 position, float range)
     {
         Debug.Log($"导弹释放：位置={position}，范围={range}");
-        
+
+        bombPosition = position;
+        bombRangeSaved = range;
+
         // ✅ 播放爆炸特效
         if (bombEffectPrefab != null)
         {
             GameObject fx = Instantiate(bombEffectPrefab, position, Quaternion.identity);
-            ParticleSystem[] particleSystems = fx.GetComponentsInChildren<ParticleSystem>();
-            
-            float longestDuration = 0f;
-            foreach (var ps in particleSystems)
+
+            //float longestDuration = 0f;
+            foreach (var ps in fx.GetComponentsInChildren<ParticleSystem>())
             {
                 var main = ps.main;
+                /*
                 if (main.duration > longestDuration)
                     longestDuration = main.duration;
+                */
+                main.useUnscaledTime = true;
             }
-            
+            /*
             // 存储位置和范围以便稍后使用
             bombPosition = position;
             bombRangeSaved = range;
+            
             
             // 在特效播放完成后触发伤害
             Invoke(nameof(TriggerBombDamage), longestDuration);
             
             Destroy(fx, longestDuration + 0.5f); // 留出一些缓冲时间再销毁特效对象
+            */
+            float longestDuration = fx.GetComponentsInChildren<ParticleSystem>().Max(p => p.main.duration);
+            StartCoroutine(TriggerBombDamageUnscaled(longestDuration, fx));
         }
         else
         {
             // 如果没有特效，则立即触发伤害
             TriggerBombDamageAtPosition(position, range);
         }
+    }
+    
+    private IEnumerator TriggerBombDamageUnscaled(float delay, GameObject fx)
+    {
+        float timer = 0f;
+        while (timer < delay)
+        {
+            timer += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        TriggerBombDamageAtPosition(bombPosition, bombRangeSaved);
+
+        Destroy(fx,0.5f);
     }
     
     private void TriggerBombDamage()

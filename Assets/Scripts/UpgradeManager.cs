@@ -100,8 +100,20 @@ public class UpgradeManager : MonoBehaviour
             return;
         }
 
+        RewardManager rewardManager = FindObjectOfType<RewardManager>();
+        if (rewardManager != null)
+        {
+            rewardManager.CancelDraggingPropIfAny();
+        }
+
         if (upgradePanelScaleAnim != null && !GameManager.Instance.isGameOver)
         {
+            if (CameraShakeController.Instance != null)
+            {
+                CameraShakeController.Instance.allowShake = false;
+                CameraShakeController.Instance.CancelShake();
+            }
+            
             UIManager.Instance.ShowUpgradePanel();
         }
         else

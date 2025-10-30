@@ -4,6 +4,7 @@ using System.Collections;
 public class CameraShakeController : MonoBehaviour
 {
     public static CameraShakeController Instance { get; private set; }
+    public bool allowShake = true;
 
     [Header("抖动参数")]
     public float shakeDuration = 0.2f; // 抖动持续时间
@@ -26,10 +27,21 @@ public class CameraShakeController : MonoBehaviour
     // 外部调用：触发抖动
     public void TriggerShake()
     {
+        if (!allowShake) return;
+
         if (!isShaking && cameraFollow != null)
         {
             StartCoroutine(ShakeCoroutine());
         }
+    }
+
+    public void CancelShake()
+    {
+        StopAllCoroutines();
+        if (cameraFollow != null)
+            cameraFollow.transform.localPosition = Vector3.zero;
+            
+        isShaking = false;
     }
 
     private IEnumerator ShakeCoroutine()

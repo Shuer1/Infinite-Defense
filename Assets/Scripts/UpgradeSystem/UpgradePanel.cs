@@ -48,6 +48,10 @@ public class UpgradePanel : MonoBehaviour
     {
         panel.SetActive(false);
         Time.timeScale = 1; // 恢复游戏
+        if (CameraShakeController.Instance != null)
+        {
+            CameraShakeController.Instance.allowShake = true;
+        }
     }
 
     /// <summary>
