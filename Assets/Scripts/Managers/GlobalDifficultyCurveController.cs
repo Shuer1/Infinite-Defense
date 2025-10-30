@@ -7,12 +7,14 @@ public class GlobalDifficultyCurveController : MonoBehaviour
     public static GlobalDifficultyCurveController Instance;
     public EnemyManager eM;
     public int clearEnemyWaveCount = 0;
-    private int baseEnemyMaxHPDeltaValue = 50;
-    private int heavyEnemyMaxHPDeltaValue = 100;
-    private int baseEnemyDamageDeltaValue = 5;
-    private int heavyEnemyDamageDeltaValue = 10;
-    private int baseEnemyExpDeltaValue = 10;
-    private int heavyEnemyExpDeltaValue = 20;
+    [Header("升级增量配置")]
+    [SerializeField] private int baseEnemyMaxHPDeltaValue = 50;
+    [SerializeField] private int heavyEnemyMaxHPDeltaValue = 100;
+    [SerializeField] private int baseEnemyDamageDeltaValue = 5;
+    [SerializeField] private int heavyEnemyDamageDeltaValue = 10;
+    [SerializeField] private int baseEnemyExpDeltaValue = 10;
+    [SerializeField] private int heavyEnemyExpDeltaValue = 20;
+    private const int upgradeThreshold = 10;
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -21,30 +23,33 @@ public class GlobalDifficultyCurveController : MonoBehaviour
             return;
         }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
     }
     void Start()
     {
         SyncData();
-        eM.OnAllEnemiesCleared += UpgradeEnemys;
 
+        if(eM == null)
+            eM = FindObjectOfType<EnemyManager>();
+
+        if (eM != null)
+            eM.OnAllEnemiesCleared += UpgradeEnemys;
+        else
+            Debug.LogError("EnemyManager未引用");
     }
 
     public void UpgradeEnemys() //统一升级
     {
         clearEnemyWaveCount++;
 
-        if (clearEnemyWaveCount > 10)
+        if (clearEnemyWaveCount >= upgradeThreshold)
         {
+            clearEnemyWaveCount = 0;
             UpdateData();
-            Debug.Log("敌人全部升级！");
-        }
-        else
-        {
-            Debug.Log($"第{clearEnemyWaveCount}波敌人结束！");
-        }
+            Debug.Log("完成10波敌人的清除,敌人全部升级！");
 
-        
+            if (eM != null)
+                eM.RefreshAllEnemiesStatusFromData();
+        }  
     }
 
     void SyncData()
@@ -54,17 +59,18 @@ public class GlobalDifficultyCurveController : MonoBehaviour
 
     void UpdateData()
     {
-        DataManager.SaveInt("BaseEnemyMaxHealth", DataManager.GetInt("BaseEnemyMaxHealth") + baseEnemyMaxHPDeltaValue);
-        DataManager.SaveInt("BaseEnemyExpEReward", DataManager.GetInt("BaseEnemyExpEReward") + baseEnemyExpDeltaValue);
-        DataManager.SaveInt("BaseBulletDamage", DataManager.GetInt("BaseBulletDamage") + baseEnemyDamageDeltaValue);
+        DataManager.SaveInt(DataManager.Enemy1MaxHealthKey, DataManager.GetInt(DataManager.Enemy1MaxHealthKey) + baseEnemyMaxHPDeltaValue);
+        DataManager.SaveInt(DataManager.Enemy1ExpRewardKey, DataManager.GetInt(DataManager.Enemy1ExpRewardKey) + baseEnemyExpDeltaValue);
+        DataManager.SaveInt(DataManager.Enemy1DamageKey, DataManager.GetInt(DataManager.Enemy1DamageKey) + baseEnemyDamageDeltaValue);
 
-        DataManager.SaveInt("HeavyEnemyMaxHealth", DataManager.GetInt("HeavyEnemyMaxHealth") + heavyEnemyMaxHPDeltaValue);
-        DataManager.SaveInt("HeavyEnemyExpEReward", DataManager.GetInt("HeavyEnemyExpEReward") + heavyEnemyExpDeltaValue);
-        DataManager.SaveInt("HeavyEnemyDamage", DataManager.GetInt("HeavyEnemyDamage") + heavyEnemyDamageDeltaValue);
+        DataManager.SaveInt(DataManager.Enemy2MaxHealthKey, DataManager.GetInt(DataManager.Enemy2MaxHealthKey) + heavyEnemyMaxHPDeltaValue);
+        DataManager.SaveInt(DataManager.Enemy2ExpRewardKey, DataManager.GetInt(DataManager.Enemy2ExpRewardKey) + heavyEnemyExpDeltaValue);
+        DataManager.SaveInt(DataManager.Enemy2DamageKey, DataManager.GetInt(DataManager.Enemy2DamageKey) + heavyEnemyDamageDeltaValue);
     }
     
     void OnDestroy()
     {
-        eM.OnAllEnemiesCleared -= UpgradeEnemys;
+        if (eM != null)
+            eM.OnAllEnemiesCleared -= UpgradeEnemys;
     }
 }

@@ -154,7 +154,7 @@ public class EnemyManager : MonoBehaviour
     {
         // 假设死亡动画时长约0.5秒，可根据实际动画调整
         yield return new WaitForSeconds(0.5f);
-        
+
         // 再次检查敌人是否为空（防止中途被销毁的极端情况）
         if (enemy != null && enemy.gameObject != null)
         {
@@ -162,7 +162,7 @@ public class EnemyManager : MonoBehaviour
             // 真正的位置会在下次从对象池取出时设置
             enemy.ResetEnemyState(enemy.transform.position, enemy.transform.rotation);
             enemy.gameObject.SetActive(false);
-            
+
             // 回收至对应类型的对象池
             if (enemyPools.TryGetValue(enemy.enemyType, out var pool))
             {
@@ -180,6 +180,50 @@ public class EnemyManager : MonoBehaviour
                 OnAllEnemiesCleared?.Invoke();
             }
         }
+    }
+
+    public void RefreshAllEnemiesStatusFromData()
+    {
+        Debug.Log("<color=cyan>统一刷新敌人属性...</color>");
+
+        int baseHP = DataManager.GetInt("BaseEnemyMaxHealth");
+        int baseDamage = DataManager.GetInt("BaseBulletDamage");
+        int baseExp = DataManager.GetInt("BaseEnemyExpEReward");
+
+        int heavyHP = DataManager.GetInt("HeavyEnemyMaxHealth");
+        int heavyDamage = DataManager.GetInt("HeavyEnemyDamage");
+        int heavyExp = DataManager.GetInt("HeavyEnemyExpEReward");
+
+        // 刷新池中敌人
+        foreach (var kvp in enemyPools)
+        {
+            foreach (var enemy in kvp.Value)
+                ApplyUpdatedStats(enemy, baseHP, baseDamage, baseExp, heavyHP, heavyDamage, heavyExp);
+        }
+
+        // 刷新活跃敌人
+        foreach (var enemy in activeEnemies)
+            ApplyUpdatedStats(enemy, baseHP, baseDamage, baseExp, heavyHP, heavyDamage, heavyExp);
+    }
+    
+    private void ApplyUpdatedStats(EnemyBase enemy, int baseHP, int baseDamage, int baseExp, int heavyHP, int heavyDamage, int heavyExp)
+    {
+        if (enemy == null) return;
+
+        if (enemy.enemyType == EnemyType.Basic)
+        {
+            enemy.maxHealth = baseHP;
+            enemy.damage = baseDamage;
+            enemy.expReward = baseExp;
+        }
+        else
+        {
+            enemy.maxHealth = heavyHP;
+            enemy.damage = heavyDamage;
+            enemy.expReward = heavyExp;
+        }
+
+        enemy.currentHealth = Mathf.Min(enemy.currentHealth, enemy.maxHealth);
     }
 
     // 注册死亡回调（避免重复注册）

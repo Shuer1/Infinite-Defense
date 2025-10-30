@@ -100,14 +100,13 @@ public class UpgradeManager : MonoBehaviour
             return;
         }
 
-        if (upgradePanelScaleAnim != null)
+        if (upgradePanelScaleAnim != null && !GameManager.Instance.isGameOver)
         {
-            //upgradePanelScaleAnim.OpenPanel();
             UIManager.Instance.ShowUpgradePanel();
         }
         else
         {
-            Debug.LogError("upgradePanelScaleAnim未赋值", this);
+            Debug.LogError("upgradePanelScaleAnim未赋值 或 游戏已结束", this);
         }
 
         UpgradePanel.Instance.Show(randomUpgrades);

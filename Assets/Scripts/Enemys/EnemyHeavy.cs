@@ -13,5 +13,6 @@ public class EnemyHeavy : EnemyBase
     {
         maxHealth = DataManager.GetInt(DataManager.Enemy2MaxHealthKey);
         damage = DataManager.GetInt(DataManager.Enemy2DamageKey);
+        expReward = DataManager.GetInt(DataManager.Enemy2ExpRewardKey);
     }
 }

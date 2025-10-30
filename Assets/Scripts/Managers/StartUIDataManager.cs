@@ -13,8 +13,8 @@ public class StartUIDataManager : MonoBehaviour
     void Start()
     {
         InitData();
-        highScoreText.text = "HighScore: " + highScore;
-        highWaveText.text = "HighWave: " + highWave;
+        highScoreText.text = "HIGHSCORE: " + highScore;
+        highWaveText.text = "HIGHWAVE: " + highWave;
     }
 
     void InitData()

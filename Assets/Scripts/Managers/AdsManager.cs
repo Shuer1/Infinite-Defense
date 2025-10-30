@@ -403,7 +403,6 @@ public class AdsManager : MonoBehaviour //单例
 
             rewardedAd.Show((reward) => 
             {
-                Debug.Log($"[AdsManager] 🏆 激励广告奖励发放: {reward.Amount} {reward.Type}");
                 if (isForRevive)
                 {
                     OnReviveRewardedAdCompleted?.Invoke(true);
