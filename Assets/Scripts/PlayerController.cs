@@ -1,8 +1,6 @@
 using System.Threading.Tasks;
 using UnityEditor;
 using System.Collections;
-//using Unity.PlasticSCM.Editor.WebApi;
-//using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -42,11 +40,6 @@ public class PlayerController : MonoBehaviour
     public AudioSource shootSound;
     [Header("按钮Btn_UI_Element")]
     public Button btn_ResetLive;
-    [Header("子弹概率配置")]
-    [Range(0, 100)]
-    public int normalBulletChance = 100; //Data5
-    [Range(0, 100)]
-    public int explosiveBulletChance = 0; //Data6
 
     void Awake()
     {
@@ -72,7 +65,7 @@ public class PlayerController : MonoBehaviour
         if (GameManager.Instance.isGameOver)
         {
             if (isDead) return;
-            
+
             Die();
         }
 
@@ -80,13 +73,13 @@ public class PlayerController : MonoBehaviour
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
 
-        #if UNITY_ANDROID || UNITY_IOS || UNITY_WEBGL
-                if (joystick != null)
-                {
-                    h = joystick.Horizontal;
-                    v = joystick.Vertical;
-                }
-        #endif
+#if UNITY_ANDROID || UNITY_IOS || UNITY_WEBGL
+        if (joystick != null)
+        {
+            h = joystick.Horizontal;
+            v = joystick.Vertical;
+        }
+#endif
 
         Vector3 move = new Vector3(h, 0, v) * moveSpeed;
         rb.velocity = move;
@@ -120,13 +113,6 @@ public class PlayerController : MonoBehaviour
 
         // 射击（计时器更新，自动攻击）
         fireTimer += Time.deltaTime;
-        /*取消手动鼠标按下攻击
-        if (Input.GetMouseButton(0) && fireTimer >= fireRate)
-        {
-            Shoot(firePoint.rotation);
-            fireTimer = 0f;
-        }
-        */
         AutoLockAndShoot();
         // 始终朝向目标
         if (currentTarget != null)
@@ -147,60 +133,39 @@ public class PlayerController : MonoBehaviour
     void SyncPlayerData()  //初始化玩家数据
     {
         //玩家自身数据
-        health = DataManager.GetInt(DataManager.PlayerMaxHealthKey,PlayerInitialConfig.MaxHealth);
+        health = DataManager.GetInt(DataManager.PlayerMaxHealthKey, PlayerInitialConfig.MaxHealth);
         level = DataManager.GetInt(DataManager.PlayerLevelKey);
         experienceToNextLevel = DataManager.GetInt(DataManager.NextLevelExpKey);
         fireRate = DataManager.GetFloat(DataManager.PlayerShootSpeedKey);
-        //不同类型子弹射击几率
-        normalBulletChance = DataManager.GetInt(DataManager.NormalBulletChanceKey);
-        explosiveBulletChance = DataManager.GetInt(DataManager.ExplosiveBulletChanceKey);
 
         Debug.Log("初始化玩家信息完成!");
     }
 
     void Shoot(Quaternion bulletRotation)
     {
-        ClampProbabilities(); // 每次射击前强制修正概率，确保合法性
-
-        int randomValue = Random.Range(0, 100);
-        int cumulativeProbability = 0;
-
-        // 普通子弹
-        cumulativeProbability += normalBulletChance;
-        if (randomValue < cumulativeProbability)
+        if (BulletManager.Instance == null)
         {
-            if (BulletPool.Instance == null)
-            {
-                Debug.LogError("普通子弹池未初始化!请检查BulletPool的Instance设置");
-                return;
-            }
-            BulletPool.Instance.GetBullet(firePoint.position, bulletRotation);
+            Debug.LogError("[PlayerController] BulletManager 未初始化！");
+            return;
+        }
+
+        // 通过BulletManager获取随机子弹类型
+        BulletType bulletType = BulletManager.Instance.GetRandomBulletType();
+
+        // 从BulletManager获取子弹实例
+        GameObject bullet = BulletManager.Instance.GetBullet(bulletType, firePoint.position, bulletRotation);
+
+        if (bullet == null)
+        {
+            Debug.LogWarning($"[PlayerController] 无法获取 {bulletType} 子弹！");
+            return;
+        }
+
+        // 播放射击音效
+        if (shootSound != null)
+        {
             shootSound.Play();
-            return;
         }
-
-        // 爆炸子弹
-        cumulativeProbability += explosiveBulletChance;
-        if (randomValue < cumulativeProbability)
-        {
-            if (ExplosiveBulletPool.Instance == null)
-            {
-                Debug.LogError("爆炸子弹池未初始化!请检查ExplosiveBulletPool的Instance设置");
-                return;
-            }
-            ExplosiveBulletPool.Instance.GetBullet(firePoint.position, bulletRotation);
-            shootSound.Play();
-            return;
-        }
-
-        // 冰冻子弹
-        if (FrostBulletPool.Instance == null)
-        {
-            Debug.LogError("冰冻子弹池未初始化!请检查FrostBulletPool的Instance设置");
-            return;
-        }
-        FrostBulletPool.Instance.GetBullet(firePoint.position, bulletRotation);
-        shootSound.Play();
     }
 
     public void TakeDamage(int damage)
@@ -231,11 +196,12 @@ public class PlayerController : MonoBehaviour
     {
         level++;
         experience = 0;
-        experienceToNextLevel = Mathf.RoundToInt(100 * Mathf.Pow(1.2f, level - 1)); // 每次升级需要更多经验：应优化为使用非线性增长，前期较容易，后期越来越难
-        currentHealth = health; 
+        experienceToNextLevel = Mathf.RoundToInt(100 * Mathf.Pow(1.2f, level - 1)); // 每次升级需要更多经验
+        currentHealth = health;
         //升级刷新恢复血量和更新等级
         UIManager.Instance?.UpdateAndShowPlayerHP(currentHealth, health);
         UIManager.Instance?.ShowLevel(level);
+
         //⚠️新增
         DefenseTowerController.Instance.currentHealth = Mathf.Min(DefenseTowerController.Instance.maxHealth,
         DefenseTowerController.Instance.currentHealth + DefenseTowerController.Instance.maxHealth / 3);
@@ -244,7 +210,7 @@ public class PlayerController : MonoBehaviour
         UpgradeManager.Instance?.ShowUpgradeOptions();
         //保存数据
         DataManager.SaveInt(DataManager.PlayerLevelKey, level);
-        DataManager.SaveInt(DataManager.NextLevelExpKey,experienceToNextLevel);
+        DataManager.SaveInt(DataManager.NextLevelExpKey, experienceToNextLevel);
     }
 
     public void Die()
@@ -264,6 +230,7 @@ public class PlayerController : MonoBehaviour
 
         // ❌ 不再调用 GameOver，由防御塔/复活管理器控制
     }
+
     public void ResetLive()
     {
         Debug.Log("初始化状态 或 选择复活!");
@@ -288,43 +255,10 @@ public class PlayerController : MonoBehaviour
         currentTarget = null;
         // 复活后立即强制更新目标，避免等待检测间隔
         UpdateTarget();
-        UIManager.Instance?.UpdateAndShowPlayerHP(currentHealth,health);
-        UIManager.Instance?.ShowAndUpdatePlayerExp(experience,experienceToNextLevel);
+        UIManager.Instance?.UpdateAndShowPlayerHP(currentHealth, health);
+        UIManager.Instance?.ShowAndUpdatePlayerExp(experience, experienceToNextLevel);
 
         StartCoroutine(InvincibilityTime(2f));
-    }
-    private void ClampProbabilities()
-    {
-        // 限制普通子弹概率范围
-        normalBulletChance = Mathf.Clamp(normalBulletChance, 0, 100);
-        // 限制爆炸子弹概率范围（剩余可用概率内）
-        explosiveBulletChance = Mathf.Clamp(explosiveBulletChance, 0, 100 - normalBulletChance);
-        // 此时冰冻子弹概率自动为非负且总和为100
-    }
-    /// 调整子弹概率（用于升级系统）
-    public void AdjustBulletChances(int normalDelta, int explosiveDelta)
-    {
-        normalBulletChance += normalDelta;
-        explosiveBulletChance += explosiveDelta;
-        ClampProbabilities(); // 确保修正
-    }
-
-    public void SetBulletChance(BulletType bulletType, int newPercentage)
-    {
-        switch (bulletType)
-        {
-            case BulletType.Normal:
-                normalBulletChance = newPercentage;
-                break;
-            case BulletType.Explosive:
-                explosiveBulletChance = newPercentage;
-                break;
-            case BulletType.Frost:
-                int delta = 100 - normalBulletChance - explosiveBulletChance - newPercentage;
-                explosiveBulletChance += delta;
-                break;
-        }
-        ClampProbabilities(); // 确保修正
     }
 
     private void AutoLockAndShoot()
@@ -397,7 +331,7 @@ public class PlayerController : MonoBehaviour
 
         return closestEnemy;
     }
-    
+
     // 可选：复活无敌时间（优化体验，避免刚复活就被秒杀）
     private IEnumerator InvincibilityTime(float duration)
     {
@@ -410,7 +344,8 @@ public class PlayerController : MonoBehaviour
 
 public enum BulletType
 {
-    Normal,    // 普通子弹
-    Explosive, // 爆炸子弹
-    Frost      // 冰冻子弹
+    Normal,
+    Explosive,
+    Frost,
+    Lightning
 }

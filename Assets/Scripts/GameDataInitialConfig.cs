@@ -15,18 +15,19 @@ public static class BulletsInitialConfig
 {
     public const int BasicBulletDamage = 50;
     //-----
-    public const int ExplosiveBulletDamage = 55;
+    public const int ExplosiveBulletDamage = 5;
     public const float ExplosionRange = 1.0f;
     //-----
-    public const int FrostBulletDamage = 45;
+    public const int FrostBulletDamage = 5;
     public const float FrostFreezeDuration = 0.5f;
-    public const float FrostRadius = 0.5f;
+    public const float FrostRadius = 1.0f;
 }
 
 public static class BulletsChanceConfig
 {
-    public const int NormalBulletChance = 100;
-    public const int ExplosiveBulletChance = 0;
+    public const int NormalBulletChance = 70;
+    public const int ExplosiveBulletChance = 10;
+    public const int FrostBulletChance = 10;
 }
 
 public static class EnemysInitialConfig

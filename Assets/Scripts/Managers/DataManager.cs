@@ -47,6 +47,7 @@ public static class DataManager
     //发射几率比例/100
     public const string NormalBulletChanceKey = "NormalBulletChance";
     public const string ExplosiveBulletChanceKey = "ExplosiveBulletChance";
+    public const string FrostBulletChanceKey = "FrostBulletChance"; //新增✅
 
     // --------------- 内存缓存（减少PlayerPrefs访问频率） ---------------
     private static readonly Dictionary<string, int> _intCache = new Dictionary<string, int>();

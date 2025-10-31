@@ -14,13 +14,9 @@ public class UpgradeManager : MonoBehaviour
 
     [Tooltip("拖入玩家控制器实例")]
     public PlayerController playerController;
+
     [Tooltip("城墙血量提升倍数因子")]
     public int multiFactor = 5;
-
-    [Tooltip("拖入子弹预制体")]
-    public Bullet bulletPrefab;
-    public ExplosiveBullet explosiveBulletPrefab;
-    public FrostBullet frostBulletPrefab;
 
     // 升级特效、音效
     [SerializeField] private ParticleSystem upgradeEffect;
@@ -32,20 +28,6 @@ public class UpgradeManager : MonoBehaviour
     private const float SLOW_DURATION_MULTIPLIER = 0.5f;
     private const float EXPLOSION_RANGE_MULTIPLIER = 0.2f;
     private const float MIN_FIRE_RATE = 0.1f;
-
-    public enum PoolType
-    {
-        BulletPool,
-        ExplosiveBulletPool,
-        FrostBulletPool
-    }
-
-    public enum BulletType
-    {
-        Bullet,
-        ExplosiveBullet,
-        FrostBullet
-    }
 
     private void Awake()
     {
@@ -162,16 +144,22 @@ public class UpgradeManager : MonoBehaviour
                 ApplyMaxHealthUpgrade(value);
                 break;
             case UpgradeType.AddChanceForExplosive:
-                GetOrAddSpecialBullet(SpecialBulletType.Explosive, value);
+                ApplyExplosiveChanceUpgrade(value);
                 break;
             case UpgradeType.AddChanceForFrost:
-                GetOrAddSpecialBullet(SpecialBulletType.Frost, value);
+                ApplyFrostChanceUpgrade(value);
+                break;
+            case UpgradeType.AddChanceForLightning:
+                ApplyLightningChanceUpgrade(value);
                 break;
             case UpgradeType.ExploseRange:
                 ApplyBulletRangeUpgrade(value);
                 break;
             case UpgradeType.SlowTime:
                 ApplySlowTimeLongerUpgrade(value);
+                break;
+            case UpgradeType.AddLightningCount:
+                ApplyAddLightningCountUpgrade(value);
                 break;
             default:
                 Debug.LogWarning($"未处理的升级类型：{type}", this);
@@ -189,26 +177,22 @@ public class UpgradeManager : MonoBehaviour
         }
     }
 
-    private enum SpecialBulletType
-    {
-        Explosive,
-        Frost
-    }
-
     private void ApplyAttackUpgrade(int value) //提升普通子弹伤害 实现保存✅
     {
-        if (bulletPrefab == null)
+        if (BulletManager.Instance == null)
         {
-            Debug.LogError("bulletPrefab未赋值", this);
+            Debug.LogError("BulletManager 未初始化", this);
             return;
         }
 
-        bulletPrefab.damage += value;
-        UpdateAllPooledBulletsDamage(BulletType.Bullet, PoolType.BulletPool, bulletPrefab.damage);
-        UIManager.Instance?.ShowAndUpdatePlayerAttack(bulletPrefab.damage);
+        int currentDamage = BulletManager.Instance.GetBulletDamage(BulletType.Normal);
+        int newDamage = currentDamage + value;
+        
+        BulletManager.Instance.UpdateBulletDamage(BulletType.Normal, newDamage);
+        UIManager.Instance?.ShowAndUpdatePlayerAttack(newDamage);
 
-        DataManager.SaveInt(DataManager.BaseBulletDamageKey,bulletPrefab.damage);
-        Debug.Log($"普通子弹伤害提升至：{bulletPrefab.damage}");
+        DataManager.SaveInt(DataManager.BaseBulletDamageKey, newDamage);
+        Debug.Log($"普通子弹伤害提升至：{newDamage}");
     }
 
     private void ApplyFireRateUpgrade(int value) //提升射速 实现保存✅
@@ -222,7 +206,7 @@ public class UpgradeManager : MonoBehaviour
         float reduction = value * FIRE_RATE_REDUCTION_MULTIPLIER;
         playerController.fireRate = Mathf.Max(MIN_FIRE_RATE, playerController.fireRate - reduction);
 
-        DataManager.SaveFloat(DataManager.PlayerShootSpeedKey,playerController.fireRate,isGreater:false);
+        DataManager.SaveFloat(DataManager.PlayerShootSpeedKey, playerController.fireRate, isGreater: false);
         Debug.Log($"射速提升，当前间隔：{playerController.fireRate:F2}秒");
     }
 
@@ -246,171 +230,117 @@ public class UpgradeManager : MonoBehaviour
 
         DataManager.SaveInt(DataManager.PlayerMaxHealthKey, playerController.health);
         DataManager.SaveInt(DataManager.DefenseTowerMaxHPKey, dTController.maxHealth);
-        Debug.Log($"玩家最大生命值提升至：{playerController.health}" + ";" + $"城墙最大生命值提升至：{dTController.maxHealth}");
+        Debug.Log($"玩家最大生命值提升至：{playerController.health}; 城墙最大生命值提升至：{dTController.maxHealth}");
     }
 
-    private void GetOrAddSpecialBullet(SpecialBulletType type, int extraDamageValue) //获得特殊子弹/增加伤害 实现保存✅
+    private void ApplyExplosiveChanceUpgrade(int value) //提升爆炸子弹概率和伤害
     {
-        switch (type)
+        if (BulletManager.Instance == null)
         {
-            case SpecialBulletType.Explosive:
-                if (explosiveBulletPrefab == null)
-                {
-                    Debug.LogError("explosiveBulletPrefab未赋值", this);
-                    return;
-                }
-
-                explosiveBulletPrefab.explosionDamage += extraDamageValue;
-                playerController.AdjustBulletChances(0,2);
-                UpdateAllPooledBulletsDamage(BulletType.ExplosiveBullet, PoolType.ExplosiveBulletPool, explosiveBulletPrefab.explosionDamage);
-
-                DataManager.SaveInt(DataManager.ExplosiveDamageKey, explosiveBulletPrefab.explosionDamage);
-                DataManager.SaveInt(DataManager.ExplosiveBulletChanceKey,playerController.explosiveBulletChance);
-                Debug.Log($"爆炸子弹伤害提升至：{explosiveBulletPrefab.explosionDamage}");
-                break;
-            case SpecialBulletType.Frost:
-                if (frostBulletPrefab == null)
-                {
-                    Debug.LogError("frostBulletPrefab未赋值", this);
-                    return;
-                }
-
-                frostBulletPrefab.frostDamage += extraDamageValue;
-                playerController.AdjustBulletChances(-1,0);
-                UpdateAllPooledBulletsDamage(BulletType.FrostBullet, PoolType.FrostBulletPool, frostBulletPrefab.damage);
-                
-                DataManager.SaveInt(DataManager.FrostDamageKey, frostBulletPrefab.frostDamage);
-                DataManager.SaveInt(DataManager.NormalBulletChanceKey, playerController.normalBulletChance, isGreater:false);
-                Debug.Log($"冰冻子弹伤害提升至：{frostBulletPrefab.damage}");
-                break;
+            Debug.LogError("BulletManager 未初始化", this);
+            return;
         }
+
+        // 增加爆炸子弹概率
+        BulletManager.Instance.UpdateBulletChance(BulletType.Explosive, value);
+        
+        // 增加爆炸子弹伤害
+        int currentDamage = BulletManager.Instance.GetBulletDamage(BulletType.Explosive);
+        int newDamage = currentDamage + value;
+        BulletManager.Instance.UpdateBulletDamage(BulletType.Explosive, newDamage);
+
+        DataManager.SaveInt(DataManager.ExplosiveDamageKey, newDamage);
+        Debug.Log($"爆炸子弹概率提升，伤害提升至：{newDamage}");
+    }
+
+    private void ApplyFrostChanceUpgrade(int value) //提升冰冻子弹概率和伤害
+    {
+        if (BulletManager.Instance == null)
+        {
+            Debug.LogError("BulletManager 未初始化", this);
+            return;
+        }
+
+        // 增加冰冻子弹概率
+        BulletManager.Instance.UpdateBulletChance(BulletType.Frost, value);
+
+        // 增加冰冻子弹伤害
+        int currentDamage = BulletManager.Instance.GetBulletDamage(BulletType.Frost);
+        int newDamage = currentDamage + value;
+        BulletManager.Instance.UpdateBulletDamage(BulletType.Frost, newDamage);
+
+        DataManager.SaveInt(DataManager.FrostDamageKey, newDamage);
+        Debug.Log($"冰冻子弹概率提升，伤害提升至：{newDamage}");
+    }
+    
+    private void ApplyLightningChanceUpgrade(int value) //提升闪电子弹概率和伤害
+    {
+        if (BulletManager.Instance == null)
+        {
+            Debug.LogError("BulletManager 未初始化", this);
+            return;
+        }
+
+        // 添加闪电弹概率
+        BulletManager.Instance.UpdateBulletChance(BulletType.Lightning, value);
+
+        // 添加闪电弹伤害
+        int currentDamage = BulletManager.Instance.GetBulletDamage(BulletType.Lightning);
+        int newDamage = currentDamage + value;
+        BulletManager.Instance.UpdateBulletDamage(BulletType.Lightning, newDamage);
+
+        DataManager.SaveInt(DataManager.LightningBulletDamageKey, newDamage);
+        Debug.Log($"闪电弹概率提升，伤害提升至：{newDamage}");
     }
 
     private void ApplySlowTimeLongerUpgrade(int value) //提升减速效果 实现保存✅
     {
-        if (frostBulletPrefab == null)
+        if (BulletManager.Instance == null)
         {
-            Debug.LogError("frostBulletPrefab未赋值", this);
+            Debug.LogError("BulletManager 未初始化", this);
             return;
         }
 
+        float currentDuration = BulletManager.Instance.GetBulletSpecialValue(BulletType.Frost, 1);
         float addDuration = value * SLOW_DURATION_MULTIPLIER;
-        frostBulletPrefab.slowDuration += addDuration;
-        UpdateAllPooledFrostSlowDuration(frostBulletPrefab.slowDuration);
+        float newDuration = currentDuration + addDuration;
 
-        DataManager.SaveFloat(DataManager.FrostFreezeDurationKey,frostBulletPrefab.slowDuration);
-        Debug.Log($"冰冻减速时长提升至：{frostBulletPrefab.slowDuration:F1}秒");
+        BulletManager.Instance.UpdateBulletSpecialValue(BulletType.Frost, 1, newDuration);
+
+        DataManager.SaveFloat(DataManager.FrostFreezeDurationKey, newDuration);
+        Debug.Log($"冰冻减速时长提升至：{newDuration:F1}秒");
     }
 
     private void ApplyBulletRangeUpgrade(int value) //提升爆炸范围 实现保存✅
     {
-        if (explosiveBulletPrefab == null)
+        if (BulletManager.Instance == null)
         {
-            Debug.LogError("explosiveBulletPrefab未赋值", this);
+            Debug.LogError("BulletManager 未初始化", this);
             return;
         }
 
+        float currentRange = BulletManager.Instance.GetBulletSpecialValue(BulletType.Explosive, 1);
         float addRange = value * EXPLOSION_RANGE_MULTIPLIER;
-        explosiveBulletPrefab.explosionRadius += addRange;
-        UpdateAllPooledExplosionRange(explosiveBulletPrefab.explosionRadius);
+        float newRange = currentRange + addRange;
 
-        DataManager.SaveFloat(DataManager.ExplosionRangeKey,explosiveBulletPrefab.explosionRadius);
-        Debug.Log($"爆炸范围提升至：{explosiveBulletPrefab.explosionRadius:F1}米");
+        BulletManager.Instance.UpdateBulletSpecialValue(BulletType.Explosive, 1, newRange);
+
+        DataManager.SaveFloat(DataManager.ExplosionRangeKey, newRange);
+        Debug.Log($"爆炸范围提升至：{newRange:F1}米");
     }
-
-    private void UpdateAllPooledBulletsDamage(BulletType bulletType, PoolType poolType, int newDamage) //更新子弹伤害提升后的对象池
+    
+    private void ApplyAddLightningCountUpgrade(int value) //提升闪电弹数量 实现保存✅
     {
-        var bulletList = GetBulletListByPoolType(poolType);
-        if (bulletList == null)
+        if (BulletManager.Instance == null)
         {
-            Debug.LogWarning($"{poolType} 实例不存在", this);
+            Debug.LogError("BulletManager 未初始化", this);
             return;
         }
 
-        int updatedCount = 0;
-        foreach (var bulletObj in bulletList)
-        {
-            if (bulletObj == null)
-                continue;
+        int currentCount = (int)BulletManager.Instance.GetBulletSpecialValue(BulletType.Lightning, 1);
+        int newCount = currentCount + value;
+        BulletManager.Instance.UpdateBulletSpecialValue(BulletType.Lightning, 1, newCount);
 
-            switch (bulletType)
-            {
-                case BulletType.Bullet:
-                    var bullet = bulletObj.GetComponent<Bullet>();
-                    if (bullet != null)
-                    {
-                        bullet.damage = newDamage;
-                        updatedCount++;
-                    }
-                    break;
-                case BulletType.ExplosiveBullet:
-                    var explosive = bulletObj.GetComponent<ExplosiveBullet>();
-                    if (explosive != null)
-                    {
-                        explosive.explosionDamage = newDamage;
-                        updatedCount++;
-                    }
-                    break;
-                case BulletType.FrostBullet:
-                    var frost = bulletObj.GetComponent<FrostBullet>();
-                    if (frost != null)
-                    {
-                        frost.frostDamage = newDamage;
-                        updatedCount++;
-                    }
-                    break;
-            }
-        }
-
-        Debug.Log($"同步 {poolType} 中的所有子弹伤害，新值：{newDamage}", this);
-    }
-
-    private void UpdateAllPooledFrostSlowDuration(float newDuration) //更新减速时长提升后的对象池
-    {
-        var bulletList = GetBulletListByPoolType(PoolType.FrostBulletPool);
-        if (bulletList == null) return;
-
-        int updatedCount = 0;
-        foreach (var bulletObj in bulletList)
-        {
-            if (bulletObj == null) continue;
-            var frost = bulletObj.GetComponent<FrostBullet>();
-            if (frost != null)
-            {
-                frost.slowDuration = newDuration;
-                updatedCount++;
-            }
-        }
-        Debug.Log($"同步冰冻子弹池 {updatedCount} 个减速时长，新值：{newDuration:F1}秒", this);
-    }
-
-    private void UpdateAllPooledExplosionRange(float newRange)  //更新爆炸范围提升后的对象池
-    {
-        var bulletList = GetBulletListByPoolType(PoolType.ExplosiveBulletPool);
-        if (bulletList == null) return;
-
-        int updatedCount = 0;
-        foreach (var bulletObj in bulletList)
-        {
-            if (bulletObj == null) continue;
-            var explosive = bulletObj.GetComponent<ExplosiveBullet>();
-            if (explosive != null)
-            {
-                explosive.explosionRadius = newRange;
-                updatedCount++;
-            }
-        }
-        Debug.Log($"同步爆炸子弹池 {updatedCount} 个范围，新值：{newRange:F1}米", this);
-    }
-
-    private IEnumerable<GameObject> GetBulletListByPoolType(PoolType poolType) //通过池类型判断获取到子弹列表
-    {
-        return poolType switch
-        {
-            PoolType.BulletPool => BulletPool.Instance?.GetAllBullets(),
-            PoolType.ExplosiveBulletPool => ExplosiveBulletPool.Instance?.GetAllBullets(),
-            PoolType.FrostBulletPool => FrostBulletPool.Instance?.GetAllBullets(),
-            _ => null
-        };
+        DataManager.SaveInt(DataManager.LightningCountKey, newCount);
     }
 }

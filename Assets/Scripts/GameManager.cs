@@ -47,25 +47,29 @@ public class GameManager : MonoBehaviour
 
     private void InitializePlayerData()
     {
-        DataManager.InitializeIntData(DataManager.HighScoreKey, 0);
-        DataManager.InitializeIntData(DataManager.CurrentWaveKey, 1);
-        DataManager.InitializeIntData(DataManager.PlayerMaxHealthKey, 100);
-        DataManager.InitializeIntData(DataManager.PlayerLevelKey, 1);
-        DataManager.InitializeIntData(DataManager.NextLevelExpKey, 100);
-        DataManager.InitializeFloatData(DataManager.PlayerShootSpeedKey, 0.5f);
-        DataManager.InitializeIntData(DataManager.CurrentPropCountKey, 3);
+        DataManager.InitializeIntData(DataManager.HighScoreKey, PlayerInitialConfig.HighScore);
+        DataManager.InitializeIntData(DataManager.CurrentWaveKey, PlayerInitialConfig.CurrentWave);
+        DataManager.InitializeIntData(DataManager.PlayerMaxHealthKey, PlayerInitialConfig.MaxHealth);
+        DataManager.InitializeIntData(DataManager.PlayerLevelKey,  PlayerInitialConfig.Level);
+        DataManager.InitializeIntData(DataManager.NextLevelExpKey, PlayerInitialConfig.NextLevelExp);
+        DataManager.InitializeFloatData(DataManager.PlayerShootSpeedKey, PlayerInitialConfig.ShootInterval);
+        DataManager.InitializeIntData(DataManager.CurrentPropCountKey, PlayerInitialConfig.CurrentPropCount);
+        // tower health
         DataManager.InitializeIntData(DataManager.DefenseTowerMaxHPKey, 500);
     }
 
     private void InitializeEnemyData()
     {
         DataManager.InitializeIntData(DataManager.EnemiesLevelKey, EnemysInitialConfig.EnemiesLevel);
+        // enemies health
         DataManager.InitializeIntData(DataManager.Enemy1MaxHealthKey, EnemysInitialConfig.Enemy1MaxHealth);
         DataManager.InitializeIntData(DataManager.Enemy2MaxHealthKey, EnemysInitialConfig.Enemy2MaxHealth);
         DataManager.InitializeIntData(DataManager.Monster1MaxHealthKey, EnemysInitialConfig.Monster1MaxHealth);
+        // enemies damage
         DataManager.InitializeIntData(DataManager.Enemy1DamageKey, EnemysInitialConfig.Enemy1Damage);
         DataManager.InitializeIntData(DataManager.Enemy2DamageKey, EnemysInitialConfig.Enemy2Damage);
         DataManager.InitializeIntData(DataManager.Monster1DamageKey, EnemysInitialConfig.Monster1Damage);
+        // enemies exp
         DataManager.InitializeIntData(DataManager.Enemy1ExpRewardKey, EnemysInitialConfig.Enemy1ExpReward);
         DataManager.InitializeIntData(DataManager.Enemy2ExpRewardKey, EnemysInitialConfig.Enemy2ExpReward);
         DataManager.InitializeIntData(DataManager.Monster1ExpRewardKey, EnemysInitialConfig.Monster1ExpReward);
@@ -73,12 +77,16 @@ public class GameManager : MonoBehaviour
 
     private void InitializeBulletData()
     {
-        DataManager.InitializeIntData(DataManager.BaseBulletDamageKey, 50);
-        DataManager.InitializeIntData(DataManager.ExplosiveDamageKey, 5);
-        DataManager.InitializeIntData(DataManager.FrostDamageKey, 5);
-        DataManager.InitializeIntData(DataManager.NormalBulletChanceKey, 100);
-        DataManager.InitializeIntData(DataManager.ExplosiveBulletChanceKey, 0);
-        DataManager.InitializeFloatData(DataManager.ExplosionRangeKey, 1.0f);
-        DataManager.InitializeFloatData(DataManager.FrostFreezeDurationKey, 1.0f);
+        // base
+        DataManager.InitializeIntData(DataManager.BaseBulletDamageKey, BulletsInitialConfig.BasicBulletDamage);
+        DataManager.InitializeIntData(DataManager.NormalBulletChanceKey, BulletsChanceConfig.NormalBulletChance);
+        // explosive
+        DataManager.InitializeIntData(DataManager.ExplosiveDamageKey, BulletsInitialConfig.ExplosiveBulletDamage);
+        DataManager.InitializeIntData(DataManager.ExplosiveBulletChanceKey, BulletsChanceConfig.ExplosiveBulletChance);
+        DataManager.InitializeFloatData(DataManager.ExplosionRangeKey, BulletsInitialConfig.ExplosionRange);
+        // frost
+        DataManager.InitializeIntData(DataManager.FrostDamageKey, BulletsInitialConfig.FrostBulletDamage);
+        DataManager.InitializeIntData(DataManager.FrostBulletChanceKey, BulletsChanceConfig.FrostBulletChance);
+        DataManager.InitializeFloatData(DataManager.FrostFreezeDurationKey, BulletsInitialConfig.FrostFreezeDuration);
     }
 }

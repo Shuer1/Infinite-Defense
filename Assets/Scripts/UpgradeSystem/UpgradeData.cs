@@ -19,6 +19,8 @@ public enum UpgradeType
     MaxHealth,            // 玩家最大血量
     AddChanceForExplosive,// 增加爆炸弹发射几率
     AddChanceForFrost,    // 增加冰冻弹发射几率
+    AddChanceForLightning,// 增加闪电弹发射几率
     ExploseRange,         // 爆炸弹范围
-    SlowTime              // 冰冻弹减速时长
+    SlowTime,              // 冰冻弹减速时长
+    AddLightningCount    // 增加闪电弹数量
 }

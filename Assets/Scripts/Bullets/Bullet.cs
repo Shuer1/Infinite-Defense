@@ -8,6 +8,8 @@ public class Bullet : MonoBehaviour
     public float lifeTime = 2f; //控制子弹回收
     private float timer;
 
+    protected string bulletType = BulletType.Normal.ToString(); //默认
+
     void OnEnable()
     {
         timer = 0f;
@@ -24,7 +26,7 @@ public class Bullet : MonoBehaviour
         timer += Time.deltaTime;
         if (timer >= lifeTime)
         {
-            gameObject.SetActive(false); // 自动回收
+            ReturnToPool();
         }
     }
 
@@ -39,7 +41,16 @@ public class Bullet : MonoBehaviour
             enemy?.TakeDamage(damage);
 
             // 回收子弹
-            gameObject.SetActive(false);
+            ReturnToPool();
+        }
+    }
+
+    protected void ReturnToPool()
+    {
+        gameObject.SetActive(false);
+        if (BulletPoolManager.Instance != null && !string.IsNullOrEmpty(bulletType)) 
+        {
+            BulletPoolManager.Instance.ReturnBullet(bulletType, gameObject);
         }
     }
 }

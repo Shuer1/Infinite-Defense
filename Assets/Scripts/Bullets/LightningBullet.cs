@@ -21,11 +21,12 @@ public class LightningBullet : Bullet
     void Awake()
     {
         _enemyLayerMask = LayerMask.GetMask("Enemy");
+        bulletType = BulletType.Lightning.ToString();
     }
 
     void Start()
     {
-        SyncLightningBulletData();
+        
     }
 
     protected override void OnTriggerEnter(Collider other)
@@ -38,8 +39,8 @@ public class LightningBullet : Bullet
         // ✅ 使用 UniTask 异步处理闪电链
         HandleChainLightningAsync(mainTarget).Forget();
 
-        // 击中后隐藏自身
-        gameObject.SetActive(false);
+        // 回收
+        ReturnToPool();
     }
 
     /// <summary>
@@ -116,12 +117,6 @@ public class LightningBullet : Bullet
         }
 
         Destroy(effect, 0.25f);
-    }
-
-    void SyncLightningBulletData()
-    {
-        lightningCount = DataManager.GetInt(DataManager.LightningCountKey);
-        lightningDamage = DataManager.GetInt(DataManager.LightningBulletDamageKey);
     }
 
 #if UNITY_EDITOR

@@ -4,7 +4,7 @@ public class FrostBullet : Bullet
 {
     [Header("冰冻特性")]
     public float frostRadius = 1.0f; // ❌减速范围(不考虑升级)
-    public int frostDamage = 3; // 冰冻伤害（低于基础子弹） Data1✅
+    public int extraFrostDamage = 3; // 冰冻伤害（低于基础子弹） Data1✅
     [Tooltip("减速百分比,eg:50表示50%,会被转换成0.5倍速度")]
     public float slowPercentage = 50f; // 摸默认减速百分比数值（50%）（不考虑升级）
     public float slowDuration = 2f; // 减速持续时间 Data2✅
@@ -20,11 +20,12 @@ public class FrostBullet : Bullet
     {
         // 初始化敌人层级索引（仅一次）
         _enemyLayerIndex = LayerMask.NameToLayer("Enemy");
+        bulletType = BulletType.Frost.ToString();
     }
 
     void Start()
     {
-        SyncFrostBulletData();
+        
     }
 
 
@@ -35,7 +36,7 @@ public class FrostBullet : Bullet
             return;
 
         // 计算总伤害（基础伤害+冰冻伤害，使用最新基础伤害值）
-        int totalDamage = damage + frostDamage;
+        int totalDamage = damage + extraFrostDamage;
 
         // 播放冰冻特效（通过对象池，带空引用保护）
         if (frostEffectPrefab != null && ParticleEffectPool.Instance != null)
@@ -69,13 +70,13 @@ public class FrostBullet : Bullet
             // 排除第一个命中的敌人，且只对存活敌人造成伤害和减速
             if (enemyInRange != null && enemyInRange != firstHitEnemy && !enemyInRange.isDead)
             {
-                enemyInRange.TakeDamage(frostDamage);
+                enemyInRange.TakeDamage(extraFrostDamage);
                 enemyInRange.ApplySlow(slowPercentage, slowDuration);
             }
         }
 
         // 回收子弹
-        gameObject.SetActive(false);
+        ReturnToPool();
     }
 
     // 绘制Gizmos（保持不变）
@@ -83,11 +84,5 @@ public class FrostBullet : Bullet
     {
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(transform.position, frostRadius);
-    }
-
-    private void SyncFrostBulletData() //初始化
-    {
-        frostDamage = DataManager.GetInt(DataManager.FrostDamageKey);
-        slowDuration = DataManager.GetFloat(DataManager.FrostFreezeDurationKey);
     }
 }

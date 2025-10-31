@@ -24,6 +24,7 @@ public class ExplosiveBullet : Bullet
     {
         // 初始化敌人层级索引（仅一次）
         _enemyLayerIndex = LayerMask.NameToLayer("Enemy");
+        bulletType = BulletType.Explosive.ToString();
     }
 
     void Start()
@@ -75,8 +76,7 @@ public class ExplosiveBullet : Bullet
             }
         }
 
-        // 触发回收（依赖基类超时回收，此处仅提前隐藏子弹）
-        gameObject.SetActive(false);
+        ReturnToPool();
     }
 
 
