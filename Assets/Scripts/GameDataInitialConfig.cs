@@ -32,12 +32,19 @@ public static class BulletsChanceConfig
 public static class EnemysInitialConfig
 {
     public const int EnemiesLevel = 1;
+    //敌人1
     public const int Enemy1MaxHealth = 50;
     public const int Enemy1Damage = 20;
     public const int Enemy1ExpReward = 10;
+    //敌人2
     public const int Enemy2MaxHealth = 120;
     public const int Enemy2Damage = 35;
     public const int Enemy2ExpReward = 25;
+    //敌人3
+    public const int Monster1MaxHealth = 200;
+    public const int Monster1Damage = 50;
+    public const int Monster1ExpReward = 50;
+
 }
 
 public static class SettingIntialConfig

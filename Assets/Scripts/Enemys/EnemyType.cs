@@ -3,5 +3,6 @@ using UnityEngine;
 public enum EnemyType
 {
     Basic,
-    Heavy
+    Heavy,
+    Monster1
 }

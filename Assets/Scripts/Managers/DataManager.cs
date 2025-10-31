@@ -20,12 +20,18 @@ public static class DataManager
 
     // 敌人数据（Int）✅
     public const string EnemiesLevelKey = "EnemiesLevel";
+    // 敌人1
     public const string Enemy1MaxHealthKey = "BaseEnemyMaxHealth";
-    public const string Enemy1ExpRewardKey = "BaseEnemyExpEReward"; //经验奖励01，新增
-    public const string Enemy2MaxHealthKey = "HeavyEnemyMaxHealth";
-    public const string Enemy2ExpRewardKey = "HeavyEnemyExpEReward"; //经验奖励02，新增
     public const string Enemy1DamageKey = "BaseEnemyDamage";
+    public const string Enemy1ExpRewardKey = "BaseEnemyExpReward";
+    // 敌人2
+    public const string Enemy2MaxHealthKey = "HeavyEnemyMaxHealth";
     public const string Enemy2DamageKey = "HeavyEnemyDamage";
+    public const string Enemy2ExpRewardKey = "HeavyEnemyExpReward";
+    // 敌人3
+    public const string Monster1MaxHealthKey = "Monster1MaxHealth";
+    public const string Monster1DamageKey = "Monster1Damage";
+    public const string Monster1ExpRewardKey = "Monster1ExpReward";
 
     // 子弹数据（Int）✅
     public const string BaseBulletDamageKey = "BaseBulletDamage";
@@ -35,6 +41,9 @@ public static class DataManager
     //冰霜弹
     public const string FrostDamageKey = "FrostDamage";
     public const string FrostFreezeDurationKey = "FrostFreezeDuration";
+    //雷击弹
+    public const string LightningBulletDamageKey = "LightningBulletDamage";
+    public const string LightningCountKey = "LightningCount";
     //发射几率比例/100
     public const string NormalBulletChanceKey = "NormalBulletChance";
     public const string ExplosiveBulletChanceKey = "ExplosiveBulletChance";
