@@ -342,5 +342,6 @@ public class UpgradeManager : MonoBehaviour
         BulletManager.Instance.UpdateBulletSpecialValue(BulletType.Lightning, 1, newCount);
 
         DataManager.SaveInt(DataManager.LightningCountKey, newCount);
+        Debug.Log($"闪电链接数量提升至：{newCount}");
     }
 }
