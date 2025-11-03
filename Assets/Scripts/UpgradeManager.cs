@@ -117,17 +117,17 @@ public class UpgradeManager : MonoBehaviour
         return shuffled.Take(count).ToList();
     }
 
-    public void ApplySelectedUpgrade(string upgradeId)
+    public void ApplySelectedUpgrade(UpgradeType upgradeType)
     {
-        var upgrade = allUpgrades.FirstOrDefault(u => u.upgradeId == upgradeId);
+        var upgrade = allUpgrades.FirstOrDefault(u => u.upgradeType == upgradeType);
         if (upgrade == null)
         {
-            Debug.LogError($"未找到升级：{upgradeId}", this);
+            Debug.LogError($"未找到升级：{upgradeType}", this);
             return;
         }
 
         ApplyUpgradeByType(upgrade.type, upgrade.value);
-        Debug.Log($"应用升级：{upgrade.displayName}（ID：{upgradeId}）");
+        Debug.Log($"应用升级：{upgrade.displayName}（ID：{upgradeType}）");
     }
 
     private void ApplyUpgradeByType(UpgradeType type, int value) // 引用外部定义的UpgradeType
@@ -171,6 +171,7 @@ public class UpgradeManager : MonoBehaviour
             upgradeEffect.gameObject.SetActive(true);
             upgradeEffect.Play();
         }
+        
         if (upgradeAudio != null && !upgradeAudio.isPlaying)
         {
             upgradeAudio.Play();
@@ -185,7 +186,7 @@ public class UpgradeManager : MonoBehaviour
             return;
         }
 
-        int currentDamage = BulletManager.Instance.GetBulletDamage(BulletType.Normal);
+        int currentDamage = DataManager.GetInt(DataManager.BaseBulletDamageKey); // 获取当前普通子弹伤害
         int newDamage = currentDamage + value;
         
         BulletManager.Instance.UpdateBulletDamage(BulletType.Normal, newDamage);
@@ -241,16 +242,16 @@ public class UpgradeManager : MonoBehaviour
             return;
         }
 
-        // 增加爆炸子弹概率
-        BulletManager.Instance.UpdateBulletChance(BulletType.Explosive, value);
-        
-        // 增加爆炸子弹伤害
-        int currentDamage = BulletManager.Instance.GetBulletDamage(BulletType.Explosive);
+        // ✅ 先获取当前概率，再 +value
+        var currentChances = BulletManager.Instance.GetBulletChances();
+        int newChance = currentChances[BulletType.Explosive] + value;
+        BulletManager.Instance.UpdateBulletChance(BulletType.Explosive, newChance);
+
+        // ✅ 伤害同步
+        int currentDamage = DataManager.GetInt(DataManager.ExplosiveDamageKey);
         int newDamage = currentDamage + value;
         BulletManager.Instance.UpdateBulletDamage(BulletType.Explosive, newDamage);
-
         DataManager.SaveInt(DataManager.ExplosiveDamageKey, newDamage);
-        Debug.Log($"爆炸子弹概率提升，伤害提升至：{newDamage}");
     }
 
     private void ApplyFrostChanceUpgrade(int value) //提升冰冻子弹概率和伤害
@@ -261,16 +262,16 @@ public class UpgradeManager : MonoBehaviour
             return;
         }
 
-        // 增加冰冻子弹概率
-        BulletManager.Instance.UpdateBulletChance(BulletType.Frost, value);
+        // ✅ 先增加概率
+        var currentChances = BulletManager.Instance.GetBulletChances();
+        int newChance = currentChances[BulletType.Frost] + value;
+        BulletManager.Instance.UpdateBulletChance(BulletType.Frost, newChance);
 
-        // 增加冰冻子弹伤害
-        int currentDamage = BulletManager.Instance.GetBulletDamage(BulletType.Frost);
+        // ✅ 提升伤害
+        int currentDamage = DataManager.GetInt(DataManager.FrostDamageKey);
         int newDamage = currentDamage + value;
         BulletManager.Instance.UpdateBulletDamage(BulletType.Frost, newDamage);
-
         DataManager.SaveInt(DataManager.FrostDamageKey, newDamage);
-        Debug.Log($"冰冻子弹概率提升，伤害提升至：{newDamage}");
     }
     
     private void ApplyLightningChanceUpgrade(int value) //提升闪电子弹概率和伤害
@@ -281,16 +282,16 @@ public class UpgradeManager : MonoBehaviour
             return;
         }
 
-        // 添加闪电弹概率
-        BulletManager.Instance.UpdateBulletChance(BulletType.Lightning, value);
+        /// ✅ 先增加概率
+        var currentChances = BulletManager.Instance.GetBulletChances();
+        int newChance = currentChances[BulletType.Lightning] + value;
+        BulletManager.Instance.UpdateBulletChance(BulletType.Lightning, newChance);
 
-        // 添加闪电弹伤害
-        int currentDamage = BulletManager.Instance.GetBulletDamage(BulletType.Lightning);
+        // ✅ 提升伤害
+        int currentDamage = DataManager.GetInt(DataManager.LightningBulletDamageKey);
         int newDamage = currentDamage + value;
         BulletManager.Instance.UpdateBulletDamage(BulletType.Lightning, newDamage);
-
         DataManager.SaveInt(DataManager.LightningBulletDamageKey, newDamage);
-        Debug.Log($"闪电弹概率提升，伤害提升至：{newDamage}");
     }
 
     private void ApplySlowTimeLongerUpgrade(int value) //提升减速效果 实现保存✅
@@ -301,7 +302,7 @@ public class UpgradeManager : MonoBehaviour
             return;
         }
 
-        float currentDuration = BulletManager.Instance.GetBulletSpecialValue(BulletType.Frost, 1);
+        float currentDuration = DataManager.GetFloat(DataManager.FrostFreezeDurationKey);
         float addDuration = value * SLOW_DURATION_MULTIPLIER;
         float newDuration = currentDuration + addDuration;
 
@@ -319,7 +320,7 @@ public class UpgradeManager : MonoBehaviour
             return;
         }
 
-        float currentRange = BulletManager.Instance.GetBulletSpecialValue(BulletType.Explosive, 1);
+        float currentRange = DataManager.GetFloat(DataManager.ExplosionRangeKey);
         float addRange = value * EXPLOSION_RANGE_MULTIPLIER;
         float newRange = currentRange + addRange;
 
@@ -337,8 +338,9 @@ public class UpgradeManager : MonoBehaviour
             return;
         }
 
-        int currentCount = (int)BulletManager.Instance.GetBulletSpecialValue(BulletType.Lightning, 1);
+        int currentCount = DataManager.GetInt(DataManager.LightningCountKey);
         int newCount = currentCount + value;
+
         BulletManager.Instance.UpdateBulletSpecialValue(BulletType.Lightning, 1, newCount);
 
         DataManager.SaveInt(DataManager.LightningCountKey, newCount);

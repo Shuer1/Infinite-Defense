@@ -8,7 +8,7 @@ public class LightningBullet : Bullet
     [Header("闪电特性")]
     public int lightningCount = 3;
     public int lightningDamage = 40;
-    public float lightningRange = 6f;
+    public float lightningRange = 2.5f;
     public float chainDelay = 100f; // 单位：毫秒（UniTask 用 ms）
     [Range(0f, 1f)] public float damageDecayRate = 0.8f;
 
@@ -21,7 +21,7 @@ public class LightningBullet : Bullet
     void Awake()
     {
         _enemyLayerMask = LayerMask.GetMask("Enemy");
-        bulletType = BulletType.Lightning.ToString();
+        bulletType = BulletType.Lightning;
     }
 
     void Start()

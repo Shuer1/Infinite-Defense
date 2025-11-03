@@ -1,14 +1,13 @@
-using JetBrains.Annotations;
 using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    public float speed = 15f; //默认不变/不升级等
-    public int damage; //Data1
-    public float lifeTime = 2f; //控制子弹回收
+    [Header("基础属性")]
+    public float speed = 15f;        // 默认飞行速度
+    public int damage;               // 子弹基础伤害
+    public float lifeTime = 2f;      // 存活时长（超过则回收）
     private float timer;
-
-    protected string bulletType = BulletType.Normal.ToString(); //默认
+    protected BulletType bulletType = BulletType.Normal;
 
     void OnEnable()
     {
@@ -17,12 +16,16 @@ public class Bullet : MonoBehaviour
 
     void Start()
     {
-        damage = DataManager.GetInt(DataManager.BaseBulletDamageKey);  //初始化
+        // 初始化子弹伤害（可升级时修改 DamageKey 即可）
+        damage = DataManager.GetInt(DataManager.BaseBulletDamageKey);
     }
+
     void Update()
     {
+        // 子弹前进
         transform.Translate(Vector3.forward * speed * Time.deltaTime);
 
+        // 计时自动回收
         timer += Time.deltaTime;
         if (timer >= lifeTime)
         {
@@ -30,25 +33,24 @@ public class Bullet : MonoBehaviour
         }
     }
 
-    // 添加可被重写的触发方法
+    // 可重写，子弹击中敌人时执行
     protected virtual void OnTriggerEnter(Collider other)
     {
-        // 基类默认实现（可以留空或实现基础逻辑）
         if (other.CompareTag("Enemy"))
         {
-            // 基础子弹逻辑（如果需要）
             EnemyBase enemy = other.GetComponent<EnemyBase>();
             enemy?.TakeDamage(damage);
 
-            // 回收子弹
             ReturnToPool();
         }
     }
 
+    // ✅ 改为传枚举，不用 string 判断
     protected void ReturnToPool()
     {
         gameObject.SetActive(false);
-        if (BulletPoolManager.Instance != null && !string.IsNullOrEmpty(bulletType)) 
+
+        if (BulletPoolManager.Instance != null)
         {
             BulletPoolManager.Instance.ReturnBullet(bulletType, gameObject);
         }

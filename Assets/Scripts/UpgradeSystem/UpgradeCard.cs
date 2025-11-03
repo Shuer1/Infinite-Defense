@@ -9,7 +9,7 @@ public class UpgradeCard : MonoBehaviour
     [SerializeField] private TextMeshProUGUI descriptionText;
     [SerializeField] private Button selectButton;
 
-    private string upgradeId;
+    private UpgradeType upgradeType;
 
     private void Awake()
     {
@@ -29,7 +29,7 @@ public class UpgradeCard : MonoBehaviour
             return;
         }
         
-        upgradeId = data.upgradeId;
+        upgradeType = data.upgradeType;
         cardImage.sprite = data.cardImage;
         titleText.text = data.displayName;
         descriptionText.text = data.description;
@@ -45,7 +45,7 @@ public class UpgradeCard : MonoBehaviour
             Debug.LogError("UpgradeManager 单例为 null!");
             return;
         }
-        UpgradeManager.Instance.ApplySelectedUpgrade(upgradeId);
+        UpgradeManager.Instance.ApplySelectedUpgrade(upgradeType);
         
         if (UpgradePanel.Instance != null)
         {

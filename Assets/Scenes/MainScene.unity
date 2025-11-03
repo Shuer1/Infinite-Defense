@@ -607,13 +607,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 528124753}
     m_Modifications:
+    - target: {fileID: 1928247218053684363, guid: 80b4356e169f440049d3f562fd669801, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 275
+      objectReference: {fileID: 0}
+    - target: {fileID: 1928247218053684363, guid: 80b4356e169f440049d3f562fd669801, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -6
+      objectReference: {fileID: 0}
     - target: {fileID: 2880658730164035181, guid: 80b4356e169f440049d3f562fd669801, type: 3}
       propertyPath: m_Name
       value: Card2
       objectReference: {fileID: 0}
     - target: {fileID: 3372629813749851776, guid: 80b4356e169f440049d3f562fd669801, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 300
+      value: 275
       objectReference: {fileID: 0}
     - target: {fileID: 3372629813749851776, guid: 80b4356e169f440049d3f562fd669801, type: 3}
       propertyPath: m_SizeDelta.y
@@ -633,7 +641,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3372629813749851776, guid: 80b4356e169f440049d3f562fd669801, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 9
+      value: -6
       objectReference: {fileID: 0}
     - target: {fileID: 3372629813749851776, guid: 80b4356e169f440049d3f562fd669801, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -641,7 +649,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3418204199448609360, guid: 80b4356e169f440049d3f562fd669801, type: 3}
       propertyPath: m_text
-      value: 'Info:'
+      value: 'Info: '
       objectReference: {fileID: 0}
     - target: {fileID: 3418204199448609360, guid: 80b4356e169f440049d3f562fd669801, type: 3}
       propertyPath: m_margin.z
@@ -5573,19 +5581,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   poolConfigs:
-  - bulletType: Normal
+  - bulletType: 0
     bulletPrefab: {fileID: 1734673711578244627, guid: 440645d6786d7401bb64687ebbea99be, type: 3}
     poolSize: 10
     allowExpand: 1
-  - bulletType: Explosive
+  - bulletType: 1
     bulletPrefab: {fileID: 6752434346227649632, guid: 4898056eac8fe4ed4b6a013151ee4642, type: 3}
     poolSize: 3
     allowExpand: 1
-  - bulletType: Frost
+  - bulletType: 2
     bulletPrefab: {fileID: 1798052242460508876, guid: a7f7c92e4227049f5b634ae1c99edcb2, type: 3}
     poolSize: 3
     allowExpand: 1
-  - bulletType: Lightning
+  - bulletType: 3
     bulletPrefab: {fileID: 1798052242460508876, guid: 4b16347d322d2439796f23eb1ff67e1b, type: 3}
     poolSize: 3
     allowExpand: 1
@@ -7614,6 +7622,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 528124753}
     m_Modifications:
+    - target: {fileID: 1928247218053684363, guid: 80b4356e169f440049d3f562fd669801, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 275
+      objectReference: {fileID: 0}
+    - target: {fileID: 1928247218053684363, guid: 80b4356e169f440049d3f562fd669801, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -6
+      objectReference: {fileID: 0}
     - target: {fileID: 2492241238054479738, guid: 80b4356e169f440049d3f562fd669801, type: 3}
       propertyPath: m_Name
       value: Choice3
@@ -7621,6 +7637,18 @@ PrefabInstance:
     - target: {fileID: 2880658730164035181, guid: 80b4356e169f440049d3f562fd669801, type: 3}
       propertyPath: m_Name
       value: Card3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3372629813749851776, guid: 80b4356e169f440049d3f562fd669801, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 275
+      objectReference: {fileID: 0}
+    - target: {fileID: 3372629813749851776, guid: 80b4356e169f440049d3f562fd669801, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3418204199448609360, guid: 80b4356e169f440049d3f562fd669801, type: 3}
+      propertyPath: m_text
+      value: 'Info: '
       objectReference: {fileID: 0}
     - target: {fileID: 4770457331056119971, guid: 80b4356e169f440049d3f562fd669801, type: 3}
       propertyPath: m_VerticalAlignment
@@ -8104,6 +8132,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 528124753}
     m_Modifications:
+    - target: {fileID: 1928247218053684363, guid: 80b4356e169f440049d3f562fd669801, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 275
+      objectReference: {fileID: 0}
+    - target: {fileID: 1928247218053684363, guid: 80b4356e169f440049d3f562fd669801, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -6
+      objectReference: {fileID: 0}
     - target: {fileID: 2492241238054479738, guid: 80b4356e169f440049d3f562fd669801, type: 3}
       propertyPath: m_Name
       value: Choice2
@@ -8114,11 +8150,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3372629813749851776, guid: 80b4356e169f440049d3f562fd669801, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 300
+      value: 275
       objectReference: {fileID: 0}
     - target: {fileID: 3372629813749851776, guid: 80b4356e169f440049d3f562fd669801, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 9
+      value: -6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3418204199448609360, guid: 80b4356e169f440049d3f562fd669801, type: 3}
+      propertyPath: m_text
+      value: 'Info: '
       objectReference: {fileID: 0}
     - target: {fileID: 3418204199448609360, guid: 80b4356e169f440049d3f562fd669801, type: 3}
       propertyPath: m_margin.z
@@ -8675,55 +8715,55 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   upgradePanelScaleAnim: {fileID: 1135337745}
   allUpgrades:
-  - upgradeId: Attack
+  - upgradeType: 0
     displayName: BasicBullet
     description: power of basic bullet
     cardImage: {fileID: 21300000, guid: c8439979792a240b5ac63f7f39db7e92, type: 3}
     value: 5
     type: 0
-  - upgradeId: FireRate
+  - upgradeType: 1
     displayName: PlusSpeed
     description: To plus shoot speed
     cardImage: {fileID: 21300000, guid: 6a9500b43427c49babbb10c4eeb3f255, type: 3}
     value: 1
     type: 1
-  - upgradeId: MaxHealth
+  - upgradeType: 2
     displayName: MoreHealth
     description: To plus player health
     cardImage: {fileID: 21300000, guid: 1188bc38816864d239c9ed6bb36189da, type: 3}
     value: 20
     type: 2
-  - upgradeId: AddChanceForExplosive
+  - upgradeType: 3
     displayName: ExplosiveBullet
     description: More chance & damage
     cardImage: {fileID: 21300000, guid: 908aafae518114a35a786b70355a683a, type: 3}
     value: 2
     type: 3
-  - upgradeId: AddChanceForFrost
+  - upgradeType: 4
     displayName: FrostBullet
     description: More chance & damage
     cardImage: {fileID: 21300000, guid: 143b1cdf5322c4a1d86476f72a48cd1c, type: 3}
     value: 2
     type: 4
-  - upgradeId: AddChanceForLightning
+  - upgradeType: 4
     displayName: PlusLightning
     description: MoreLightningCount
     cardImage: {fileID: 21300000, guid: 428f543e7ac314d8c8eaf45feee9d4fb, type: 3}
     value: 2
     type: 5
-  - upgradeId: ExploseRange
+  - upgradeType: 6
     displayName: RangeUp
     description: Wider explose range
     cardImage: {fileID: 21300000, guid: 9065e93b766a04f3980f9786cb9adec4, type: 3}
     value: 1
     type: 6
-  - upgradeId: SlowTime
+  - upgradeType: 7
     displayName: FrostTime
     description: LongerDuration
     cardImage: {fileID: 21300000, guid: c7c5562fd799b4917b366ae4f0a91ba5, type: 3}
     value: 1
     type: 7
-  - upgradeId: LightningCount
+  - upgradeType: 8
     displayName: PlusLightning
     description: MoreLightningCount
     cardImage: {fileID: 21300000, guid: 8c86c8c12712945daabd1335bbda1adf, type: 3}

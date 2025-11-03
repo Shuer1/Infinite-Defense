@@ -1,10 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// 🧩 通用多类型子弹对象池管理器（单例）
-/// 仅负责子弹的创建、回收，不修改任何其他逻辑。
-/// </summary>
 public class BulletPoolManager : MonoBehaviour
 {
     public static BulletPoolManager Instance;
@@ -12,17 +8,17 @@ public class BulletPoolManager : MonoBehaviour
     [System.Serializable]
     public class BulletPoolConfig
     {
-        public string bulletType;              // 子弹类型标识（如 "Frost", "Lightning", "Fire"）
-        public GameObject bulletPrefab;        // 子弹预制体
-        public int poolSize = 20;              // 初始池大小
-        public bool allowExpand = true;        // 是否允许自动扩容
+        public BulletType bulletType;
+        public GameObject bulletPrefab;
+        public int poolSize = 10;
+        public bool allowExpand = true;
     }
 
     [Header("子弹池配置列表")]
     public List<BulletPoolConfig> poolConfigs = new List<BulletPoolConfig>();
 
-    // 每种类型的对象池独立管理
-    private readonly Dictionary<string, Queue<GameObject>> bulletPools = new Dictionary<string, Queue<GameObject>>();
+    // ✅ 使用 BulletType 作为 Key，而非 string
+    private readonly Dictionary<BulletType, Queue<GameObject>> bulletPools = new Dictionary<BulletType, Queue<GameObject>>();
 
     void Awake()
     {
@@ -37,9 +33,6 @@ public class BulletPoolManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 初始化所有类型的子弹池
-    /// </summary>
     private void InitializeAllPools()
     {
         foreach (var config in poolConfigs)
@@ -64,9 +57,9 @@ public class BulletPoolManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 从指定类型的对象池中获取一个子弹实例
+    /// ✅ 从对象池获取子弹实例（使用 BulletType 而非 string）
     /// </summary>
-    public GameObject GetBullet(string bulletType, Vector3 position, Quaternion rotation)
+    public GameObject GetBullet(BulletType bulletType, Vector3 position, Quaternion rotation)
     {
         if (!bulletPools.ContainsKey(bulletType))
         {
@@ -77,13 +70,8 @@ public class BulletPoolManager : MonoBehaviour
         var pool = bulletPools[bulletType];
         var config = poolConfigs.Find(c => c.bulletType == bulletType);
 
-        GameObject bullet = null;
-        if (pool.Count > 0)
-        {
-            bullet = pool.Dequeue();
-        }
+        GameObject bullet = (pool.Count > 0) ? pool.Dequeue() : null;
 
-        // 若池中对象仍在使用或池为空
         if (bullet == null || bullet.activeInHierarchy)
         {
             if (config != null && config.allowExpand)
@@ -92,7 +80,7 @@ public class BulletPoolManager : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning($"[BulletPoolManager] {bulletType} 池耗尽，且未启用自动扩容！");
+                Debug.LogWarning($"[BulletPoolManager] {bulletType}池已耗尽，且未开启扩容功能！");
                 return null;
             }
         }
@@ -100,36 +88,28 @@ public class BulletPoolManager : MonoBehaviour
         bullet.transform.SetPositionAndRotation(position, rotation);
         bullet.SetActive(true);
 
-        // 重新入队以保持循环使用
         pool.Enqueue(bullet);
         return bullet;
     }
 
     /// <summary>
-    /// 回收子弹到对应对象池
+    /// ✅ 回收子弹
     /// </summary>
-    public void ReturnBullet(string bulletType, GameObject bullet)
+    public void ReturnBullet(BulletType bulletType, GameObject bullet)
     {
         if (bullet == null) return;
-
         bullet.SetActive(false);
 
         if (bulletPools.ContainsKey(bulletType))
         {
-            var pool = bulletPools[bulletType];
-            if (!pool.Contains(bullet))
-                pool.Enqueue(bullet);
-        }
-        else
-        {
-            Debug.LogWarning($"[BulletPoolManager] 无法回收：未注册类型 {bulletType}");
+            if (!bulletPools[bulletType].Contains(bullet))
+            {
+                bulletPools[bulletType].Enqueue(bullet);
+            }
         }
     }
 
-    /// <summary>
-    /// 获取当前类型的所有子弹（用于升级同步）
-    /// </summary>
-    public IEnumerable<GameObject> GetAllBullets(string bulletType)
+    public IEnumerable<GameObject> GetAllBullets(BulletType bulletType)
     {
         if (bulletPools.ContainsKey(bulletType))
             return bulletPools[bulletType].ToArray();

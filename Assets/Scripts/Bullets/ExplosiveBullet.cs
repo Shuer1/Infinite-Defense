@@ -24,7 +24,7 @@ public class ExplosiveBullet : Bullet
     {
         // 初始化敌人层级索引（仅一次）
         _enemyLayerIndex = LayerMask.NameToLayer("Enemy");
-        bulletType = BulletType.Explosive.ToString();
+        bulletType = BulletType.Explosive;
     }
 
     void Start()

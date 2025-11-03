@@ -42,7 +42,7 @@ public static class DataManager
     public const string FrostDamageKey = "FrostDamage";
     public const string FrostFreezeDurationKey = "FrostFreezeDuration";
     //雷击弹
-    public const string LightningBulletDamageKey = "LightningBulletDamage";
+    public const string LightningBulletDamageKey = "LightningDamage";
     public const string LightningCountKey = "LightningCount";
     //发射几率比例/100
     public const string NormalBulletChanceKey = "NormalBulletChance";

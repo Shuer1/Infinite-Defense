@@ -3,7 +3,7 @@ using UnityEngine;
 [System.Serializable]
 public class UpgradeData
 {
-    public string upgradeId; // 升级唯一标识
+    public UpgradeType upgradeType; // 升级唯一标识
     public string displayName; // 显示名称
     public string description; // 描述文本
     public Sprite cardImage; // 卡片图片

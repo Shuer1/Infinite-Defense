@@ -20,7 +20,7 @@ public class FrostBullet : Bullet
     {
         // 初始化敌人层级索引（仅一次）
         _enemyLayerIndex = LayerMask.NameToLayer("Enemy");
-        bulletType = BulletType.Frost.ToString();
+        bulletType = BulletType.Frost;
     }
 
     void Start()
