@@ -334,6 +334,6 @@ public class BulletTemplate
     public int baseDamage;
     public int currentDamage;
     public float baseSpeed;
-    public float specialValue1;
+    public float specialValue1; //范例example : explosionRadius
     public float specialValue2;
 }
