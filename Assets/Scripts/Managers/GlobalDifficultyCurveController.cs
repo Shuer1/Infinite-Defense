@@ -59,12 +59,16 @@ public class GlobalDifficultyCurveController : MonoBehaviour
 
     void SyncData()
     {
+        clearEnemyWaveCount = DataManager.GetInt(DataManager.ClearEnemiesCountKey, 0);
         UIManager.Instance.UpdateWaveToLevelUP(DataManager.GetInt(DataManager.ClearEnemiesCountKey, 0));
         Debug.Log("初始化数据");
     }
 
     void UpdateData()
     {
+        int currentLevel = DataManager.GetInt(DataManager.EnemiesLevelKey, 1);
+        DataManager.SaveIntForce(DataManager.EnemiesLevelKey, currentLevel + 1);
+
         DataManager.SaveInt(DataManager.Enemy1MaxHealthKey, DataManager.GetInt(DataManager.Enemy1MaxHealthKey) + baseEnemyMaxHPDeltaValue);
         DataManager.SaveInt(DataManager.Enemy1ExpRewardKey, DataManager.GetInt(DataManager.Enemy1ExpRewardKey) + baseEnemyExpDeltaValue);
         DataManager.SaveInt(DataManager.Enemy1DamageKey, DataManager.GetInt(DataManager.Enemy1DamageKey) + baseEnemyDamageDeltaValue);

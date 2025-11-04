@@ -60,6 +60,17 @@ public class ParticleEffectPool : MonoBehaviour  //单例
         }
     }
 
+    public GameObject GetEffect(GameObject prefab)
+    {
+        if (!effectPools.ContainsKey(prefab))
+            effectPools[prefab] = new Queue<GameObject>();
+
+        if (effectPools[prefab].Count > 0)
+            return effectPools[prefab].Dequeue();
+
+        return Instantiate(prefab, transform);
+    }
+    
     /// <summary>
     /// 从池获取特效并播放
     /// </summary>
@@ -126,5 +137,16 @@ public class ParticleEffectPool : MonoBehaviour  //单例
         yield return new WaitForSeconds(delay);
         effect.SetActive(false);
         effectPools[prefab].Enqueue(effect); // 放回对应预制体的池
+    }
+
+    public void RecycleEffect(GameObject prefab, GameObject effectobj)
+    {
+        effectobj.SetActive(false);
+        if (!effectPools.ContainsKey(prefab))
+        {
+            effectPools[prefab] = new Queue<GameObject>();
+        }
+
+        effectPools[prefab].Enqueue(effectobj);
     }
 }

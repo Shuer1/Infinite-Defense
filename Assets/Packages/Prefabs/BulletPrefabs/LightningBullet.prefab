@@ -123,8 +123,9 @@ MonoBehaviour:
   lifeTime: 2
   lightningCount: 2
   lightningDamage: 15
-  lightningRange: 3
-  chainDelay: 100
+  lightningRange: 2
+  chainDelayMs: 100
   damageDecayRate: 0.8
-  lightningEffectPrefab: {fileID: 6004755151496686226, guid: ae205193434e84fe6a5e291b48c4d5d4, type: 3}
-  hitSound: {fileID: 8300000, guid: 000393e3a6a7942a0ba3b2f5e68de444, type: 3}
+  lightningEffectPrefab: {fileID: 5338927862652666767, guid: bd102d194402049f38146fa942dd10ac, type: 3}
+  hitSound: {fileID: 8300000, guid: e21de6fc3fefe436487f6ef372aad15f, type: 3}
+  soundVolume: 1

@@ -15,6 +15,8 @@ public class LightningBullet : Bullet
     [Header("特效")]
     public GameObject lightningEffectPrefab;
     public AudioClip hitSound;
+    [Range(0,1.5f)] public float soundVolume = 1f;
+    private AudioSource audioSource;
 
     private int enemyLayer;
     private int enemyLayerMask;
@@ -24,6 +26,14 @@ public class LightningBullet : Bullet
         bulletType = BulletType.Lightning;
         enemyLayer = LayerMask.NameToLayer("Enemy");
         enemyLayerMask = 1 << enemyLayer;
+
+        audioSource = gameObject.AddComponent<AudioSource>();
+          // 初始化AudioSource属性（你可以调大音量这里）
+        audioSource.playOnAwake = false;
+        audioSource.spatialBlend = 1f;      // 3D 音效
+        audioSource.minDistance = 1f;
+        audioSource.maxDistance = 30f;
+        audioSource.volume = soundVolume;
     }
 
     protected override void OnEnable()
@@ -55,31 +65,46 @@ public class LightningBullet : Bullet
     /// </summary>
     private async UniTaskVoid HandleChainLightningAsync(EnemyBase startEnemy)
     {
-        var hitEnemies = new List<EnemyBase>();
+        List<EnemyBase> hitEnemies = new List<EnemyBase>();
         EnemyBase current = startEnemy;
         int currentDamage = lightningDamage;
 
-        for (int i = 0; i < lightningCount && current != null; i++)
+        for (int i = 0; i < lightningCount; i++)
         {
-            if (!current.isDead)
-            {
-                current.TakeDamage(currentDamage);
-            }
-
-            if (hitSound)
-            {
-                AudioSource.PlayClipAtPoint(hitSound, current.transform.position);
-            }
-
-            Vector3 startPos = (i == 0) ? transform.position : hitEnemies[i - 1].transform.position;
-            SpawnLightningEffect(startPos, current.transform.position);
-
+            if (current == null || current.isDead) break;
             hitEnemies.Add(current);
 
+            // 伤害
+            current.TakeDamage(currentDamage);
+            if (hitSound != null)
+            {
+                // AudioSource.PlayClipAtPoint(hitSound, current.transform.position);
+                audioSource.transform.position = current.transform.position;
+                audioSource.PlayOneShot(hitSound);
+            }
+
+            // 🔹 生成/复用电弧特效：使用通用池
+            GameObject effect = ParticleEffectPool.Instance.GetEffect(lightningEffectPrefab);
+            if (effect != null)
+            {
+                effect.SetActive(true);
+                var le = effect.GetComponent<LightningEffect>();
+                le.Init(
+                    start: (i == 0 ? this.transform : hitEnemies[i - 1].transform),
+                    end: current.transform,
+                    prefab: lightningEffectPrefab,
+                    duration: 0.25f
+                );
+            }
+
+            // 递减伤害
+            currentDamage = Mathf.Max(1, Mathf.RoundToInt(currentDamage * damageDecayRate));
+
+            // 延迟链向下一个敌人
             await UniTask.Delay(chainDelayMs);
 
+            // 查找下一目标
             current = FindNextEnemy(current, hitEnemies);
-            currentDamage = Mathf.Max(1, Mathf.RoundToInt(currentDamage * damageDecayRate));
         }
     }
 
