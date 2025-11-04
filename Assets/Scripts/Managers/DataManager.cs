@@ -14,6 +14,7 @@ public static class DataManager
     public const string PlayerShootSpeedKey = "PlayerShootSpeed";
     public const string CurrentPropCountKey = "CurrentPropCount";
     public const string LastestVolumeKey = "LastestVolume";
+    public const string ClearEnemiesCountKey = "ClearEnemiesCount";
 
     // 城墙DefenseTower数据（Int）
     public const string DefenseTowerMaxHPKey = "DefenseTowerMaxHP";
@@ -48,6 +49,7 @@ public static class DataManager
     public const string NormalBulletChanceKey = "NormalBulletChance";
     public const string ExplosiveBulletChanceKey = "ExplosiveBulletChance";
     public const string FrostBulletChanceKey = "FrostBulletChance"; //新增✅
+    public const string LightningBulletChanceKey = "LightningBulletChance"; //新增✅
 
     // --------------- 内存缓存（减少PlayerPrefs访问频率） ---------------
     private static readonly Dictionary<string, int> _intCache = new Dictionary<string, int>();
@@ -63,6 +65,10 @@ public static class DataManager
         Application.quitting += FlushSave;
     }
 
+    public static bool HasKey(string key)
+    {
+        return PlayerPrefs.HasKey(key);
+    }
 
     // --------------- Int类型数据操作 ---------------
     /// <summary>

@@ -1,203 +1,242 @@
 using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
+using UnityEngine;
 
 public class BulletManager : MonoBehaviour
 {
     public static BulletManager Instance;
 
-    [Header("子弹配置")]
+    [Header("※仅用于无存档时初始化DataManager，不再直接控制子弹属性※")]
     public List<BulletConfig> bulletConfigs = new List<BulletConfig>();
 
-    [Header("默认概率配置")]
-    [Range(0,100)] public int defaultNormalChance = 70;
-    [Range(0,100)] public int defaultExplosiveChance = 10;
-    [Range(0,100)] public int defaultFrostChance = 10;
-    [Range(0,100)] public int defaultLightningChance = 10;
-
+    // --- 子弹概率 ---
     private Dictionary<BulletType, int> bulletChances = new Dictionary<BulletType, int>();
-    private Dictionary<BulletType, BulletTemplate> bulletTemplates = new Dictionary<BulletType, BulletTemplate>();
 
-    void Awake()
+    private void Awake()
     {
-        if (Instance != null && Instance != this){ Destroy(gameObject); return; }
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
         Instance = this;
-        InitializeBulletSystem();
-    }
 
-    private void InitializeBulletSystem()
-    {
         InitializeBulletChances();
-        InitializeBulletTemplates();
-        ValidateBulletConfigs();
+        InitializeBulletDataIfNotExist();
     }
 
+    // =========================================================
+    // 1. 子弹概率只依赖DataManager，不依赖模板
+    // =========================================================
     private void InitializeBulletChances()
     {
-        bulletChances.Clear();
-        bulletChances[BulletType.Normal]     = DataManager.GetInt(DataManager.NormalBulletChanceKey, defaultNormalChance);
-        bulletChances[BulletType.Explosive] = DataManager.GetInt(DataManager.ExplosiveBulletChanceKey, defaultExplosiveChance);
-        bulletChances[BulletType.Frost]     = DataManager.GetInt(DataManager.FrostBulletChanceKey, defaultFrostChance);
-        bulletChances[BulletType.Lightning] = 100 - bulletChances[BulletType.Normal] - bulletChances[BulletType.Explosive] - bulletChances[BulletType.Frost];
-        ClampProbabilities();
+        bulletChances[BulletType.Normal]    = DataManager.GetInt(DataManager.NormalBulletChanceKey, 70);
+        bulletChances[BulletType.Explosive] = DataManager.GetInt(DataManager.ExplosiveBulletChanceKey, 10);
+        bulletChances[BulletType.Frost]     = DataManager.GetInt(DataManager.FrostBulletChanceKey, 10);
+        bulletChances[BulletType.Lightning] = DataManager.GetInt(DataManager.LightningBulletChanceKey, 10);
+        ClampAndNormalizeChances();
+        SaveBulletChances();
     }
 
-    private void InitializeBulletTemplates()
+    private void SaveBulletChances()
     {
-        bulletTemplates.Clear();
-        foreach(var config in bulletConfigs)
+        DataManager.SaveInt(DataManager.NormalBulletChanceKey, bulletChances[BulletType.Normal]);
+        DataManager.SaveInt(DataManager.ExplosiveBulletChanceKey, bulletChances[BulletType.Explosive]);
+        DataManager.SaveInt(DataManager.FrostBulletChanceKey, bulletChances[BulletType.Frost]);
+        DataManager.SaveInt(DataManager.LightningBulletChanceKey, bulletChances[BulletType.Lightning]);
+    }
+
+    private void ClampAndNormalizeChances()
+    {
+        foreach (var key in bulletChances.Keys.ToList())
+            bulletChances[key] = Mathf.Clamp(bulletChances[key], 0, 100);
+
+        int total = bulletChances.Values.Sum();
+        if (total == 0)
         {
-            bulletTemplates[config.bulletType] = new BulletTemplate
-            {
-                bulletType     = config.bulletType,
-                prefab         = config.prefab,
-                baseDamage     = config.baseDamage,
-                currentDamage  = config.baseDamage,
-                baseSpeed      = config.baseSpeed,
-                specialValue1  = config.specialValue1,
-                specialValue2  = config.specialValue2
-            };
+            bulletChances[BulletType.Normal] = 100;
+            return;
+        }
+
+        if (total != 100)
+        {
+            float scale = 100f / total;
+            foreach (var key in bulletChances.Keys.ToList())
+                bulletChances[key] = Mathf.RoundToInt(bulletChances[key] * scale);
         }
     }
 
-    private void ValidateBulletConfigs()
+    // =========================================================
+    // 2. 初始化子弹属性到 DataManager（仅第一次，无持久化数据时）
+    // =========================================================
+    private void InitializeBulletDataIfNotExist()
     {
-        var required = new[] { BulletType.Normal, BulletType.Explosive, BulletType.Frost, BulletType.Lightning };
-        var missing = required.Where(t => !bulletConfigs.Any(c => c.bulletType == t)).ToList();
-        if (missing.Count > 0)
-            Debug.LogWarning($"[BulletManager] 缺少子弹类型配置: {string.Join(",", missing)}");
+        foreach (var config in bulletConfigs)
+        {
+            switch (config.bulletType)
+            {
+                case BulletType.Normal:
+                    InitIfMissing(DataManager.BaseBulletDamageKey, config.baseDamage);
+                    break;
+
+                case BulletType.Explosive:
+                    InitIfMissing(DataManager.ExplosiveDamageKey, config.extraDamage);
+                    InitIfMissing(DataManager.ExplosionRangeKey, config.specialValue1);
+                    break;
+
+                case BulletType.Frost:
+                    InitIfMissing(DataManager.FrostDamageKey, config.extraDamage);
+                    InitIfMissing(DataManager.FrostFreezeDurationKey, config.specialValue1);
+                    break;
+
+                case BulletType.Lightning:
+                    InitIfMissing(DataManager.LightningBulletDamageKey, config.extraDamage);
+                    InitIfMissing(DataManager.LightningCountKey, (int)config.specialValue1);
+                    break;
+            }
+        }
     }
 
+    private void InitIfMissing(string key, int defaultValue)
+    {
+        if (!DataManager.HasKey(key))
+            DataManager.SaveInt(key, defaultValue);
+    }
+
+    private void InitIfMissing(string key, float defaultValue)
+    {
+        if (!DataManager.HasKey(key))
+            DataManager.SaveFloat(key, defaultValue);
+    }
+
+    // =========================================================
+    // 3. 对外调用接口（保持原有功能）
+    // =========================================================
     public BulletType GetRandomBulletType()
     {
-        int randomValue = Random.Range(0,100);
+        int rnd = Random.Range(0, 100);
         int cumulative = 0;
-        foreach (var kvp in bulletChances.OrderBy(x => x.Key))
+        foreach (var kv in bulletChances)
         {
-            cumulative += kvp.Value;
-            if (randomValue < cumulative) return kvp.Key;
+            cumulative += kv.Value;
+            if (rnd < cumulative)
+                return kv.Key;
         }
         return BulletType.Normal;
     }
 
-    public GameObject GetBullet(BulletType bulletType, Vector3 position, Quaternion rotation)
+    public GameObject GetBullet(BulletType type, Vector3 pos, Quaternion rot)
     {
         if (BulletPoolManager.Instance == null)
         {
             Debug.LogError("[BulletManager] BulletPoolManager 未初始化！");
             return null;
         }
-        return BulletPoolManager.Instance.GetBullet(bulletType, position, rotation);
+        return BulletPoolManager.Instance.GetBullet(type, pos, rot);
     }
 
-    public void UpdateBulletChance(BulletType type, int newChance)
+    public IReadOnlyDictionary<BulletType, int> GetBulletChances()
     {
-        if (bulletChances.ContainsKey(type))
+        return bulletChances;
+    }
+
+    // =========================================================
+    // 4. 数据修改接口（升级/设定面板调用）→ 写入 DataManager + 同步Pool
+    // =========================================================
+    public void UpdateBulletDamage(BulletType type, int newDamage)
+    {
+        switch (type)
         {
-            bulletChances[type] = newChance;
-            ClampProbabilities();
-            SaveBulletChances();
+            case BulletType.Normal:
+                DataManager.SaveInt(DataManager.BaseBulletDamageKey, newDamage);
+                break;
+            case BulletType.Explosive:
+                DataManager.SaveInt(DataManager.ExplosiveDamageKey, newDamage);
+                break;
+            case BulletType.Frost:
+                DataManager.SaveInt(DataManager.FrostDamageKey, newDamage);
+                break;
+            case BulletType.Lightning:
+                DataManager.SaveInt(DataManager.LightningBulletDamageKey, newDamage);
+                break;
         }
+        SyncBulletPropertiesToPool(type);
     }
 
-    public void AdjustBulletChances(int normalDelta, int explosiveDelta, int frostDelta)
+    public void UpdateBulletChance(BulletType type, int newValue)
     {
-        bulletChances[BulletType.Normal]     += normalDelta;
-        bulletChances[BulletType.Explosive] += explosiveDelta;
-        bulletChances[BulletType.Frost]     += frostDelta;
-        ClampProbabilities();
+        if (!bulletChances.ContainsKey(type)) return;
+
+        bulletChances[type] = Mathf.Clamp(newValue, 0, 100);
+        ClampAndNormalizeChances();
         SaveBulletChances();
     }
 
-    private void ClampProbabilities()
+    public void UpdateBulletSpecialValue(BulletType type, int index, float value)
     {
-        int total = bulletChances.Values.Sum();
-        if (total != 100)
+        switch (type)
         {
-            float scale = 100f / total;
-            var types = bulletChances.Keys.ToList();
-            for(int i = 0; i < types.Count-1; i++)
-            {
-                bulletChances[types[i]] = Mathf.RoundToInt(bulletChances[types[i]] * scale);
-            }
-            bulletChances[types.Last()] = 100 - bulletChances.Take(types.Count - 1).Sum(v => v.Value);
+            case BulletType.Explosive:
+                if (index == 1) DataManager.SaveFloat(DataManager.ExplosionRangeKey, value);
+                break;
+            case BulletType.Frost:
+                if (index == 1) DataManager.SaveFloat(DataManager.FrostFreezeDurationKey, value);
+                break;
+            case BulletType.Lightning:
+                if (index == 1) DataManager.SaveInt(DataManager.LightningCountKey, Mathf.RoundToInt(value));
+                break;
         }
-    }
-
-    private void SaveBulletChances()
-    {
-        DataManager.SaveInt(DataManager.NormalBulletChanceKey,     bulletChances[BulletType.Normal]);
-        DataManager.SaveInt(DataManager.ExplosiveBulletChanceKey, bulletChances[BulletType.Explosive]);
-        DataManager.SaveInt(DataManager.FrostBulletChanceKey,     bulletChances[BulletType.Frost]);
-    }
-
-    public void UpdateBulletDamage(BulletType type, int newDamage)
-    {
-        if (!bulletTemplates.ContainsKey(type)) return;
-        bulletTemplates[type].currentDamage = newDamage;
         SyncBulletPropertiesToPool(type);
     }
 
-    public void UpdateBulletSpecialValue(BulletType type, int index, float newValue)
+    // =========================================================
+    // 5. 保留：同步对象池中的子弹实例（但数据从 DataManager 获取）
+    // =========================================================
+    public void SyncBulletPropertiesToPool(BulletType type)
     {
-        if (!bulletTemplates.ContainsKey(type)) return;
-
-        if (index == 1) bulletTemplates[type].specialValue1 = newValue;
-        if (index == 2) bulletTemplates[type].specialValue2 = newValue;
-
-        SyncBulletPropertiesToPool(type);
-    }
-
-
-    private void SyncBulletPropertiesToPool(BulletType bulletType)
-    {
-        Debug.Log($"[BulletManager] 同步子弹属性到池子: {bulletType}");
         if (BulletPoolManager.Instance == null) return;
-        if (!bulletTemplates.ContainsKey(bulletType)) return;
 
-        var template = bulletTemplates[bulletType];
-        var bullets = BulletPoolManager.Instance.GetAllBullets(bulletType);
-
-        foreach(var bulletObj in bullets)
+        var bullets = BulletPoolManager.Instance.GetAllBullets(type);
+        foreach (var obj in bullets)
         {
-            if (bulletObj == null) continue;
-            
-            switch(bulletType)
+            if (obj == null) continue;
+
+            switch (type)
             {
                 case BulletType.Normal:
-                    var bullet = bulletObj.GetComponent<Bullet>();
-                    if (bullet != null) bullet.damage = template.currentDamage;
+                    var b = obj.GetComponent<Bullet>();
+                    if (b != null) b.damage = DataManager.GetInt(DataManager.BaseBulletDamageKey, b.damage);
                     break;
+
                 case BulletType.Explosive:
-                    var explosive = bulletObj.GetComponent<ExplosiveBullet>();
-                    if (explosive != null)
+                    var e = obj.GetComponent<ExplosiveBullet>();
+                    if (e != null)
                     {
-                        explosive.explosionDamage = template.currentDamage;
-                        explosive.explosionRadius = template.specialValue1;
+                        e.explosionDamage = DataManager.GetInt(DataManager.ExplosiveDamageKey, e.explosionDamage);
+                        e.explosionRadius = DataManager.GetFloat(DataManager.ExplosionRangeKey, e.explosionRadius);
                     }
                     break;
+
                 case BulletType.Frost:
-                    var frost = bulletObj.GetComponent<FrostBullet>();
-                    if (frost != null)
+                    var f = obj.GetComponent<FrostBullet>();
+                    if (f != null)
                     {
-                        frost.extraFrostDamage = template.currentDamage;
-                        frost.slowDuration = template.specialValue1;
+                        f.extraFrostDamage = DataManager.GetInt(DataManager.FrostDamageKey, f.extraFrostDamage);
+                        f.slowDuration = DataManager.GetFloat(DataManager.FrostFreezeDurationKey, f.slowDuration);
                     }
                     break;
+
                 case BulletType.Lightning:
-                    var lightning = bulletObj.GetComponent<LightningBullet>();
-                    if (lightning != null)
+                    var l = obj.GetComponent<LightningBullet>();
+                    if (l != null)
                     {
-                        lightning.lightningDamage = template.currentDamage;
-                        lightning.lightningCount = Mathf.RoundToInt(template.specialValue1);
+                        l.lightningDamage = DataManager.GetInt(DataManager.LightningBulletDamageKey, l.lightningDamage);
+                        l.lightningCount = DataManager.GetInt(DataManager.LightningCountKey, l.lightningCount);
                     }
                     break;
             }
         }
     }
-
-    public IReadOnlyDictionary<BulletType,int> GetBulletChances() => 
-        new Dictionary<BulletType,int>(bulletChances);
 }
 
 [System.Serializable]
@@ -207,17 +246,7 @@ public class BulletConfig
     public GameObject prefab;
     public int baseDamage = 10;
     public float baseSpeed = 15f;
+    public int extraDamage = 0;
     public float specialValue1 = 0f;
     public float specialValue2 = 0f;
-}
-
-public class BulletTemplate
-{
-    public BulletType bulletType;
-    public GameObject prefab;
-    public int baseDamage;
-    public int currentDamage;
-    public float baseSpeed;
-    public float specialValue1;
-    public float specialValue2;
 }

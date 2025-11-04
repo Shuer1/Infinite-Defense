@@ -25,7 +25,7 @@ public class UpgradeManager : MonoBehaviour
 
     // 常量定义
     private const float FIRE_RATE_REDUCTION_MULTIPLIER = 0.01f;
-    private const float SLOW_DURATION_MULTIPLIER = 0.5f;
+    private const float SLOW_DURATION_MULTIPLIER = 0.25f;
     private const float EXPLOSION_RANGE_MULTIPLIER = 0.2f;
     private const float MIN_FIRE_RATE = 0.1f;
 

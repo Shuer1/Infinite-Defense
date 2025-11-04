@@ -2,87 +2,80 @@ using UnityEngine;
 
 public class FrostBullet : Bullet
 {
-    [Header("冰冻特性")]
-    public float frostRadius = 1.0f; // ❌减速范围(不考虑升级)
-    public int extraFrostDamage = 3; // 冰冻伤害（低于基础子弹） Data1✅
-    [Tooltip("减速百分比,eg:50表示50%,会被转换成0.5倍速度")]
-    public float slowPercentage = 50f; // 摸默认减速百分比数值（50%）（不考虑升级）
-    public float slowDuration = 2f; // 减速持续时间 Data2✅
-    [Header("冰冻特效及音效")]
-    public GameObject frostEffectPrefab; // 适配对象池
+    [Header("冰冻子弹数据（Inspector仅初始默认值）")]
+    public float frostRadius = 1.0f;         // 范围半径
+    public int extraFrostDamage = 3;         // 额外伤害
+    public float slowPercentage = 50f;       // 减速百分比
+    public float slowDuration = 0.5f;        // 减速持续时间
+
+    [Header("特效/音效")]
+    public GameObject frostEffectPrefab;
     public AudioClip hitSound;
 
-    // 敌人专属层级索引（缓存避免重复计算）
-    private int _enemyLayerIndex;
+    private int enemyLayer;
+    private int enemyLayerMask;
 
-
-    void Awake()
+    // 设置类型 & LayerMask
+    private void Awake()
     {
-        // 初始化敌人层级索引（仅一次）
-        _enemyLayerIndex = LayerMask.NameToLayer("Enemy");
         bulletType = BulletType.Frost;
+        enemyLayer = LayerMask.NameToLayer("Enemy");
+        enemyLayerMask = 1 << enemyLayer;
     }
 
-    void Start()
+    protected override void OnEnable()
     {
-        
-    }
+        base.OnEnable(); // 从DataManager读取 damage 基础伤害
 
+        // 冰冻额外伤害、时间从 DataManager 读取（防止Inspector覆盖存档数据）
+        extraFrostDamage = DataManager.GetInt(DataManager.FrostDamageKey, extraFrostDamage);
+        slowDuration     = DataManager.GetFloat(DataManager.FrostFreezeDurationKey, slowDuration);
+    }
 
     protected override void OnTriggerEnter(Collider other)
     {
-        // 仅处理敌人层级的碰撞（过滤所有非敌人对象）
-        if (other.gameObject.layer != _enemyLayerIndex)
-            return;
+        if (other.gameObject.layer != enemyLayer) return;
 
-        // 计算总伤害（基础伤害+冰冻伤害，使用最新基础伤害值）
         int totalDamage = damage + extraFrostDamage;
 
-        // 播放冰冻特效（通过对象池，带空引用保护）
-        if (frostEffectPrefab != null && ParticleEffectPool.Instance != null)
+        // 播放特效和音效
+        if (frostEffectPrefab && ParticleEffectPool.Instance != null)
         {
-            ParticleEffectPool.Instance.PlayEffect(frostEffectPrefab, transform.position, transform.rotation);
+            ParticleEffectPool.Instance.PlayEffect(frostEffectPrefab, transform.position, Quaternion.identity);
         }
-        else
-        {
-            Debug.LogError("Frost effect is null or ParticleEffectPool not initialized");
-        }
-
-        // 播放冰冻音效
-        if (hitSound != null)
+        if (hitSound)
         {
             AudioSource.PlayClipAtPoint(hitSound, transform.position);
         }
 
-        // 处理第一个命中的敌人（直接碰撞的敌人）
-        EnemyBase firstHitEnemy = other.GetComponent<EnemyBase>();
-        if (firstHitEnemy != null && !firstHitEnemy.isDead)
+        // 对首个敌人造成伤害+减速
+        EnemyBase firstEnemy = other.GetComponent<EnemyBase>();
+        if (firstEnemy && !firstEnemy.isDead)
         {
-            firstHitEnemy.TakeDamage(totalDamage);
-            firstHitEnemy.ApplySlow(slowPercentage, slowDuration);
+            firstEnemy.TakeDamage(totalDamage);
+            firstEnemy.ApplySlow(slowPercentage, slowDuration);
         }
 
-        // 检测范围内其他敌人（仅敌人层级，排除第一个命中的敌人）
-        Collider[] collidersInRange = Physics.OverlapSphere(transform.position, frostRadius, 1 << _enemyLayerIndex);
-        foreach (var collider in collidersInRange)
+        // 对范围内其它敌人伤害+减速
+        Collider[] hits = Physics.OverlapSphere(transform.position, frostRadius, enemyLayerMask);
+        foreach (var hit in hits)
         {
-            EnemyBase enemyInRange = collider.GetComponent<EnemyBase>();
-            // 排除第一个命中的敌人，且只对存活敌人造成伤害和减速
-            if (enemyInRange != null && enemyInRange != firstHitEnemy && !enemyInRange.isDead)
+            EnemyBase enemy = hit.GetComponent<EnemyBase>();
+            if (enemy && !enemy.isDead && enemy != firstEnemy)
             {
-                enemyInRange.TakeDamage(extraFrostDamage);
-                enemyInRange.ApplySlow(slowPercentage, slowDuration);
+                enemy.TakeDamage(extraFrostDamage);
+                enemy.ApplySlow(slowPercentage, slowDuration);
             }
         }
 
-        // 回收子弹
         ReturnToPool();
     }
 
-    // 绘制Gizmos（保持不变）
+#if UNITY_EDITOR
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(transform.position, frostRadius);
     }
+#endif
 }

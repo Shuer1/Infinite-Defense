@@ -88,5 +88,9 @@ public class GameManager : MonoBehaviour
         DataManager.InitializeIntData(DataManager.FrostDamageKey, BulletsInitialConfig.FrostBulletDamage);
         DataManager.InitializeIntData(DataManager.FrostBulletChanceKey, BulletsChanceConfig.FrostBulletChance);
         DataManager.InitializeFloatData(DataManager.FrostFreezeDurationKey, BulletsInitialConfig.FrostFreezeDuration);
+        // lightning
+        DataManager.InitializeIntData(DataManager.LightningBulletDamageKey, BulletsInitialConfig.LightningBulletDamage);
+        DataManager.InitializeIntData(DataManager.LightningBulletChanceKey, BulletsChanceConfig.LightningBulletChance);
+        DataManager.InitializeIntData(DataManager.LightningCountKey, BulletsInitialConfig.LightningCount);
     }
 }

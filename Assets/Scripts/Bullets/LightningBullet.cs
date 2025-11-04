@@ -1,128 +1,139 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System.Linq;
 using Cysharp.Threading.Tasks;
 
 public class LightningBullet : Bullet
 {
-    [Header("闪电特性")]
-    public int lightningCount = 3;
-    public int lightningDamage = 40;
-    public float lightningRange = 2.5f;
-    public float chainDelay = 100f; // 单位：毫秒（UniTask 用 ms）
-    [Range(0f, 1f)] public float damageDecayRate = 0.8f;
+    [Header("闪电连锁属性（Inspector仅初始默认值）")]
+    public int lightningCount = 3;          // 连锁次数
+    public int lightningDamage = 40;        // 初始化伤害（首个目标）
+    public float lightningRange = 2.5f;     // 连锁搜索范围
+    public int chainDelayMs = 100;          // 每次连锁延迟(ms)
+    [Range(0f, 1f)]
+    public float damageDecayRate = 0.8f;    // 损耗系数
 
-    [Header("闪电特效及音效")]
+    [Header("特效")]
     public GameObject lightningEffectPrefab;
     public AudioClip hitSound;
 
-    private int _enemyLayerMask;
+    private int enemyLayer;
+    private int enemyLayerMask;
 
-    void Awake()
+    private void Awake()
     {
-        _enemyLayerMask = LayerMask.GetMask("Enemy");
         bulletType = BulletType.Lightning;
+        enemyLayer = LayerMask.NameToLayer("Enemy");
+        enemyLayerMask = 1 << enemyLayer;
     }
 
-    void Start()
+    protected override void OnEnable()
     {
-        
+        base.OnEnable(); // 从DataManager读取 damage(基础伤害)
+
+        // lightningDamage 和 lightningCount 从 DataManager 持久化读取
+        lightningDamage = DataManager.GetInt(DataManager.LightningBulletDamageKey, lightningDamage);
+        lightningCount = DataManager.GetInt(DataManager.LightningCountKey, lightningCount);
     }
 
     protected override void OnTriggerEnter(Collider other)
     {
-        if (!other.CompareTag("Enemy")) return;
+        if (other.gameObject.layer != enemyLayer) return;
 
-        EnemyBase mainTarget = other.GetComponent<EnemyBase>();
-        if (mainTarget == null) return;
+        EnemyBase startEnemy = other.GetComponent<EnemyBase>();
+        if (startEnemy != null && !startEnemy.isDead)
+        {
+            // 执行闪电连锁逻辑（异步，不阻塞主线程）
+            HandleChainLightningAsync(startEnemy).Forget();
+        }
 
-        // ✅ 使用 UniTask 异步处理闪电链
-        HandleChainLightningAsync(mainTarget).Forget();
-
-        // 回收
+        // 子弹打到第一个敌人后回收，不在场景中继续飞行
         ReturnToPool();
     }
 
     /// <summary>
-    /// 异步链式闪电逻辑（UniTask优化版）
+    /// 链式闪电逻辑（异步执行）
     /// </summary>
-    private async UniTaskVoid HandleChainLightningAsync(EnemyBase startTarget)
+    private async UniTaskVoid HandleChainLightningAsync(EnemyBase startEnemy)
     {
-        List<EnemyBase> hitList = new List<EnemyBase>();
-        EnemyBase currentTarget = startTarget;
+        var hitEnemies = new List<EnemyBase>();
+        EnemyBase current = startEnemy;
         int currentDamage = lightningDamage;
 
-        for (int i = 0; i <= lightningCount && currentTarget != null; i++)
+        for (int i = 0; i < lightningCount && current != null; i++)
         {
-            currentTarget.TakeDamage(currentDamage);
-            hitList.Add(currentTarget);
+            if (!current.isDead)
+            {
+                current.TakeDamage(currentDamage);
+            }
 
             if (hitSound)
-                AudioSource.PlayClipAtPoint(hitSound, currentTarget.transform.position);
+            {
+                AudioSource.PlayClipAtPoint(hitSound, current.transform.position);
+            }
 
-            Vector3 startPos = (i == 0) ? transform.position : hitList[i - 1].transform.position;
-            SpawnLightningEffect(startPos, currentTarget.transform.position);
+            Vector3 startPos = (i == 0) ? transform.position : hitEnemies[i - 1].transform.position;
+            SpawnLightningEffect(startPos, current.transform.position);
 
-            // ✅ 使用异步延迟而非 Coroutine 等待
-            await UniTask.Delay((int)chainDelay);
+            hitEnemies.Add(current);
 
-            // ✅ 查找下一个目标
-            EnemyBase nextTarget = FindNextTarget(currentTarget, hitList);
-            currentTarget = nextTarget;
-            currentDamage = Mathf.RoundToInt(currentDamage * damageDecayRate);
+            await UniTask.Delay(chainDelayMs);
+
+            current = FindNextEnemy(current, hitEnemies);
+            currentDamage = Mathf.Max(1, Mathf.RoundToInt(currentDamage * damageDecayRate));
         }
     }
 
-    private EnemyBase FindNextTarget(EnemyBase fromTarget, List<EnemyBase> excludeList)
+    /// <summary>
+    /// 寻找下一个连锁目标
+    /// </summary>
+    private EnemyBase FindNextEnemy(EnemyBase from, List<EnemyBase> excludeList)
     {
-        Collider[] hits = Physics.OverlapSphere(fromTarget.transform.position, lightningRange, _enemyLayerMask);
-        EnemyBase next = null;
-        float nearestDist = float.MaxValue;
+        Collider[] hits = Physics.OverlapSphere(from.transform.position, lightningRange, enemyLayerMask);
+        EnemyBase nearest = null;
+        float minDistSqr = float.MaxValue;
 
         foreach (var hit in hits)
         {
             EnemyBase enemy = hit.GetComponent<EnemyBase>();
-            if (enemy != null && !excludeList.Contains(enemy))
+            if (enemy == null || excludeList.Contains(enemy) || enemy.isDead) continue;
+
+            float dist = (enemy.transform.position - from.transform.position).sqrMagnitude;
+            if (dist < minDistSqr)
             {
-                float dist = Vector3.Distance(fromTarget.transform.position, enemy.transform.position);
-                if (dist < nearestDist)
-                {
-                    nearestDist = dist;
-                    next = enemy;
-                }
+                minDistSqr = dist;
+                nearest = enemy;
             }
         }
-
-        return next;
+        return nearest;
     }
 
+    /// <summary>
+    /// 生成闪电视觉效果
+    /// </summary>
     private void SpawnLightningEffect(Vector3 start, Vector3 end)
     {
-        if (lightningEffectPrefab == null) return;
+        if (!lightningEffectPrefab) return;
 
         GameObject effect = Instantiate(lightningEffectPrefab);
         LineRenderer lr = effect.GetComponent<LineRenderer>();
         if (lr != null)
         {
-            int segments = 6;
+            int segments = 5;
             lr.positionCount = segments;
-
             for (int i = 0; i < segments; i++)
             {
                 float t = (float)i / (segments - 1);
-                Vector3 point = Vector3.Lerp(start, end, t);
-                point += Random.insideUnitSphere * 0.15f;
-                lr.SetPosition(i, point);
+                Vector3 pos = Vector3.Lerp(start, end, t) + Random.insideUnitSphere * 0.15f;
+                lr.SetPosition(i, pos);
             }
         }
-
         Destroy(effect, 0.25f);
     }
 
 #if UNITY_EDITOR
-    void OnDrawGizmosSelected()
+    private void OnDrawGizmosSelected()
     {
-        Gizmos.color = Color.cyan;
+        Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, lightningRange);
     }
 #endif

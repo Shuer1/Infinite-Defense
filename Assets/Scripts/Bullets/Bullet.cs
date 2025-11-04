@@ -3,56 +3,57 @@ using UnityEngine;
 public class Bullet : MonoBehaviour
 {
     [Header("基础属性")]
-    public float speed = 15f;        // 默认飞行速度
-    public int damage;               // 子弹基础伤害
-    public float lifeTime = 2f;      // 存活时长（超过则回收）
-    private float timer;
+    public float speed = 15f;
+    public int damage = 10;
+    public float lifeTime = 2f;
+
     protected BulletType bulletType = BulletType.Normal;
+    private float currentLifeTime = 0f;
 
-    void OnEnable()
+    // 子弹每次从对象池激活时，重新读取最新的 DataManager 数据
+    protected virtual void OnEnable()
     {
-        timer = 0f;
+        currentLifeTime = 0f;
+        damage = DataManager.GetInt(DataManager.BaseBulletDamageKey, damage);
     }
 
-    void Start()
+    protected virtual void Update()
     {
-        // 初始化子弹伤害（可升级时修改 DamageKey 即可）
-        damage = DataManager.GetInt(DataManager.BaseBulletDamageKey);
-    }
-
-    void Update()
-    {
-        // 子弹前进
+        // 基础移动
         transform.Translate(Vector3.forward * speed * Time.deltaTime);
 
-        // 计时自动回收
-        timer += Time.deltaTime;
-        if (timer >= lifeTime)
+        // 生命周期计时 & 自动回收
+        currentLifeTime += Time.deltaTime;
+        if (currentLifeTime >= lifeTime)
         {
             ReturnToPool();
         }
     }
 
-    // 可重写，子弹击中敌人时执行
+    // 基础伤害逻辑（普通子弹）
     protected virtual void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Enemy"))
-        {
-            EnemyBase enemy = other.GetComponent<EnemyBase>();
-            enemy?.TakeDamage(damage);
+        if (!other.CompareTag("Enemy")) return;
 
-            ReturnToPool();
+        EnemyBase enemy = other.GetComponent<EnemyBase>();
+        if (enemy != null && !enemy.isDead)
+        {
+            enemy.TakeDamage(damage);
         }
+
+        ReturnToPool(); 
     }
 
-    // ✅ 改为传枚举，不用 string 判断
-    protected void ReturnToPool()
+    // 放回对象池
+    protected virtual void ReturnToPool()
     {
-        gameObject.SetActive(false);
-
         if (BulletPoolManager.Instance != null)
         {
             BulletPoolManager.Instance.ReturnBullet(bulletType, gameObject);
+        }
+        else
+        {
+            gameObject.SetActive(false);
         }
     }
 }

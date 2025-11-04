@@ -21,6 +21,8 @@ public class UIManager : MonoBehaviour
     private int currentWaveOrderInPause = 1;
     public TextMeshProUGUI enemiesLevelTMPInPause; //新增
     private int enemiesLevel = 1;
+    public TextMeshProUGUI waveToLevelUPTMP;
+    public int historyClearEnemiesWave = 0;
     public SpawnManager spawnManager;
     public TextMeshProUGUI propCount;
     public TextMeshProUGUI tempCurrentWaveTMP;
@@ -197,10 +199,20 @@ public class UIManager : MonoBehaviour
         ShowAndUpdatePlayerExp(0, current_Exp);
         int current_PropCount = DataManager.GetInt(DataManager.CurrentPropCountKey);
         ShowAndUpdatePropCount(current_PropCount);
+
         currentWaveOrderInPause = DataManager.GetInt(DataManager.CurrentWaveKey); //New Addition
         currentWaveTMPInPause.text = $"CURRENT WAVE: {currentWaveOrderInPause}";
+
         enemiesLevel = DataManager.GetInt(DataManager.EnemiesLevelKey);
         enemiesLevelTMPInPause.text = $"ENEMIES LEVEL: {enemiesLevel}";
+
+        historyClearEnemiesWave = DataManager.GetInt(DataManager.ClearEnemiesCountKey);
+        UpdateWaveToLevelUP(historyClearEnemiesWave);
+    }
+
+    public void UpdateWaveToLevelUP(int clearEnemiesWave)
+    {
+        waveToLevelUPTMP.text = $"WAVE TO LEVELUP: {Mathf.Max(0, 10 - clearEnemiesWave)}";
     }
 
     public void ShowGameOver()

@@ -121,7 +121,7 @@ MonoBehaviour:
   speed: 15
   damage: 50
   lifeTime: 2
-  explosionRadius: 1
+  explosionRadius: 0.8
   explosionDamage: 5
   hitEffectPrefab: {fileID: 8602304315960938330, guid: f183a4f2538424d42aab1b82a46567cb, type: 3}
   hitSound: {fileID: 8300000, guid: 90f94821fe37743d08308eb0c50a6450, type: 3}

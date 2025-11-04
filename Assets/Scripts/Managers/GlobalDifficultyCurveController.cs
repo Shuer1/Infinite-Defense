@@ -28,7 +28,6 @@ public class GlobalDifficultyCurveController : MonoBehaviour
     void Start()
     {
         SyncData();
-        clearEnemyWaveCount = 0;
 
         if(eM == null)
             eM = FindObjectOfType<EnemyManager>();
@@ -52,11 +51,15 @@ public class GlobalDifficultyCurveController : MonoBehaviour
 
             if (eM != null)
                 eM.RefreshAllEnemiesStatusFromData();
-        }  
+        }
+
+        UIManager.Instance.UpdateWaveToLevelUP(clearEnemyWaveCount);
+        DataManager.SaveIntForce(DataManager.ClearEnemiesCountKey, clearEnemyWaveCount); //保存清除的敌人数
     }
 
     void SyncData()
     {
+        UIManager.Instance.UpdateWaveToLevelUP(DataManager.GetInt(DataManager.ClearEnemiesCountKey, 0));
         Debug.Log("初始化数据");
     }
 
