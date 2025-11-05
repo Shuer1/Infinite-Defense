@@ -1848,6 +1848,7 @@ MonoBehaviour:
   damageTextPrefab: {fileID: 8237515232130285393, guid: d1b21f7573a8946a0b3ed9eec192917a, type: 3}
   canvas: {fileID: 1595431332}
   initialPoolSize: 10
+  maxActiveTexts: 5
   obj_dontDestroyOnLoad: {fileID: 1595431329}
 --- !u!1 &436568600
 GameObject:
@@ -4461,7 +4462,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 17, y: 464}
-  m_SizeDelta: {x: 360, y: 120}
+  m_SizeDelta: {x: 480, y: 160}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &768610602
 MonoBehaviour:
@@ -5672,7 +5673,7 @@ MonoBehaviour:
     initialSize: 5
   - effectPrefab: {fileID: 6004755151496686226, guid: ae205193434e84fe6a5e291b48c4d5d4, type: 3}
     initialSize: 5
-  - effectPrefab: {fileID: 5338927862652666767, guid: bd102d194402049f38146fa942dd10ac, type: 3}
+  - effectPrefab: {fileID: 5627696518775099638, guid: 390cc74915d4a054bbd897e1885047a4, type: 3}
     initialSize: 5
 --- !u!1 &1064122995
 GameObject:
@@ -5732,7 +5733,7 @@ MonoBehaviour:
     poolSize: 3
     allowExpand: 1
   - bulletType: 3
-    bulletPrefab: {fileID: 1798052242460508876, guid: 4b16347d322d2439796f23eb1ff67e1b, type: 3}
+    bulletPrefab: {fileID: 5627696518775099638, guid: 390cc74915d4a054bbd897e1885047a4, type: 3}
     poolSize: 3
     allowExpand: 1
 --- !u!1 &1075028230

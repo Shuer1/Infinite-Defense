@@ -10,9 +10,11 @@ public class DamageTextManager : MonoBehaviour
     [SerializeField] private DamageText damageTextPrefab;
     [SerializeField] private Canvas canvas;
     [SerializeField] private int initialPoolSize = 10;
+    [SerializeField] private int maxActiveTexts = 5;
     [SerializeField] private GameObject obj_dontDestroyOnLoad;
 
     private Queue<DamageText> pool = new Queue<DamageText>();
+    private List<DamageText> activeTexts = new List<DamageText>();
 
     private void Awake()
     {
@@ -123,11 +125,23 @@ public class DamageTextManager : MonoBehaviour
             return;
         }
 
+        if (activeTexts.Count >= maxActiveTexts) //新增
+        {
+            // 移除最旧的文本
+            DamageText oldestText = activeTexts[0];
+            activeTexts.RemoveAt(0);
+
+            oldestText.gameObject.SetActive(false);
+            pool.Enqueue(oldestText);
+        }
+
         DamageText dt = GetFromPool();
         if (dt == null) return;
 
         dt.gameObject.SetActive(true);
         dt.Initialize(damage, worldPos);
+
+        activeTexts.Add(dt);
     }
 
     /// <summary>
@@ -147,6 +161,8 @@ public class DamageTextManager : MonoBehaviour
     public void ReturnToPool(DamageText dt)
     {
         if (dt == null) return;
+
+        activeTexts.Remove(dt);
         pool.Enqueue(dt);
     }
 
