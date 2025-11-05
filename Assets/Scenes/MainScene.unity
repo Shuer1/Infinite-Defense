@@ -3146,6 +3146,15 @@ MonoBehaviour:
   - bulletType: 1
   - bulletType: 2
   - bulletType: 3
+  debugChances:
+  - type: 0
+    chance: 0
+  - type: 1
+    chance: 0
+  - type: 2
+    chance: 0
+  - type: 3
+    chance: 0
 --- !u!1 &677128463
 GameObject:
   m_ObjectHideFlags: 0

@@ -121,7 +121,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 15
   damage: 50
-  lifeTime: 2
+  lifeTime: 1.5
   explosionRadius: 0.8
   explosionDamage: 5
   hitEffectPrefab: {fileID: 8602304315960938330, guid: f183a4f2538424d42aab1b82a46567cb, type: 3}

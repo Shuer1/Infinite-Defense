@@ -120,7 +120,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 15
   damage: 50
-  lifeTime: 2
+  lifeTime: 1.5
   lightningCount: 2
   lightningDamage: 15
   lightningRange: 2

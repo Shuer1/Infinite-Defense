@@ -121,7 +121,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 15
   damage: 50
-  lifeTime: 2
+  lifeTime: 1.5
   frostRadius: 0.8
   extraFrostDamage: 3
   slowPercentage: 50

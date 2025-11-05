@@ -1,16 +1,17 @@
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using UnityEngine;
 
 public class BulletManager : MonoBehaviour
 {
     public static BulletManager Instance;
-
-    [Header("※仅用于无存档时初始化DataManager，不再直接控制子弹属性※")]
     public List<BulletConfig> bulletConfigs = new List<BulletConfig>();
-
     // --- 子弹概率 ---
     private Dictionary<BulletType, int> bulletChances = new Dictionary<BulletType, int>();
+
+    [Header("子弹概率")]
+    [SerializeField] private List<BulletChanceDebug> debugChances = new List<BulletChanceDebug>();
 
     private void Awake()
     {
@@ -23,6 +24,8 @@ public class BulletManager : MonoBehaviour
 
         InitializeBulletChances();
         InitializeBulletDataIfNotExist();
+
+        RefreshChances();//新增
     }
 
     // =========================================================
@@ -251,10 +254,26 @@ public class BulletManager : MonoBehaviour
             }
         }
     }
+
+    public void RefreshChances()
+    {
+        debugChances.Clear();
+        foreach (var kv in bulletChances)
+        {
+            debugChances.Add(new BulletChanceDebug { type = kv.Key, chance = kv.Value });
+        }
+    }
 }
 
 [System.Serializable]
 public class BulletConfig
 {
     public BulletType bulletType;
+}
+
+[System.Serializable]
+public struct BulletChanceDebug
+{
+    public BulletType type;
+    [ReadOnly(true)] public int chance;
 }

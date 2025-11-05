@@ -245,6 +245,7 @@ public class UpgradeManager : MonoBehaviour
 
         // ✅ 修复
         BulletManager.Instance.UpdateBulletChance(BulletType.Explosive, deltaValue);
+        BulletManager.Instance.RefreshChances(); //新增
 
         // ✅ 伤害同步
         int currentDamage = DataManager.GetInt(DataManager.ExplosiveDamageKey);
@@ -262,6 +263,7 @@ public class UpgradeManager : MonoBehaviour
         }
 
         BulletManager.Instance.UpdateBulletChance(BulletType.Frost, deltaValue);
+        BulletManager.Instance.RefreshChances(); //新增
 
         // ✅ 提升伤害
         int currentDamage = DataManager.GetInt(DataManager.FrostDamageKey);
@@ -279,6 +281,7 @@ public class UpgradeManager : MonoBehaviour
         }
 
         BulletManager.Instance.UpdateBulletChance(BulletType.Lightning, deltaValue);
+        BulletManager.Instance.RefreshChances(); //新增
 
         // ✅ 提升伤害
         int currentDamage = DataManager.GetInt(DataManager.LightningBulletDamageKey);
