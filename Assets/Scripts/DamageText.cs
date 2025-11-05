@@ -14,7 +14,7 @@ public class DamageText : MonoBehaviour
     private Vector3 startPosition;
     private Color startColor;
     private RectTransform rectTransform;
-    private bool isAnimating = false;
+    bool isAnimating = false;
 
     // 新增字段：当前正在播放的协程
     private Coroutine currentAnimation;

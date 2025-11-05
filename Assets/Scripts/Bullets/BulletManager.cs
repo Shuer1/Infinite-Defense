@@ -76,34 +76,34 @@ public class BulletManager : MonoBehaviour
             switch (config.bulletType)
             {
                 case BulletType.Normal:
-                    InitIfMissing(DataManager.BaseBulletDamageKey, config.baseDamage);
+                    InitIfMissing(DataManager.BaseBulletDamageKey, BulletsInitialConfig.BasicBulletDamage);
                     break;
 
                 case BulletType.Explosive:
-                    InitIfMissing(DataManager.ExplosiveDamageKey, config.extraDamage);
-                    InitIfMissing(DataManager.ExplosionRangeKey, config.specialValue1);
+                    InitIfMissing(DataManager.ExplosiveDamageKey, BulletsInitialConfig.ExplosiveBulletDamage);
+                    InitIfMissing(DataManager.ExplosionRangeKey, BulletsInitialConfig.ExplosionRange);
                     break;
 
                 case BulletType.Frost:
-                    InitIfMissing(DataManager.FrostDamageKey, config.extraDamage);
-                    InitIfMissing(DataManager.FrostFreezeDurationKey, config.specialValue1);
+                    InitIfMissing(DataManager.FrostDamageKey, BulletsInitialConfig.FrostBulletDamage);
+                    InitIfMissing(DataManager.FrostFreezeDurationKey, BulletsInitialConfig.FrostFreezeDuration);
                     break;
 
                 case BulletType.Lightning:
-                    InitIfMissing(DataManager.LightningBulletDamageKey, config.extraDamage);
-                    InitIfMissing(DataManager.LightningCountKey, (int)config.specialValue1);
+                    InitIfMissing(DataManager.LightningBulletDamageKey, BulletsInitialConfig.LightningBulletDamage);
+                    InitIfMissing(DataManager.LightningCountKey, BulletsInitialConfig.LightningCount);
                     break;
             }
         }
     }
 
-    private void InitIfMissing(string key, int defaultValue)
+    private void InitIfMissing(string key, int defaultValue) //Save int type
     {
         if (!DataManager.HasKey(key))
             DataManager.SaveInt(key, defaultValue);
     }
 
-    private void InitIfMissing(string key, float defaultValue)
+    private void InitIfMissing(string key, float defaultValue) //Save float type
     {
         if (!DataManager.HasKey(key))
             DataManager.SaveFloat(key, defaultValue);
@@ -163,13 +163,27 @@ public class BulletManager : MonoBehaviour
         SyncBulletPropertiesToPool(type);
     }
 
-    public void UpdateBulletChance(BulletType type, int newValue)
+    public void UpdateBulletChance(BulletType type, int deltaValue)
     {
+        if (type == BulletType.Normal) return;
         if (!bulletChances.ContainsKey(type)) return;
 
-        bulletChances[type] = Mathf.Clamp(newValue, 0, 100);
+        int normalChance = bulletChances[BulletType.Normal];
+        if (normalChance <= 25)
+        {
+            Debug.Log($"普通子弹概率已 ≤ 25，拒绝继续削减，跳过本次升级");
+            return;
+        }
+
+        bulletChances[type] += deltaValue;
+
+        int reduceValue = deltaValue;
+        bulletChances[BulletType.Normal] = Mathf.Max(25, normalChance - reduceValue);
+
         ClampAndNormalizeChances();
         SaveBulletChances();
+
+        Debug.Log($"升级 {type} 概率 +{deltaValue}%，普通子弹概率减为 {bulletChances[BulletType.Normal]}%");
     }
 
     public void UpdateBulletSpecialValue(BulletType type, int index, float value)
@@ -243,10 +257,4 @@ public class BulletManager : MonoBehaviour
 public class BulletConfig
 {
     public BulletType bulletType;
-    public GameObject prefab;
-    public int baseDamage = 10;
-    public float baseSpeed = 15f;
-    public int extraDamage = 0;
-    public float specialValue1 = 0f;
-    public float specialValue2 = 0f;
 }

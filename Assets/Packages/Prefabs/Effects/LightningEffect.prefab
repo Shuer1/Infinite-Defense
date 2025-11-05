@@ -14795,7 +14795,6 @@ GameObject:
   - component: {fileID: 8538455091997576435}
   - component: {fileID: 5861850483175589971}
   - component: {fileID: -7284875800828661758}
-  - component: {fileID: -6887267590056321832}
   m_Layer: 0
   m_Name: LightningEffect
   m_TagString: Untagged
@@ -19704,20 +19703,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lightningParticle: {fileID: 8538455091997576435}
---- !u!114 &-6887267590056321832
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5627696518775099638}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 34d2400e6309b4a22852ba2d8ee97a98, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  prefabKey: {fileID: 5627696518775099638}
-  lifeTime: 0.2
 --- !u!1 &6630951671508150946
 GameObject:
   m_ObjectHideFlags: 0

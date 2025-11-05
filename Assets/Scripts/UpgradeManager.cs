@@ -16,7 +16,8 @@ public class UpgradeManager : MonoBehaviour
     public PlayerController playerController;
 
     [Tooltip("城墙血量提升倍数因子")]
-    public int multiFactor = 5;
+    public int towerHPMultiFactor = 5;
+    public int damageMultiFactor = 3;
 
     // 升级特效、音效
     [SerializeField] private ParticleSystem upgradeEffect;
@@ -223,7 +224,7 @@ public class UpgradeManager : MonoBehaviour
         playerController.health += value;
         playerController.currentHealth = Mathf.Min(playerController.currentHealth + value, playerController.health);
 
-        dTController.maxHealth += value * multiFactor;
+        dTController.maxHealth += value * towerHPMultiFactor;
         dTController.currentHealth = dTController.maxHealth;
 
         UIManager.Instance?.UpdateAndShowPlayerHP(playerController.currentHealth, playerController.health);
@@ -234,7 +235,7 @@ public class UpgradeManager : MonoBehaviour
         Debug.Log($"玩家最大生命值提升至：{playerController.health}; 城墙最大生命值提升至：{dTController.maxHealth}");
     }
 
-    private void ApplyExplosiveChanceUpgrade(int value) //提升爆炸子弹概率和伤害
+    private void ApplyExplosiveChanceUpgrade(int deltaValue) //提升爆炸子弹概率和伤害
     {
         if (BulletManager.Instance == null)
         {
@@ -242,19 +243,17 @@ public class UpgradeManager : MonoBehaviour
             return;
         }
 
-        // ✅ 先获取当前概率，再 +value
-        var currentChances = BulletManager.Instance.GetBulletChances();
-        int newChance = currentChances[BulletType.Explosive] + value;
-        BulletManager.Instance.UpdateBulletChance(BulletType.Explosive, newChance);
+        // ✅ 修复
+        BulletManager.Instance.UpdateBulletChance(BulletType.Explosive, deltaValue);
 
         // ✅ 伤害同步
         int currentDamage = DataManager.GetInt(DataManager.ExplosiveDamageKey);
-        int newDamage = currentDamage + value;
+        int newDamage = currentDamage + deltaValue * damageMultiFactor;
         BulletManager.Instance.UpdateBulletDamage(BulletType.Explosive, newDamage);
         DataManager.SaveInt(DataManager.ExplosiveDamageKey, newDamage);
     }
 
-    private void ApplyFrostChanceUpgrade(int value) //提升冰冻子弹概率和伤害
+    private void ApplyFrostChanceUpgrade(int deltaValue) //提升冰冻子弹概率和伤害
     {
         if (BulletManager.Instance == null)
         {
@@ -262,19 +261,16 @@ public class UpgradeManager : MonoBehaviour
             return;
         }
 
-        // ✅ 先增加概率
-        var currentChances = BulletManager.Instance.GetBulletChances();
-        int newChance = currentChances[BulletType.Frost] + value;
-        BulletManager.Instance.UpdateBulletChance(BulletType.Frost, newChance);
+        BulletManager.Instance.UpdateBulletChance(BulletType.Frost, deltaValue);
 
         // ✅ 提升伤害
         int currentDamage = DataManager.GetInt(DataManager.FrostDamageKey);
-        int newDamage = currentDamage + value;
+        int newDamage = currentDamage + deltaValue * damageMultiFactor;
         BulletManager.Instance.UpdateBulletDamage(BulletType.Frost, newDamage);
         DataManager.SaveInt(DataManager.FrostDamageKey, newDamage);
     }
     
-    private void ApplyLightningChanceUpgrade(int value) //提升闪电子弹概率和伤害
+    private void ApplyLightningChanceUpgrade(int deltaValue) //提升闪电子弹概率和伤害
     {
         if (BulletManager.Instance == null)
         {
@@ -282,14 +278,11 @@ public class UpgradeManager : MonoBehaviour
             return;
         }
 
-        /// ✅ 先增加概率
-        var currentChances = BulletManager.Instance.GetBulletChances();
-        int newChance = currentChances[BulletType.Lightning] + value;
-        BulletManager.Instance.UpdateBulletChance(BulletType.Lightning, newChance);
+        BulletManager.Instance.UpdateBulletChance(BulletType.Lightning, deltaValue);
 
         // ✅ 提升伤害
         int currentDamage = DataManager.GetInt(DataManager.LightningBulletDamageKey);
-        int newDamage = currentDamage + value;
+        int newDamage = currentDamage + deltaValue * damageMultiFactor;
         BulletManager.Instance.UpdateBulletDamage(BulletType.Lightning, newDamage);
         DataManager.SaveInt(DataManager.LightningBulletDamageKey, newDamage);
     }

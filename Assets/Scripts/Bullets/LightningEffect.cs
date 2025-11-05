@@ -9,7 +9,6 @@ public class LightningEffect : MonoBehaviour
 
     private GameObject prefabKey;             // 对象池 Key
     private float duration = 0.3f;            // 闪电持续时间（粒子播放时间）
-    private List<Transform> targetChain;      // 仅用于记录，不再影响表现
 
     private void Awake()
     {

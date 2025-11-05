@@ -5,7 +5,7 @@ using Cysharp.Threading.Tasks;
 public class LightningBullet : Bullet
 {
     [Header("闪电连锁属性")]
-    public int lightningCount = 3;
+    public int lightningCount = 2;
     private const int maxLightningCount = 5;   // 最大连锁次数
     public int lightningDamage = 40;           // 初始伤害（第一个目标）
     public float lightningRange = 2.5f;        // 连锁范围
