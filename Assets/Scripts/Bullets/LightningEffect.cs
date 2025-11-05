@@ -4,132 +4,78 @@ using System.Collections.Generic;
 
 public class LightningEffect : MonoBehaviour
 {
-    private LineRenderer lr;
-    private List<Transform> targetChain = new List<Transform>(); // 目标链
-    private float duration = 0.3f;
-    private GameObject prefabKey;
-    private float trailFadeSpeed = 2f; // 拖尾消失速度
-    private int segments = 8; // 线段分段数，越多拖尾越平滑
-    private List<Vector3> segmentOffsets = new List<Vector3>(); // 每段的随机偏移
+    [Header("粒子特效组件（必须绑定）")]
+    public ParticleSystem lightningParticle;  // 你的雷电粒子系统
+
+    private GameObject prefabKey;             // 对象池 Key
+    private float duration = 0.3f;            // 闪电持续时间（粒子播放时间）
+    private List<Transform> targetChain;      // 仅用于记录，不再影响表现
 
     private void Awake()
     {
-        lr = GetComponent<LineRenderer>();
-        if (lr != null)
-        {
-            // 初始化线段渲染器属性
-            lr.positionCount = segments;
-            lr.widthCurve = new AnimationCurve(
-                new Keyframe(0, 0.1f),
-                new Keyframe(0.5f, 0.3f),
-                new Keyframe(1, 0.1f)
-            ); // 中间粗两端细
-            lr.numCapVertices = 5;
-            lr.numCornerVertices = 5;
-        }
+        if (lightningParticle == null)
+            lightningParticle = GetComponentInChildren<ParticleSystem>();
+
+        if (lightningParticle == null)
+            Debug.LogError("[LightningEffect] 未绑定粒子特效组件！");
     }
 
-    // 初始化方法，支持传入目标链
+    /// <summary>
+    /// 传入目标链（可选），但仅用于定位粒子位置
+    /// </summary>
     public void Init(List<Transform> targets, GameObject prefab, float duration = 0.3f)
     {
         this.prefabKey = prefab;
-        this.targetChain = new List<Transform>(targets);
         this.duration = duration;
 
-        // 初始化随机偏移量，让闪电更自然
-        segmentOffsets.Clear();
-        for (int i = 0; i < segments; i++)
-        {
-            segmentOffsets.Add(Random.insideUnitSphere * 0.3f);
-        }
+        if (targets != null && targets.Count > 0)
+            transform.position = targets[0].position; // 粒子起点放第一目标位置
 
-        UpdateLightningPositions();
-        StopAllCoroutines();
-        StartCoroutine(AnimateLightning());
+        PlayEffect();
     }
 
-    // 单个目标连接的重载（兼容旧用法）
+    /// <summary> 简化重载：起点→终点 </summary>
     public void Init(Transform start, Transform end, GameObject prefab, float duration = 0.3f)
     {
-        Init(new List<Transform> { start, end }, prefab, duration);
+        transform.position = start.position;
+        this.prefabKey = prefab;
+        this.duration = duration;
+
+        // 如果粒子系统需要朝向目标，可加上朝向逻辑：
+        // transform.forward = (end.position - start.position).normalized;
+
+        PlayEffect();
     }
 
-    private IEnumerator AnimateLightning()
+    private void PlayEffect()
     {
-        float lifeTime = 0;
-        while (lifeTime < duration)
-        {
-            lifeTime += Time.deltaTime;
-            UpdateLightningPositions();
-            
-            // 随时间增加随机偏移，模拟电流流动
-            for (int i = 0; i < segmentOffsets.Count; i++)
-            {
-                segmentOffsets[i] = Vector3.Lerp(
-                    segmentOffsets[i], 
-                    Random.insideUnitSphere * 0.4f, 
-                    Time.deltaTime * 15f
-                );
-            }
+        gameObject.SetActive(true);
 
-            // 逐渐降低透明度
-            Color startColor = lr.startColor;
-            Color endColor = lr.endColor;
-            startColor.a = Mathf.Lerp(1f, 0f, lifeTime / duration);
-            endColor.a = Mathf.Lerp(0.8f, 0f, lifeTime / duration);
-            lr.startColor = startColor;
-            lr.endColor = endColor;
+        if (lightningParticle != null)
+            lightningParticle.Play(true);
 
-            yield return null;
-        }
-
-        gameObject.SetActive(false);
-        ParticleEffectPool.Instance.RecycleEffect(prefabKey, this.gameObject);
+        StopAllCoroutines();
+        StartCoroutine(DelayRecycle());
     }
 
-    private void UpdateLightningPositions()
+    // 在 LightningEffect 类中增加：
+    public void SetPrefabKey(GameObject prefab)
     {
-        if (lr == null || targetChain.Count < 2) return;
+        this.prefabKey = prefab;
+    }
 
-        // 计算所有目标点之间的总距离
-        float totalDistance = 0;
-        for (int i = 0; i < targetChain.Count - 1; i++)
-        {
-            totalDistance += Vector3.Distance(
-                targetChain[i].position, 
-                targetChain[i + 1].position
-            );
-        }
 
-        // 生成闪电路径点
-        float currentDistance = 0;
-        int currentTargetIndex = 0;
-        Vector3 currentTargetPos = targetChain[0].position;
-        Vector3 nextTargetPos = targetChain[1].position;
-        float segmentDistance = totalDistance / (segments - 1);
+    /// <summary>
+    /// 粒子播放完毕后回收或销毁
+    /// </summary>
+    private IEnumerator DelayRecycle()
+    {
+        yield return new WaitForSeconds(duration);
 
-        for (int i = 0; i < segments; i++)
-        {
-            // 计算当前段应该在哪个目标区间
-            while (currentDistance + Vector3.Distance(currentTargetPos, nextTargetPos) < segmentDistance * i)
-            {
-                currentDistance += Vector3.Distance(currentTargetPos, nextTargetPos);
-                currentTargetIndex++;
-                if (currentTargetIndex >= targetChain.Count - 1) break;
-                currentTargetPos = targetChain[currentTargetIndex].position;
-                nextTargetPos = targetChain[currentTargetIndex + 1].position;
-            }
-
-            // 计算当前段在目标区间内的比例
-            float remaining = (segmentDistance * i) - currentDistance;
-            float ratio = remaining / Vector3.Distance(currentTargetPos, nextTargetPos);
-            ratio = Mathf.Clamp01(ratio);
-
-            // 计算带随机偏移的位置
-            Vector3 position = Vector3.Lerp(currentTargetPos, nextTargetPos, ratio);
-            position += segmentOffsets[i] * (1 - i / (float)segments); // 拖尾逐渐变弱
-
-            lr.SetPosition(i, position);
-        }
+        // 如果特效 Prefab 是通过对象池生成的：
+        if (prefabKey != null && ParticleEffectPool.Instance != null)
+            ParticleEffectPool.Instance.RecycleEffect(prefabKey, gameObject);
+        else
+            gameObject.SetActive(false);
     }
 }

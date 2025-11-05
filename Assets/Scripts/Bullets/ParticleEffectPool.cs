@@ -62,14 +62,41 @@ public class ParticleEffectPool : MonoBehaviour  //单例
 
     public GameObject GetEffect(GameObject prefab)
     {
+        if (prefab == null)
+        {
+            Debug.LogError("GetEffect 失败：传入的 prefab 为空！");
+            return null;
+        }
+
+        // 如果没有为这个 prefab 创建过对象池，自动创建新的队列
         if (!effectPools.ContainsKey(prefab))
+        {
             effectPools[prefab] = new Queue<GameObject>();
+        }
 
+        GameObject effectObj;
+
+        // ✅ 从池中取已有的对象
         if (effectPools[prefab].Count > 0)
-            return effectPools[prefab].Dequeue();
+        {
+            effectObj = effectPools[prefab].Dequeue();
+        }
+        else
+        {
+            // ✅ 如果池中没有，则实例化新的
+            effectObj = Instantiate(prefab, transform);
+        }
 
-        return Instantiate(prefab, transform);
+        // ✅ 保证取出的对象关联正确的 prefabKey（用于回收）
+        var lightningEffect = effectObj.GetComponent<LightningEffect>();
+        if (lightningEffect != null)
+        {
+            lightningEffect.SetPrefabKey(prefab);
+        }
+
+        return effectObj;
     }
+
     
     /// <summary>
     /// 从池获取特效并播放

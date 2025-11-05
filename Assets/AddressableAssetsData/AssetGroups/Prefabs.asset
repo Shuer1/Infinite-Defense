@@ -29,6 +29,11 @@ MonoBehaviour:
     m_SerializedLabels:
     - obj
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4b16347d322d2439796f23eb1ff67e1b
+    m_Address: Prefab_LightningBullet
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 8f8a30a0aa3484ecab92d1dce648f981
     m_Address: Prefab_Skeleton
     m_ReadOnly: 0
