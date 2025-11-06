@@ -10,7 +10,7 @@ public class FrostBullet : Bullet
 
     [Header("特效/音效")]
     public GameObject frostEffectPrefab;
-    public AudioSource hitSound;
+    public AudioClip hitSound;
     [Range(0,1.5f)] public float soundVolume = 1f;
 
     private int enemyLayer;
@@ -39,15 +39,16 @@ public class FrostBullet : Bullet
 
         int totalDamage = damage + extraFrostDamage;
 
-        // 播放特效和音效
+        // 播放特效
         if (frostEffectPrefab && ParticleEffectPool.Instance != null)
         {
             ParticleEffectPool.Instance.PlayEffect(frostEffectPrefab, transform.position, Quaternion.identity);
         }
 
-        if (hitSound != null && hitSound.clip != null)
+        // 播放音效
+        if (hitSound != null)
         {
-            AudioSource.PlayClipAtPoint(hitSound.clip, transform.position);
+            SoundManager.Instance.PlaySFX(hitSound, soundVolume);
         }
 
         // 对首个敌人造成伤害+减速

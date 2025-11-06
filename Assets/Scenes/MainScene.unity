@@ -2100,7 +2100,7 @@ GameObject:
   - component: {fileID: 469150680}
   - component: {fileID: 469150679}
   m_Layer: 0
-  m_Name: LightningSound
+  m_Name: HitSound
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -8,7 +8,7 @@ public class ExplosiveBullet : Bullet
 
     [Header("特效/音效")]
     public GameObject hitEffectPrefab;
-    public AudioSource hitSound;
+    public AudioClip hitSound;
     [Range(0,1.5f)] public float soundVolume = 1f;
 
     private int enemyLayer;
@@ -42,9 +42,10 @@ public class ExplosiveBullet : Bullet
             ParticleEffectPool.Instance.PlayEffect(hitEffectPrefab, transform.position, Quaternion.identity);
         }
 
-        if (hitSound != null && hitSound.clip != null)
+        // 播放音效
+        if (hitSound != null)
         {
-            AudioSource.PlayClipAtPoint(hitSound.clip, transform.position, soundVolume);
+            SoundManager.Instance.PlaySFX(hitSound, soundVolume);
         }
 
         // 首个直接命中的敌人

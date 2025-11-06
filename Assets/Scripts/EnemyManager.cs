@@ -7,6 +7,7 @@ public class EnemyManager : MonoBehaviour
     [Header("对象池设置")]
     public EnemyBase basicEnemyPrefab;  // 基础怪物预制体
     public EnemyBase heavyEnemyPrefab;  // 重型怪物预制体
+    public EnemyBase Monster1Prefab; // 怪物1预制体 -- 新增✅
     public int initialPoolSize = 10;    // 初始对象池大小
 
     [Header("分离设置")]
