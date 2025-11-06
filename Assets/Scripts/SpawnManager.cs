@@ -13,7 +13,7 @@ public class SpawnManager : MonoBehaviour
     public float xMax = 5f;
 
     [Header("波数设置")]
-    public int maxEnemyCount = 30;
+    public const int maxEnemyCount = 30;
     public int baseEnemyCount = 3;     // 第1波基础数量
     public int enemiesPerWaveIncrease = 2; // 每波增加的数量
     public float heavyEnemyBaseChance = 0.1f; // 第1波重型怪物概率
@@ -35,7 +35,6 @@ public class SpawnManager : MonoBehaviour
         enemyManager.OnAllEnemiesCleared += StartNextWave;
         // 启动当前波
         StartWave(currentWave);
-
     }
 
     private void StartWave(int wave) //新增
@@ -84,6 +83,9 @@ public class SpawnManager : MonoBehaviour
     private int CalculateEnemyCount(int wave) //限制敌人最大数量为30
     {
         int CalculateEnemyCount = baseEnemyCount + (wave - 1) * enemiesPerWaveIncrease;
+        if (CalculateEnemyCount > maxEnemyCount)
+            CalculateEnemyCount = maxEnemyCount;
+
         return Mathf.Min(CalculateEnemyCount, maxEnemyCount);
     }
 

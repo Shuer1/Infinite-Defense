@@ -7,7 +7,8 @@ public class EnemyManager : MonoBehaviour
     [Header("对象池设置")]
     public EnemyBase basicEnemyPrefab;  // 基础怪物预制体
     public EnemyBase heavyEnemyPrefab;  // 重型怪物预制体
-    public EnemyBase Monster1Prefab; // 怪物1预制体 -- 新增✅
+    public EnemyBase Monster1Prefab;    // 怪物1预制体 -- 新增✅
+    public EnemyBase Monster2Prefab;    // 怪物2预制体 -- 新增✅
     public int initialPoolSize = 10;    // 初始对象池大小
 
     [Header("分离设置")]
@@ -28,6 +29,8 @@ public class EnemyManager : MonoBehaviour
         // 初始化对象池
         InitializePool(EnemyType.Basic, basicEnemyPrefab);
         InitializePool(EnemyType.Heavy, heavyEnemyPrefab);
+        InitializePool(EnemyType.Monster1, Monster1Prefab);
+        InitializePool(EnemyType.Monster2, Monster2Prefab);
     }
 
     void Update()
@@ -92,7 +95,25 @@ public class EnemyManager : MonoBehaviour
         // 池为空时动态扩容
         if (pool.Count == 0)
         {
-            enemy = Instantiate(type == EnemyType.Basic ? basicEnemyPrefab : heavyEnemyPrefab, transform);
+            //enemy = Instantiate(type == EnemyType.Basic ? basicEnemyPrefab : heavyEnemyPrefab, transform);
+
+            EnemyBase prefabToInstantiate = type switch // 扩展方法，以兼容新怪物类型
+            {
+                EnemyType.Basic => basicEnemyPrefab,
+                EnemyType.Heavy => heavyEnemyPrefab,
+                EnemyType.Monster1 => Monster1Prefab,
+                EnemyType.Monster2 => Monster2Prefab,
+                _ => null
+            };
+
+            if (prefabToInstantiate == null)
+            {
+                Debug.LogError($"初始化{type}对象池失败：预制体为空！");
+                return null;
+            }
+
+            enemy = Instantiate(prefabToInstantiate, spawnPos, rotation, transform);
+
             enemy.enemyType = type;
             RegisterEnemyDeathCallback(enemy);
             // 对新实例化的敌人也要进行完整的状态重置
@@ -189,42 +210,46 @@ public class EnemyManager : MonoBehaviour
 
         int enemiesLevel = DataManager.GetInt(DataManager.EnemiesLevelKey);
 
-        int baseHP = DataManager.GetInt(DataManager.Enemy1MaxHealthKey);
-        int baseDamage = DataManager.GetInt(DataManager.Enemy1DamageKey);
-        int baseExp = DataManager.GetInt(DataManager.Enemy1ExpRewardKey);
-
-        int heavyHP = DataManager.GetInt(DataManager.Enemy2MaxHealthKey);
-        int heavyDamage = DataManager.GetInt(DataManager.Enemy2DamageKey);
-        int heavyExp = DataManager.GetInt(DataManager.Enemy2ExpRewardKey);
-
         // 刷新池中敌人
         foreach (var kvp in enemyPools)
         {
             foreach (var enemy in kvp.Value)
-                ApplyUpdatedStats(enemy, enemiesLevel, baseHP, baseDamage, baseExp, heavyHP, heavyDamage, heavyExp);
+                ApplyUpdatedStats(enemy, enemiesLevel);
         }
 
         // 刷新活跃敌人
         foreach (var enemy in activeEnemies)
-            ApplyUpdatedStats(enemy, enemiesLevel, baseHP, baseDamage, baseExp, heavyHP, heavyDamage, heavyExp);
+            ApplyUpdatedStats(enemy, enemiesLevel);
     }
     
-    private void ApplyUpdatedStats(EnemyBase enemy, int level, int baseHP, int baseDamage, int baseExp, int heavyHP, int heavyDamage, int heavyExp)
+    private void ApplyUpdatedStats(EnemyBase enemy, int level)
     {
         if (enemy == null) return;
 
         enemy.EnemiesLevel = level;
-        if (enemy.enemyType == EnemyType.Basic)
+        
+        switch (enemy.enemyType)
         {
-            enemy.maxHealth = baseHP;
-            enemy.damage = baseDamage;
-            enemy.expReward = baseExp;
-        }
-        else
-        {
-            enemy.maxHealth = heavyHP;
-            enemy.damage = heavyDamage;
-            enemy.expReward = heavyExp;
+            case EnemyType.Basic:
+                enemy.maxHealth = DataManager.GetInt(DataManager.Enemy1MaxHealthKey);
+                enemy.damage = DataManager.GetInt(DataManager.Enemy1DamageKey);
+                enemy.expReward = DataManager.GetInt(DataManager.Enemy1ExpRewardKey);
+                break;
+            case EnemyType.Heavy:
+                enemy.maxHealth = DataManager.GetInt(DataManager.Enemy2MaxHealthKey);
+                enemy.damage = DataManager.GetInt(DataManager.Enemy2DamageKey);
+                enemy.expReward = DataManager.GetInt(DataManager.Enemy2ExpRewardKey);
+                break;
+            case EnemyType.Monster1:
+                enemy.maxHealth = DataManager.GetInt(DataManager.Monster1MaxHealthKey);
+                enemy.damage = DataManager.GetInt(DataManager.Monster1DamageKey);
+                enemy.expReward = DataManager.GetInt(DataManager.Monster1ExpRewardKey);
+                break;
+            case EnemyType.Monster2:
+                enemy.maxHealth = DataManager.GetInt(DataManager.Monster2MaxHealthKey);
+                enemy.damage = DataManager.GetInt(DataManager.Monster2DamageKey);
+                enemy.expReward = DataManager.GetInt(DataManager.Monster2ExpRewardKey);
+                break;
         }
 
         enemy.currentHealth = Mathf.Min(enemy.currentHealth, enemy.maxHealth);

@@ -5492,6 +5492,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   basicEnemyPrefab: {fileID: -1206824888230949408, guid: c489516f0a6e64537ad2f94f22afc313, type: 3}
   heavyEnemyPrefab: {fileID: 7997829624179449316, guid: 8f8a30a0aa3484ecab92d1dce648f981, type: 3}
+  Monster1Prefab: {fileID: 0}
+  Monster2Prefab: {fileID: 0}
   initialPoolSize: 10
   separationRadius: 1
   separationForce: 1
@@ -8361,7 +8363,6 @@ MonoBehaviour:
   spawn_LineFiled: {fileID: 450734461}
   xMin: -4.5
   xMax: 4.5
-  maxEnemyCount: 30
   baseEnemyCount: 3
   enemiesPerWaveIncrease: 1
   heavyEnemyBaseChance: 0.1
@@ -9010,7 +9011,7 @@ MonoBehaviour:
   - upgradeType: 8
     displayName: PlusLightning
     description: MoreLightningCount
-    cardImage: {fileID: 21300000, guid: 8c86c8c12712945daabd1335bbda1adf, type: 3}
+    cardImage: {fileID: 21300000, guid: 628a278f7678f4565b2c0a8ae6cfdd60, type: 3}
     value: 1
     type: 8
   playerController: {fileID: 942823808}

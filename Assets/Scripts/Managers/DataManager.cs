@@ -29,10 +29,14 @@ public static class DataManager
     public const string Enemy2MaxHealthKey = "HeavyEnemyMaxHealth";
     public const string Enemy2DamageKey = "HeavyEnemyDamage";
     public const string Enemy2ExpRewardKey = "HeavyEnemyExpReward";
-    // 敌人3
+    // 怪物1
     public const string Monster1MaxHealthKey = "Monster1MaxHealth";
     public const string Monster1DamageKey = "Monster1Damage";
     public const string Monster1ExpRewardKey = "Monster1ExpReward";
+    // 怪物2
+    public const string Monster2MaxHealthKey = "Monster2MaxHealth";
+    public const string Monster2DamageKey = "Monster2Damage";
+    public const string Monster2ExpRewardKey = "Monster2ExpReward";
 
     // 子弹数据（Int）✅
     public const string BaseBulletDamageKey = "BaseBulletDamage";

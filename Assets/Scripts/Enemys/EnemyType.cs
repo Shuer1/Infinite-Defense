@@ -4,5 +4,6 @@ public enum EnemyType
 {
     Basic,
     Heavy,
-    Monster1
+    Monster1,
+    Monster2
 }
