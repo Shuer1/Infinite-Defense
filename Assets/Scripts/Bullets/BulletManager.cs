@@ -33,17 +33,17 @@ public class BulletManager : MonoBehaviour
     // =========================================================
     private void InitializeBulletChances()
     {
-        bulletChances[BulletType.Normal]    = DataManager.GetInt(DataManager.NormalBulletChanceKey, 70);
-        bulletChances[BulletType.Explosive] = DataManager.GetInt(DataManager.ExplosiveBulletChanceKey, 10);
-        bulletChances[BulletType.Frost]     = DataManager.GetInt(DataManager.FrostBulletChanceKey, 10);
-        bulletChances[BulletType.Lightning] = DataManager.GetInt(DataManager.LightningBulletChanceKey, 10);
+        bulletChances[BulletType.Normal]    = DataManager.GetInt(DataManager.NormalBulletChanceKey, BulletsChanceConfig.NormalBulletChance);
+        bulletChances[BulletType.Explosive] = DataManager.GetInt(DataManager.ExplosiveBulletChanceKey, BulletsChanceConfig.ExplosiveBulletChance);
+        bulletChances[BulletType.Frost]     = DataManager.GetInt(DataManager.FrostBulletChanceKey, BulletsChanceConfig.FrostBulletChance);
+        bulletChances[BulletType.Lightning] = DataManager.GetInt(DataManager.LightningBulletChanceKey, BulletsChanceConfig.LightningBulletChance);
         ClampAndNormalizeChances();
         SaveBulletChances();
     }
 
     private void SaveBulletChances()
     {
-        DataManager.SaveInt(DataManager.NormalBulletChanceKey, bulletChances[BulletType.Normal]);
+        DataManager.SaveIntForce(DataManager.NormalBulletChanceKey, bulletChances[BulletType.Normal]);
         DataManager.SaveInt(DataManager.ExplosiveBulletChanceKey, bulletChances[BulletType.Explosive]);
         DataManager.SaveInt(DataManager.FrostBulletChanceKey, bulletChances[BulletType.Frost]);
         DataManager.SaveInt(DataManager.LightningBulletChanceKey, bulletChances[BulletType.Lightning]);

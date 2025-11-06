@@ -126,7 +126,7 @@ MonoBehaviour:
   extraFrostDamage: 3
   slowPercentage: 50
   slowDuration: 0.5
-  frostEffectPrefab: {fileID: 6004755151496686226, guid: ae205193434e84fe6a5e291b48c4d5d4, type: 3}
+  frostEffectPrefab: {fileID: 3323387954473017891, guid: 0b912e9003fba894faa88cf964a6fb8a, type: 3}
   hitSound: {fileID: 9178434191979648313}
   soundVolume: 1
 --- !u!82 &9178434191979648313

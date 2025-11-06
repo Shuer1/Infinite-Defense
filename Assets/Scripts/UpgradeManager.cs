@@ -28,7 +28,9 @@ public class UpgradeManager : MonoBehaviour
     private const float FIRE_RATE_REDUCTION_MULTIPLIER = 0.01f;
     private const float SLOW_DURATION_MULTIPLIER = 0.25f;
     private const float EXPLOSION_RANGE_MULTIPLIER = 0.2f;
-    private const float MIN_FIRE_RATE = 0.1f;
+    private const float MIN_FIRE_RATE = 0.2f;
+    private const float MAX_SLOW_DURATION = 2.5f;
+    private const float MAX_EXPLOSION_RANGE = 2f;
 
     private void Awake()
     {
@@ -300,7 +302,7 @@ public class UpgradeManager : MonoBehaviour
 
         float currentDuration = DataManager.GetFloat(DataManager.FrostFreezeDurationKey);
         float addDuration = value * SLOW_DURATION_MULTIPLIER;
-        float newDuration = currentDuration + addDuration;
+        float newDuration = Mathf.Min(MAX_SLOW_DURATION, currentDuration + addDuration); // 限制最大时长
 
         BulletManager.Instance.UpdateBulletSpecialValue(BulletType.Frost, 1, newDuration);
 
@@ -318,7 +320,7 @@ public class UpgradeManager : MonoBehaviour
 
         float currentRange = DataManager.GetFloat(DataManager.ExplosionRangeKey);
         float addRange = value * EXPLOSION_RANGE_MULTIPLIER;
-        float newRange = currentRange + addRange;
+        float newRange = Mathf.Min(MAX_EXPLOSION_RANGE, currentRange + addRange);
 
         BulletManager.Instance.UpdateBulletSpecialValue(BulletType.Explosive, 1, newRange);
 

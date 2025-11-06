@@ -3,6 +3,7 @@ using UnityEditor;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public class PlayerController : MonoBehaviour
 {
@@ -195,20 +196,41 @@ public class PlayerController : MonoBehaviour
     void LevelUp()
     {
         level++;
+
+        // 1) 计算下一级所需经验
+        if (level <= 15)
+        {
+            // 线性段：1 级 100，每级 +120，可任意改基值与步长
+            experienceToNextLevel = 100 + (level - 1) * 120;
+        }
+        else
+        {
+            // 指数段：以 15 级的线性末端为“锚点”做平滑衔接
+            // 先求出 15 级时线性公式给出的值
+            int lv15Exp = 100 + (15 - 1) * 120;   // = 1780
+
+            // 指数增长：1780 * q^(level-15) ，q 取 1.48 与原 1.48 保持一致
+            experienceToNextLevel = Mathf.RoundToInt(lv15Exp * Mathf.Pow(1.48f, level - 15));
+        }
+
+        // 2) 清零当前经验
         experience = 0;
-        experienceToNextLevel = Mathf.RoundToInt(100 * Mathf.Pow(1.2f, level - 1)); // 每次升级需要更多经验
+
+        // 3) 回血、刷新 UI
         currentHealth = health;
-        //升级刷新恢复血量和更新等级
         UIManager.Instance?.UpdateAndShowPlayerHP(currentHealth, health);
         UIManager.Instance?.ShowLevel(level);
 
-        //⚠️新增
-        DefenseTowerController.Instance.currentHealth = Mathf.Min(DefenseTowerController.Instance.maxHealth,
-        DefenseTowerController.Instance.currentHealth + DefenseTowerController.Instance.maxHealth / 3);
-        UIManager.Instance?.UpdateAndShowTowerHP(DefenseTowerController.Instance.currentHealth, DefenseTowerController.Instance.maxHealth);
+        // 4) 防御塔回血（1/3 上限）
+        var tower = DefenseTowerController.Instance;
+        if (tower != null)
+        {
+            tower.currentHealth = Mathf.Min(tower.maxHealth, tower.currentHealth + tower.maxHealth / 3);
+            UIManager.Instance?.UpdateAndShowTowerHP(tower.currentHealth, tower.maxHealth);
+        }
 
+        // 5) 弹出升级面板 & 存档
         UpgradeManager.Instance?.ShowUpgradeOptions();
-        //保存数据
         DataManager.SaveInt(DataManager.PlayerLevelKey, level);
         DataManager.SaveInt(DataManager.NextLevelExpKey, experienceToNextLevel);
     }

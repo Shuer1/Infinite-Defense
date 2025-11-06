@@ -133,6 +133,7 @@ public class ParticleEffectPool : MonoBehaviour  //单例
         }
 
         // 重置特效状态并播放
+        position.y = 0f;
         effect.transform.position = position;
         effect.transform.rotation = rotation;
         effect.SetActive(true);

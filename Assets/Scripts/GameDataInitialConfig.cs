@@ -28,10 +28,10 @@ public static class BulletsInitialConfig
 
 public static class BulletsChanceConfig
 {
-    public const int NormalBulletChance = 70;
+    public const int NormalBulletChance = 80;
     public const int ExplosiveBulletChance = 10;
-    public const int FrostBulletChance = 10;
-    public const int LightningBulletChance = 10;
+    public const int FrostBulletChance = 6;
+    public const int LightningBulletChance = 4;
 }
 
 public static class EnemysInitialConfig
