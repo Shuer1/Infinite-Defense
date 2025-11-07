@@ -38,11 +38,11 @@ public static class EnemysInitialConfig
 {
     public const int EnemiesLevel = 1;
     //敌人1
-    public const int Enemy1MaxHealth = 150;
+    public const int Enemy1MaxHealth = 200;
     public const int Enemy1Damage = 20;
     public const int Enemy1ExpReward = 10;
     //敌人2
-    public const int Enemy2MaxHealth = 200;
+    public const int Enemy2MaxHealth = 300;
     public const int Enemy2Damage = 35;
     public const int Enemy2ExpReward = 25;
     //怪物1

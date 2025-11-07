@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class SpawnManager : MonoBehaviour
 {
-    public EnemyManager enemyManager;  // 引用敌人管理器
+    public EnemyManager enemyManager;
     public Transform spawn_LineFiled;
 
     [Header("X轴范围设置")]
@@ -14,45 +14,39 @@ public class SpawnManager : MonoBehaviour
 
     [Header("波数设置")]
     public const int maxEnemyCount = 30;
-    public int baseEnemyCount = 3;     // 第1波基础数量
-    public int enemiesPerWaveIncrease = 2; // 每波增加的数量
-    public float heavyEnemyBaseChance = 0.1f; // 第1波重型怪物概率
-    public float heavyExtraChancePerWave = 0.02f;  // 每波增加的重型概率
+    public int baseEnemyCount = 3;
+    public int enemiesPerWaveIncrease = 2;
+    public float heavyEnemyBaseChance = 0.1f;
+    public float heavyExtraChancePerWave = 0.02f;
     public event Action OnWaveCompleted;
 
-    [Header("进度UI信息配置")]
-    private int currentWave = 1;
+    [Header("UI与间隔")]
     public UnityEngine.UI.Image uiPartImg;
-    [Header("波数间隔设置")]
-    public float waveStartDelay = 4f; //留出时间作为加载延迟造成的time waste
+    public float waveStartDelay = 4f;
     private Coroutine waveStartCoroutine;
+
+    private int currentWave;
 
     void Start()
     {
-        //初始化存档波数
         currentWave = DataManager.GetInt(DataManager.CurrentWaveKey);
-        // 注册波数完成事件
-        enemyManager.OnAllEnemiesCleared += StartNextWave;
-        // 启动当前波
+        if (enemyManager != null)
+            enemyManager.OnAllEnemiesCleared += StartNextWave;
         StartWave(currentWave);
     }
 
-    private void StartWave(int wave) //新增
+    private void StartWave(int wave)
     {
         Debug.Log($"开始第{wave}波！");
         if (waveStartCoroutine != null)
             StopCoroutine(waveStartCoroutine);
         waveStartCoroutine = StartCoroutine(StartWaveCoroutine(wave));
-
     }
-    
-    private IEnumerator StartWaveCoroutine(int wave) //⚠️新增:倒计时3s
+
+    private IEnumerator StartWaveCoroutine(int wave)
     {
         UIManager.Instance.AutoShowCurrentWaveUI(uiPartImg, wave);
-        Debug.Log("Next Wave !倒计时开始！");
-
         yield return new WaitForSeconds(waveStartDelay - 3f);
-
         for (int count = 3; count >= 1; count--)
         {
             UIManager.Instance.UpdateCountdownUI(count);
@@ -61,47 +55,68 @@ public class SpawnManager : MonoBehaviour
         UIManager.Instance.HideAllCountdownImages();
 
         int enemyCount = CalculateEnemyCount(wave);
-        float heavyChance = CalculateHeavyChance(wave);
 
-        for (int i = 0; i < enemyCount; i++)
+        /* ✅ 提前决定整波特殊怪数量（只触发一次） */
+        int specialMonsterCount = 0;
+        if (wave > 10)
         {
-            Vector3 spawnPos = new Vector3(
+            float triggerChance = UnityEngine.Random.Range(0.3f, 0.45f);
+            if (UnityEngine.Random.value < triggerChance)
+            {
+                if (wave <= 20) specialMonsterCount = 1;
+                else if (wave <= 30) specialMonsterCount = UnityEngine.Random.Range(1, 3); // 1或2
+                else specialMonsterCount = UnityEngine.Random.Range(1, 4);               // 1~3
+            }
+        }
+
+        int spawned = 0;
+        int specialSpawned = 0;
+
+        while (spawned < enemyCount)
+        {
+            /* ✅ 优先生成特殊怪 */
+            if (specialSpawned < specialMonsterCount)
+            {
+                Vector3 spawnPos = new Vector3(
+                    UnityEngine.Random.Range(xMin, xMax),
+                    spawn_LineFiled.position.y,
+                    spawn_LineFiled.position.z);
+
+                EnemyType mType = UnityEngine.Random.value < 0.5f ? EnemyType.Monster1 : EnemyType.Monster2;
+                enemyManager.GetEnemy(mType, spawnPos, Quaternion.identity);
+                spawned++;
+                specialSpawned++;
+                yield return new WaitForSeconds(0.2f);
+                continue;
+            }
+
+            /* ✅ 剩余生成普通怪 */
+            float heavyChance = CalculateHeavyChance(wave);
+            EnemyType chosenType = UnityEngine.Random.value < heavyChance ? EnemyType.Heavy : EnemyType.Basic;
+
+            Vector3 pos = new Vector3(
                 UnityEngine.Random.Range(xMin, xMax),
                 spawn_LineFiled.position.y,
-                spawn_LineFiled.position.z
-            );
-            
-            EnemyType type = UnityEngine.Random.value < heavyChance ? EnemyType.Heavy : EnemyType.Basic;
-            enemyManager.GetEnemy(type, spawnPos, Quaternion.identity);
-            
-            // 敌人生成间隔，避免扎堆
+                spawn_LineFiled.position.z);
+
+            enemyManager.GetEnemy(chosenType, pos, Quaternion.identity);
+            spawned++;
             yield return new WaitForSeconds(0.2f);
         }
     }
 
-    // 计算当前波怪物总数
-    private int CalculateEnemyCount(int wave) //限制敌人最大数量为30
-    {
-        int CalculateEnemyCount = baseEnemyCount + (wave - 1) * enemiesPerWaveIncrease;
-        if (CalculateEnemyCount > maxEnemyCount)
-            CalculateEnemyCount = maxEnemyCount;
+    private int CalculateEnemyCount(int wave) =>
+        Mathf.Min(baseEnemyCount + (wave - 1) * enemiesPerWaveIncrease, maxEnemyCount);
 
-        return Mathf.Min(CalculateEnemyCount, maxEnemyCount);
-    }
+    private float CalculateHeavyChance(int wave) =>
+        Mathf.Clamp01(heavyEnemyBaseChance + (wave - 1) * heavyExtraChancePerWave);
 
-    // 计算当前波重型怪物概率（上限100%）
-    private float CalculateHeavyChance(int wave)
-    {
-        return Mathf.Clamp01(heavyEnemyBaseChance + (wave - 1) * heavyExtraChancePerWave);
-    }
-
-    // 开始下一波
     private void StartNextWave()
     {
         currentWave++;
         DataManager.SaveInt(DataManager.CurrentWaveKey, currentWave);
         StartWave(currentWave);
-        OnWaveCompleted?.Invoke(); // 触发波数完成事件
+        OnWaveCompleted?.Invoke();
     }
 
     private void OnDestroy()

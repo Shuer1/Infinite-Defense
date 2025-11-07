@@ -9,7 +9,7 @@ public class EnemyManager : MonoBehaviour
     public EnemyBase heavyEnemyPrefab;  // 重型怪物预制体
     public EnemyBase Monster1Prefab;    // 怪物1预制体 -- 新增✅
     public EnemyBase Monster2Prefab;    // 怪物2预制体 -- 新增✅
-    public int initialPoolSize = 10;    // 初始对象池大小
+    public int initialPoolSize = 5;    // 初始对象池大小
 
     [Header("分离设置")]
     public float separationRadius = 1.5f;
@@ -27,10 +27,10 @@ public class EnemyManager : MonoBehaviour
     void Awake()
     {
         // 初始化对象池
-        InitializePool(EnemyType.Basic, basicEnemyPrefab);
-        InitializePool(EnemyType.Heavy, heavyEnemyPrefab);
-        InitializePool(EnemyType.Monster1, Monster1Prefab);
-        InitializePool(EnemyType.Monster2, Monster2Prefab);
+        InitializePool(EnemyType.Basic, basicEnemyPrefab, 5);
+        InitializePool(EnemyType.Heavy, heavyEnemyPrefab, 5);
+        InitializePool(EnemyType.Monster1, Monster1Prefab, 3);
+        InitializePool(EnemyType.Monster2, Monster2Prefab, 3);
     }
 
     void Update()
@@ -75,6 +75,27 @@ public class EnemyManager : MonoBehaviour
             enemy.gameObject.SetActive(false);
             enemy.enemyType = type; // 确保敌人类型正确
             RegisterEnemyDeathCallback(enemy); // 注册死亡回调
+            pool.Enqueue(enemy);
+        }
+        enemyPools[type] = pool;
+    }
+
+    // ✅ 新增重载：允许自定义初始数量
+    private void InitializePool(EnemyType type, EnemyBase prefab, int customCount)
+    {
+        if (prefab == null)
+        {
+            Debug.LogError($"初始化{type}对象池失败：预制体为空！");
+            return;
+        }
+
+        Queue<EnemyBase> pool = new Queue<EnemyBase>();
+        for (int i = 0; i < customCount; i++)
+        {
+            EnemyBase enemy = Instantiate(prefab, transform);
+            enemy.gameObject.SetActive(false);
+            enemy.enemyType = type;
+            RegisterEnemyDeathCallback(enemy);
             pool.Enqueue(enemy);
         }
         enemyPools[type] = pool;
