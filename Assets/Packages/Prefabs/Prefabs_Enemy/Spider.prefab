@@ -225,8 +225,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 4155713699296038862}
   - {fileID: 6522540446020068846}
@@ -249,7 +249,7 @@ Animator:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 917721915748924745}
   m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: eaa6c567d9ea03744a0d4ea30cfe9f99, type: 3}
+  m_Avatar: {fileID: 9000000, guid: bc600cce01eb57a409f4e69025868a2c, type: 3}
   m_Controller: {fileID: 9100000, guid: 5dbb6bed3df714dd889c5f3c21ddc77b, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
@@ -305,8 +305,8 @@ MonoBehaviour:
   maxHealth: 0
   currentHealth: 0
   damage: 0
-  moveSpeed: 0.7
-  originalMoveSpeed: 0.7
+  moveSpeed: 0.6
+  originalMoveSpeed: 0.6
   expReward: 0
   scoreReward: 0
   isDead: 0
@@ -332,8 +332,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0.5, z: 0}
+  m_Size: {x: 1, y: 2, z: 1}
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!136 &-2559698460897506328
 CapsuleCollider:
   m_ObjectHideFlags: 0
