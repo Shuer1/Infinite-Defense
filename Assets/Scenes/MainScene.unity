@@ -5492,7 +5492,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   basicEnemyPrefab: {fileID: -1206824888230949408, guid: c489516f0a6e64537ad2f94f22afc313, type: 3}
   heavyEnemyPrefab: {fileID: 7997829624179449316, guid: 8f8a30a0aa3484ecab92d1dce648f981, type: 3}
-  Monster1Prefab: {fileID: 0}
+  Monster1Prefab: {fileID: 8516743720221433322, guid: 6a8349e2d3de94ef7a77c76174ff6601, type: 3}
   Monster2Prefab: {fileID: 0}
   initialPoolSize: 10
   separationRadius: 1
