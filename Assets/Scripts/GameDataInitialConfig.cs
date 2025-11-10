@@ -3,6 +3,7 @@ public static class PlayerInitialConfig
 {
     // 玩家初始属性
     public const int MaxHealth = 100;       // 初始最大生命值
+    public const int TowerMaxHP = 500;
     public const int Level = 1;             // 初始等级
     public const int NextLevelExp = 100;    // 初始下一级经验
     public const float ShootInterval = 0.3f; // 初始发射周期
@@ -28,10 +29,10 @@ public static class BulletsInitialConfig
 
 public static class BulletsChanceConfig
 {
-    public const int NormalBulletChance = 80;
-    public const int ExplosiveBulletChance = 10;
-    public const int FrostBulletChance = 6;
-    public const int LightningBulletChance = 4;
+    public const int NormalBulletChance = 100;
+    public const int ExplosiveBulletChance = 0;
+    public const int FrostBulletChance = 0;
+    public const int LightningBulletChance = 0;
 }
 
 public static class EnemysInitialConfig
@@ -40,19 +41,19 @@ public static class EnemysInitialConfig
     //敌人1
     public const int Enemy1MaxHealth = 200;
     public const int Enemy1Damage = 20;
-    public const int Enemy1ExpReward = 10;
+    public const int Enemy1ExpReward = 20;
     //敌人2
     public const int Enemy2MaxHealth = 300;
     public const int Enemy2Damage = 35;
-    public const int Enemy2ExpReward = 25;
+    public const int Enemy2ExpReward = 30;
     //怪物1
-    public const int Monster1MaxHealth = 2000;
+    public const int Monster1MaxHealth = 1500;
     public const int Monster1Damage = 50;
     public const int Monster1ExpReward = 50;
     //怪物2
-    public const int Monster2MaxHealth = 2800;
-    public const int Monster2Damage = 75;
-    public const int Monster2ExpReward = 100;
+    public const int Monster2MaxHealth = 1800;
+    public const int Monster2Damage = 70;
+    public const int Monster2ExpReward = 75;
 
 }
 

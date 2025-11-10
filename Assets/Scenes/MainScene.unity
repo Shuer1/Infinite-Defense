@@ -4695,7 +4695,7 @@ Transform:
   m_GameObject: {fileID: 783500681}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.2, z: -12.5}
+  m_LocalPosition: {x: 0, y: -0.2, z: -13.38}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5837,7 +5837,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   effectConfigs:
-  - effectPrefab: {fileID: 8602304315960938330, guid: f183a4f2538424d42aab1b82a46567cb, type: 3}
+  - effectPrefab: {fileID: 6499532851927768924, guid: 3fce5ab2182394ea2bdc2525fc88751d, type: 3}
     initialSize: 3
   - effectPrefab: {fileID: 3323387954473017891, guid: 0b912e9003fba894faa88cf964a6fb8a, type: 3}
     initialSize: 3
@@ -5897,11 +5897,11 @@ MonoBehaviour:
     poolSize: 3
     allowExpand: 1
   - bulletType: 2
-    bulletPrefab: {fileID: 1798052242460508876, guid: a7f7c92e4227049f5b634ae1c99edcb2, type: 3}
+    bulletPrefab: {fileID: 2708412164748546351, guid: 72693114be55d4f1da1e5cbdb63fe058, type: 3}
     poolSize: 3
     allowExpand: 1
   - bulletType: 3
-    bulletPrefab: {fileID: 1798052242460508876, guid: 4b16347d322d2439796f23eb1ff67e1b, type: 3}
+    bulletPrefab: {fileID: 4627397464917972297, guid: 8ca6052be4fa645b79667f999d981542, type: 3}
     poolSize: 3
     allowExpand: 1
 --- !u!1 &1075028230
@@ -6893,7 +6893,7 @@ Transform:
   m_GameObject: {fileID: 1361014208}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 5.63, y: -0.2, z: -11.046}
+  m_LocalPosition: {x: 5.63, y: -0.2, z: -11.27}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6918,7 +6918,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 4, y: 1, z: 0.2}
+  m_Size: {x: 4.4, y: 1, z: 0.2}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1386358225
 GameObject:
@@ -8155,7 +8155,7 @@ Transform:
   m_GameObject: {fileID: 1625010799}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -6.12, y: -0.2, z: -11.018}
+  m_LocalPosition: {x: -6.12, y: -0.2, z: -11.242001}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8180,7 +8180,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 4, y: 1, z: 0.2}
+  m_Size: {x: 4.4, y: 1, z: 0.2}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1637372546
 GameObject:
@@ -8969,6 +8969,12 @@ MonoBehaviour:
   heavyEnemyDamageDeltaValue: 10
   baseEnemyExpDeltaValue: 5
   heavyEnemyExpDeltaValue: 10
+  Monster1MaxHPDeltaValue: 350
+  Monster1DamageDeltaValue: 20
+  Monster1ExpDeltaValue: 65
+  Monster2MaxHPDeltaValue: 500
+  Monster2DamageDeltaValue: 25
+  Monster2ExpDeltaValue: 80
 --- !u!4 &1742370149
 Transform:
   m_ObjectHideFlags: 0
@@ -9121,19 +9127,19 @@ MonoBehaviour:
     displayName: ExplosiveBullet
     description: More chance & damage
     cardImage: {fileID: 21300000, guid: 908aafae518114a35a786b70355a683a, type: 3}
-    value: 2
+    value: 5
     type: 3
   - upgradeType: 4
     displayName: FrostBullet
     description: More chance & damage
     cardImage: {fileID: 21300000, guid: 143b1cdf5322c4a1d86476f72a48cd1c, type: 3}
-    value: 2
+    value: 5
     type: 4
   - upgradeType: 5
     displayName: PlusLightning
     description: More chance & damage
     cardImage: {fileID: 21300000, guid: 428f543e7ac314d8c8eaf45feee9d4fb, type: 3}
-    value: 2
+    value: 5
     type: 5
   - upgradeType: 6
     displayName: RangeUp

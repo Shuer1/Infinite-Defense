@@ -55,7 +55,9 @@ public class GameManager : MonoBehaviour
         DataManager.InitializeFloatData(DataManager.PlayerShootSpeedKey, PlayerInitialConfig.ShootInterval);
         DataManager.InitializeIntData(DataManager.CurrentPropCountKey, PlayerInitialConfig.CurrentPropCount);
         // tower health
-        DataManager.InitializeIntData(DataManager.DefenseTowerMaxHPKey, 500);
+        DataManager.InitializeIntData(DataManager.DefenseTowerMaxHPKey, PlayerInitialConfig.TowerMaxHP);
+        // PropsStatus
+        DataManager.InitializeIntData(DataManager.PropsStatusKey, 1); // 1: 表示可道具状态可获得 0: 表示不可获得道具
     }
 
     private void InitializeEnemyData()

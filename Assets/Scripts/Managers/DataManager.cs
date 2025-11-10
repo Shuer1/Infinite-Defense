@@ -15,6 +15,7 @@ public static class DataManager
     public const string CurrentPropCountKey = "CurrentPropCount";
     public const string LastestVolumeKey = "LastestVolume";
     public const string ClearEnemiesCountKey = "ClearEnemiesCount";
+    public const string PropsStatusKey = "PropsStatus";
 
     // 城墙DefenseTower数据（Int）
     public const string DefenseTowerMaxHPKey = "DefenseTowerMaxHP";
