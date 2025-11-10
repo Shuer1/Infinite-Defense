@@ -56,8 +56,6 @@ public class GameManager : MonoBehaviour
         DataManager.InitializeIntData(DataManager.CurrentPropCountKey, PlayerInitialConfig.CurrentPropCount);
         // tower health
         DataManager.InitializeIntData(DataManager.DefenseTowerMaxHPKey, PlayerInitialConfig.TowerMaxHP);
-        // PropsStatus
-        DataManager.InitializeIntData(DataManager.PropsStatusKey, 1); // 1: 表示可道具状态可获得 0: 表示不可获得道具
     }
 
     private void InitializeEnemyData()
@@ -78,6 +76,10 @@ public class GameManager : MonoBehaviour
         DataManager.InitializeIntData(DataManager.Enemy2ExpRewardKey, EnemysInitialConfig.Enemy2ExpReward);
         DataManager.InitializeIntData(DataManager.Monster1ExpRewardKey, EnemysInitialConfig.Monster1ExpReward);
         DataManager.InitializeIntData(DataManager.Monster2ExpRewardKey, EnemysInitialConfig.Monster2ExpReward);
+        // first kill info : 默认未击杀
+        DataManager.InitializeIntData(DataManager.FirstKillMonster1Key, 0);
+        DataManager.InitializeIntData(DataManager.FirstKillMonster2Key, 0);
+
     }
 
     private void InitializeBulletData()

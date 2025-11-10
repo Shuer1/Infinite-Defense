@@ -15,4 +15,10 @@ public class Monster1 : EnemyBase
         damage = DataManager.GetInt(DataManager.Monster1DamageKey);
         expReward = DataManager.GetInt(DataManager.Monster1ExpRewardKey);
     }
+
+    protected override void Die() // Override logic of Die function. Add the detection of first killed.
+    {
+        base.Die();
+        
+    }
 }

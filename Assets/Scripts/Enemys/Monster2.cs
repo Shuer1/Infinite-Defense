@@ -15,4 +15,9 @@ public class Monster2 : EnemyBase
         damage = DataManager.GetInt(DataManager.Monster2DamageKey);
         expReward = DataManager.GetInt(DataManager.Monster2ExpRewardKey);
     }
+
+    protected override void Die() // 重写死亡逻辑，增加（被）首杀检查
+    {
+        base.Die();
+    }
 }

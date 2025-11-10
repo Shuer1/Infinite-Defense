@@ -15,8 +15,6 @@ public static class DataManager
     public const string CurrentPropCountKey = "CurrentPropCount";
     public const string LastestVolumeKey = "LastestVolume";
     public const string ClearEnemiesCountKey = "ClearEnemiesCount";
-    public const string PropsStatusKey = "PropsStatus";
-
     // 城墙DefenseTower数据（Int）
     public const string DefenseTowerMaxHPKey = "DefenseTowerMaxHP";
 
@@ -38,7 +36,9 @@ public static class DataManager
     public const string Monster2MaxHealthKey = "Monster2MaxHealth";
     public const string Monster2DamageKey = "Monster2Damage";
     public const string Monster2ExpRewardKey = "Monster2ExpReward";
-
+    // 首杀怪物标记
+    public const string FirstKillMonster1Key = "FirstKillMonster1";
+    public const string FirstKillMonster2Key = "FirstKillMonster2";
     // 子弹数据（Int）✅
     public const string BaseBulletDamageKey = "BaseBulletDamage";
     //烈焰弹
