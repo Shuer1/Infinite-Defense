@@ -13,6 +13,7 @@ public static class DataManager
     public const string NextLevelExpKey = "NextLevelExp";
     public const string PlayerShootSpeedKey = "PlayerShootSpeed";
     public const string CurrentPropCountKey = "CurrentPropCount";
+    public const string CurrentTicketCountKey = "CurrentTicketCount";
     public const string LastestVolumeKey = "LastestVolume";
     public const string ClearEnemiesCountKey = "ClearEnemiesCount";
     // 城墙DefenseTower数据（Int）
@@ -36,7 +37,7 @@ public static class DataManager
     public const string Monster2MaxHealthKey = "Monster2MaxHealth";
     public const string Monster2DamageKey = "Monster2Damage";
     public const string Monster2ExpRewardKey = "Monster2ExpReward";
-    // 首杀怪物标记
+    // 首杀怪物标记：0 未击杀，1 已击杀 默认值0
     public const string FirstKillMonster1Key = "FirstKillMonster1";
     public const string FirstKillMonster2Key = "FirstKillMonster2";
     // 子弹数据（Int）✅

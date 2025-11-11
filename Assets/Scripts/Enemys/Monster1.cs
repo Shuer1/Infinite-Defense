@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class Monster1 : EnemyBase
 {
+    public GameObject propPrefab;
     new void Start()
     {
         base.Start();
@@ -20,6 +21,10 @@ public class Monster1 : EnemyBase
     protected override void Die() // Override logic of Die function. Add the detection of first killed.
     {
         base.Die();
-        FirstKillRewardManager.Instance?.TryGrantFirstKillReward(enemyType);
+
+        if (FirstKillRewardManager.Instance != null && FirstKillRewardManager.Instance?.ShouldShowFKPanel(enemyType) == true)
+        {
+            UIManager.Instance?.ShowFirstKillPanel(enemyType);
+        }
     }
 }

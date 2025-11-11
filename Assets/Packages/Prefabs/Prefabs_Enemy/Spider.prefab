@@ -308,7 +308,7 @@ MonoBehaviour:
   moveSpeed: 0.6
   originalMoveSpeed: 0.6
   expReward: 0
-  scoreReward: 0
+  scoreReward: 5
   isDead: 0
   attackRange: 2.5
   chaseRange: 3

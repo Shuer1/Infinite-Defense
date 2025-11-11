@@ -20,5 +20,10 @@ public class Monster2 : EnemyBase
     protected override void Die() // 重写死亡逻辑，增加（被）首杀检查
     {
         base.Die();
+
+        if (FirstKillRewardManager.Instance != null && FirstKillRewardManager.Instance?.ShouldShowFKPanel(enemyType) == true)
+        {
+            UIManager.Instance?.ShowFirstKillPanel(enemyType);
+        }
     }
 }

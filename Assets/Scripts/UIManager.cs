@@ -25,10 +25,17 @@ public class UIManager : MonoBehaviour
     public int historyClearEnemiesWave = 0;
     public SpawnManager spawnManager;
     public TextMeshProUGUI propCount;
+    public TextMeshProUGUI ticketCountTMP; //新增✅
+    public int currentTicketCount;
     public TextMeshProUGUI tempCurrentWaveTMP;
     private Coroutine _currentShowCoroutine;
     [Header("Upgrade Panel")]
     [SerializeField] private PanelScaleAnimation upgradePanelAnim;
+    [Header("首杀领取面板")]
+    [SerializeField] private GameObject firstKillRewardPanel;
+    [SerializeField] private Button grantFKRewardButton;
+    private EnemyType _pendingFirstKill;
+
     [Header("GameOver Panel")]
     public GameObject gameOverPanel;
     [Header("倒计时UI图片配置")]
@@ -66,6 +73,28 @@ public class UIManager : MonoBehaviour
             Debug.LogError("GlobalDifficultyCurveController: 未找到全局难度曲线控制器！");
             return;
         }
+
+        grantFKRewardButton?.onClick.AddListener(OnFKRewardGrant); //新增✅
+        HideFirstKillPanel();
+    }
+
+    public void ShowFirstKillPanel(EnemyType type)
+    {
+        _pendingFirstKill = type;
+        if (firstKillRewardPanel == null) return;
+        firstKillRewardPanel.SetActive(true);
+        Time.timeScale = 0f;          // 暂停战斗，让玩家点领取
+    }
+    private void OnFKRewardGrant()
+    {
+        // 发放奖励
+        FirstKillRewardManager.Instance.GrantFirstKillReward(_pendingFirstKill);
+        HideFirstKillPanel();
+    }
+    private void HideFirstKillPanel()
+    {
+        firstKillRewardPanel?.SetActive(false);
+        if (Time.timeScale == 0f) Time.timeScale = 1f;
     }
 
     private void InitializeUpgradePanel()
@@ -151,6 +180,11 @@ public class UIManager : MonoBehaviour
         propCount.text = currentPropCount.ToString();
     }
 
+    public void ShowAndUpdateTicketCount(int tempTicketCount)
+    {
+        ticketCountTMP.text = tempTicketCount.ToString();
+    }
+
     public void ShowLevel(int level_value)
     {
         level.text = "LEVEL: " + level_value;
@@ -200,7 +234,10 @@ public class UIManager : MonoBehaviour
         int current_PropCount = DataManager.GetInt(DataManager.CurrentPropCountKey);
         ShowAndUpdatePropCount(current_PropCount);
 
-        currentWaveOrderInPause = DataManager.GetInt(DataManager.CurrentWaveKey); //New Addition
+        currentTicketCount = DataManager.GetInt(DataManager.CurrentTicketCountKey); // New Addition✅
+        ShowAndUpdateTicketCount(currentTicketCount);
+
+        currentWaveOrderInPause = DataManager.GetInt(DataManager.CurrentWaveKey);
         currentWaveTMPInPause.text = $"CURRENT WAVE: {currentWaveOrderInPause}";
 
         enemiesLevel = DataManager.GetInt(DataManager.EnemiesLevelKey);

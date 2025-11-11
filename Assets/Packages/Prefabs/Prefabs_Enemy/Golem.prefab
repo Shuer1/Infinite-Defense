@@ -581,11 +581,12 @@ MonoBehaviour:
   moveSpeed: 0.5
   originalMoveSpeed: 0.5
   expReward: 0
-  scoreReward: 0
+  scoreReward: 5
   isDead: 0
   attackRange: 2
   chaseRange: 2.5
   attackCooldown: 2
+  propPrefab: {fileID: 0}
 --- !u!54 &2722255502946823115
 Rigidbody:
   m_ObjectHideFlags: 0

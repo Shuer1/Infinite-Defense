@@ -8,6 +8,7 @@ public static class PlayerInitialConfig
     public const int NextLevelExp = 100;    // 初始下一级经验
     public const float ShootInterval = 0.3f; // 初始发射周期
     public const int CurrentPropCount = 3; // 道具数量初始值
+    public const int CurrentTicketCount = 1; // 初始券数量
     public const int HighScore = 0;
     public const int CurrentWave = 1;
 }

@@ -18,10 +18,26 @@ public class FirstKillRewardManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 检查并发放首杀奖励
+    /// 是否显示首杀奖励面板
+    /// </summary>
+    public bool ShouldShowFKPanel(EnemyType enemyType)
+    {
+        string key = enemyType switch
+        {
+            EnemyType.Monster1 => DataManager.FirstKillMonster1Key,
+            EnemyType.Monster2 => DataManager.FirstKillMonster2Key,
+            _ => null
+        };
+        if (key == null) return false;
+
+        return DataManager.GetInt(key, 0) == 0;
+    }
+
+    /// <summary>
+    /// 发放首杀奖励
     /// </summary>
     /// <param name="enemyType">敌人类型（Monster1 或 Monster2）</param>
-    public void TryGrantFirstKillReward(EnemyType enemyType)
+    public void GrantFirstKillReward(EnemyType enemyType)
     {
         string key = enemyType switch
         {
@@ -32,19 +48,17 @@ public class FirstKillRewardManager : MonoBehaviour
 
         if (key == null) return;
 
-        int alreadyKilled = DataManager.GetInt(key, 0);
-        if (alreadyKilled == 1) return; // 已领取过
+        int curProp = DataManager.GetInt(DataManager.CurrentPropCountKey, 0);
+        int curTicket = DataManager.GetInt(DataManager.CurrentTicketCountKey, 0);
 
-        // 标记已领取
-        DataManager.SaveInt(key, 1);
+        DataManager.SaveInt(DataManager.CurrentPropCountKey, curProp + firstKillPropReward);
+        UIManager.Instance?.ShowAndUpdatePropCount(curProp + firstKillPropReward);
 
-        // 发放奖励
-        int current = DataManager.GetInt(DataManager.CurrentPropCountKey, 0);
-        DataManager.SaveIntForce(DataManager.CurrentPropCountKey, current + firstKillPropReward);
+        DataManager.SaveInt(DataManager.CurrentTicketCountKey, curTicket + 1);
+        UIManager.Instance?.ShowAndUpdateTicketCount(curTicket + 1);
 
-        // UI更新
-        UIManager.Instance?.ShowAndUpdatePropCount(current + firstKillPropReward);
+        DataManager.SaveIntForce(key, 1); // 标记已领取
 
-        Debug.Log($"[首杀奖励] {enemyType} 首杀完成，获得道具 +{firstKillPropReward}");
+        Debug.Log($"[首杀奖励] {enemyType} 首杀完成，获得道具 +{firstKillPropReward} / 升级自选券 +1");
     }
 }

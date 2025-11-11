@@ -54,6 +54,7 @@ public class GameManager : MonoBehaviour
         DataManager.InitializeIntData(DataManager.NextLevelExpKey, PlayerInitialConfig.NextLevelExp);
         DataManager.InitializeFloatData(DataManager.PlayerShootSpeedKey, PlayerInitialConfig.ShootInterval);
         DataManager.InitializeIntData(DataManager.CurrentPropCountKey, PlayerInitialConfig.CurrentPropCount);
+        DataManager.InitializeIntData(DataManager.CurrentTicketCountKey, PlayerInitialConfig.CurrentTicketCount); //新增✅
         // tower health
         DataManager.InitializeIntData(DataManager.DefenseTowerMaxHPKey, PlayerInitialConfig.TowerMaxHP);
     }
@@ -76,7 +77,7 @@ public class GameManager : MonoBehaviour
         DataManager.InitializeIntData(DataManager.Enemy2ExpRewardKey, EnemysInitialConfig.Enemy2ExpReward);
         DataManager.InitializeIntData(DataManager.Monster1ExpRewardKey, EnemysInitialConfig.Monster1ExpReward);
         DataManager.InitializeIntData(DataManager.Monster2ExpRewardKey, EnemysInitialConfig.Monster2ExpReward);
-        // first kill info : 默认未击杀
+        // first kill info : 默认未获得首杀奖励
         DataManager.InitializeIntData(DataManager.FirstKillMonster1Key, 0);
         DataManager.InitializeIntData(DataManager.FirstKillMonster2Key, 0);
 
