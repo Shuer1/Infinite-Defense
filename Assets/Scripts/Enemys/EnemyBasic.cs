@@ -11,6 +11,7 @@ public class EnemyBasic : EnemyBase
 
     void SyncEnemyData()
     {
+        enemyType = EnemyType.Basic;
         maxHealth = DataManager.GetInt(DataManager.Enemy1MaxHealthKey);
         damage = DataManager.GetInt(DataManager.Enemy1DamageKey);
         expReward = DataManager.GetInt(DataManager.Enemy1ExpRewardKey);

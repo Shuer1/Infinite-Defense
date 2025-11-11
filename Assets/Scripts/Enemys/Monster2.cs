@@ -11,6 +11,7 @@ public class Monster2 : EnemyBase
 
     void SyncEnemyData()
     {
+        enemyType = EnemyType.Monster2;
         maxHealth = DataManager.GetInt(DataManager.Monster2MaxHealthKey);
         damage = DataManager.GetInt(DataManager.Monster2DamageKey);
         expReward = DataManager.GetInt(DataManager.Monster2ExpRewardKey);
