@@ -54,7 +54,7 @@ public class FirstKillRewardManager : MonoBehaviour
         DataManager.SaveInt(DataManager.CurrentPropCountKey, curProp + firstKillPropReward);
         UIManager.Instance?.ShowAndUpdatePropCount(curProp + firstKillPropReward);
 
-        DataManager.SaveInt(DataManager.CurrentTicketCountKey, curTicket + 1);
+        DataManager.SaveInt(DataManager.CurrentTicketCountKey, curTicket + 1); //获得升级自选券
         UIManager.Instance?.ShowAndUpdateTicketCount(curTicket + 1);
 
         DataManager.SaveIntForce(key, 1); // 标记已领取

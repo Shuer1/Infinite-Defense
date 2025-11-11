@@ -25,14 +25,16 @@ public class UIManager : MonoBehaviour
     public int historyClearEnemiesWave = 0;
     public SpawnManager spawnManager;
     public TextMeshProUGUI propCount;
-    public TextMeshProUGUI ticketCountTMP; //新增✅
+    [Header("升级券配置")] //新增✅
+    public Button useTicketBtn;
+    public TextMeshProUGUI ticketCountTMP;
     public int currentTicketCount;
     public TextMeshProUGUI tempCurrentWaveTMP;
     private Coroutine _currentShowCoroutine;
     [Header("Upgrade Panel")]
     [SerializeField] private PanelScaleAnimation upgradePanelAnim;
     [Header("首杀领取面板")]
-    [SerializeField] private GameObject firstKillRewardPanel;
+    [SerializeField] private PanelScaleAnimation firstKillPanelAnim;
     [SerializeField] private Button grantFKRewardButton;
     private EnemyType _pendingFirstKill;
 
@@ -40,6 +42,9 @@ public class UIManager : MonoBehaviour
     public GameObject gameOverPanel;
     [Header("倒计时UI图片配置")]
     public Image[] countdownImages;
+    private bool isUpgradePanelOpen = false;
+    private bool isFirstKillPanelOpen = false;
+    private bool isUsingTicket = false;
 
     void Awake()
     {
@@ -58,6 +63,7 @@ public class UIManager : MonoBehaviour
         InitUI();
         HideAllCountdownImages();
         InitializeUpgradePanel();
+        InitializeFKRewardPanel(); //新增✅
 
         if (spawnManager != null)
         {
@@ -74,17 +80,39 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        grantFKRewardButton?.onClick.AddListener(OnFKRewardGrant); //新增✅
+        useTicketBtn?.onClick.AddListener(UseTicket); //新增✅
+
+        grantFKRewardButton?.onClick.AddListener(OnFKRewardGrant);
         HideFirstKillPanel();
     }
 
     public void ShowFirstKillPanel(EnemyType type)
     {
-        _pendingFirstKill = type;
-        if (firstKillRewardPanel == null) return;
-        firstKillRewardPanel.SetActive(true);
-        Time.timeScale = 0f;          // 暂停战斗，让玩家点领取
+        StartCoroutine(ShowFirstKillPanelDelayed(type));
     }
+
+    private IEnumerator ShowFirstKillPanelDelayed(EnemyType type)
+    {
+        _pendingFirstKill = type;
+
+        // ✅ 如果升级面板正在播放动画，等待它关闭完毕
+        if (upgradePanelAnim != null && (upgradePanelAnim.IsAnimating || isUpgradePanelOpen))
+        {
+            upgradePanelAnim.ClosePanel();
+            isUpgradePanelOpen = false;
+
+            // 等待升级面板完全关闭
+            yield return new WaitWhile(() => upgradePanelAnim.IsAnimating);
+        }
+
+        // ✅ 确保只显示首杀面板
+        if (firstKillPanelAnim == null) yield break;
+
+        Time.timeScale = 0f;
+        firstKillPanelAnim.OpenPanel();
+        isFirstKillPanelOpen = true;
+    }
+
     private void OnFKRewardGrant()
     {
         // 发放奖励
@@ -93,8 +121,15 @@ public class UIManager : MonoBehaviour
     }
     private void HideFirstKillPanel()
     {
-        firstKillRewardPanel?.SetActive(false);
-        if (Time.timeScale == 0f) Time.timeScale = 1f;
+        if (firstKillPanelAnim != null)
+            firstKillPanelAnim.ClosePanel();
+        else
+            Debug.LogWarning("FirstKillRewardPanel: 未找到首杀奖励面板引用！");
+
+        isFirstKillPanelOpen = false;
+
+        if(Time.timeScale == 0f)
+            Time.timeScale = 1f;
     }
 
     private void InitializeUpgradePanel()
@@ -115,8 +150,46 @@ public class UIManager : MonoBehaviour
         upgradePanelAnim.ClosePanelImmediate();
     }
 
-    public void ShowUpgradePanel() => upgradePanelAnim?.OpenPanel();
-    public void HideUpgradePanel() => upgradePanelAnim?.ClosePanel();
+    private void InitializeFKRewardPanel()
+    {
+        if (firstKillPanelAnim == null) return;
+
+        if (!firstKillPanelAnim.gameObject.activeSelf)
+            firstKillPanelAnim.gameObject.SetActive(true);
+
+        firstKillPanelAnim.InitializePanelState();
+        firstKillPanelAnim.ClosePanelImmediate();
+    }
+
+    public void ShowUpgradePanel()
+    {
+        StartCoroutine(ShowUpgradePanelDelayed());
+    }
+
+    private IEnumerator ShowUpgradePanelDelayed()
+    {
+        // ✅ 如果首杀面板正在播放动画或未关闭，等待它关闭完毕
+        if (firstKillPanelAnim != null && (firstKillPanelAnim.IsAnimating || isFirstKillPanelOpen))
+        {
+            firstKillPanelAnim.ClosePanel();
+            isFirstKillPanelOpen = false;
+
+            // 等待首杀面板动画完全关闭
+            yield return new WaitWhile(() => firstKillPanelAnim.IsAnimating);
+        }
+
+        // ✅ 确保只显示升级面板
+        if (upgradePanelAnim == null) yield break;
+
+        upgradePanelAnim.OpenPanel();
+        isUpgradePanelOpen = true;
+    }
+
+    public void HideUpgradePanel()
+    {
+        upgradePanelAnim?.ClosePanel();
+        isUpgradePanelOpen = false;
+    }
 
     public void UpdateScore(int score)
     {
@@ -245,6 +318,34 @@ public class UIManager : MonoBehaviour
 
         historyClearEnemiesWave = DataManager.GetInt(DataManager.ClearEnemiesCountKey);
         UpdateWaveToLevelUP(historyClearEnemiesWave);
+    }
+
+    void UseTicket() //使用券:获得一次升级选择机会
+    {
+        if (isUsingTicket) return;
+
+        if (currentTicketCount < 1)
+        {
+            // 后续添加广告进入
+            Debug.LogWarning("[升级券] 已用完！");
+            return;
+        }
+
+        isUsingTicket = true;
+
+        currentTicketCount--;
+        DataManager.SaveIntForce(DataManager.CurrentTicketCountKey, currentTicketCount);
+        ShowAndUpdateTicketCount(currentTicketCount);
+
+        UpgradeManager.Instance.ShowUpgradeOptions(); //显示升级选项
+
+        StartCoroutine(ResetTicketUseCooldown());
+    }
+
+    private IEnumerator ResetTicketUseCooldown()
+    {
+        yield return new WaitForSecondsRealtime(0.3f);
+        isUsingTicket = false;
     }
 
     public void UpdateWaveToLevelUP(int clearEnemiesWave)

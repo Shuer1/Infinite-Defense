@@ -12,6 +12,7 @@ public class PanelScaleAnimation : MonoBehaviour
     [SerializeField] private bool debugMode = true;
 
     private bool isAnimating = false;
+    public bool IsAnimating => isAnimating;
 
     // 打开面板
     public void OpenPanel()

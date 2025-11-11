@@ -220,23 +220,9 @@ public class RewardManager : MonoBehaviour
             foreach (var ps in fx.GetComponentsInChildren<ParticleSystem>())
             {
                 var main = ps.main;
-                /*
-                if (main.duration > longestDuration)
-                    longestDuration = main.duration;
-                */
                 main.useUnscaledTime = true;
             }
-            /*
-            // 存储位置和范围以便稍后使用
-            bombPosition = position;
-            bombRangeSaved = range;
-            
-            
-            // 在特效播放完成后触发伤害
-            Invoke(nameof(TriggerBombDamage), longestDuration);
-            
-            Destroy(fx, longestDuration + 0.5f); // 留出一些缓冲时间再销毁特效对象
-            */
+
             float longestDuration = fx.GetComponentsInChildren<ParticleSystem>().Max(p => p.main.duration);
             StartCoroutine(TriggerBombDamageUnscaled(longestDuration, fx));
         }
