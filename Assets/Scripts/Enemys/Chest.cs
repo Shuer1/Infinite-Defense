@@ -34,13 +34,8 @@ public class Chest : MonoBehaviour
         {
             AudioSource.PlayClipAtPoint(openSound, transform.position);
         }
-
-        // 重要：不要在这里直接给奖励（或Invoke GiveReward），
-        // 让动画事件在合适帧调用 GiveReward()，并由 GiveReward 做 guard 与 UI 通知。
     }
 
-    // 已由动画事件调用（或测试时可手动调用）
-    // 注意：不要从其他脚本/逻辑直接调用此方法（除非你知道自己在做什么）
     public void GiveReward()
     {
         // Guard：确保这个 GiveReward 是来源于玩家主动点击的开启流程
@@ -62,8 +57,6 @@ public class Chest : MonoBehaviour
         else
         {
             Debug.LogError("Chest.GiveReward: UIManager.Instance 为 null，无法显示首杀面板。请检查 UIManager 是否已初始化。");
-            // 如果 UIManager 不存在，出于安全可以选择临时不发放，或作为回退直接发放（不推荐）
-            // FirstKillRewardManager.Instance?.GrantFirstKillReward(enemyType); // <- 不建议自动回退
         }
 
         // 动画播放完毕后安全销毁宝箱（使用 realtime 延迟，避免受 Time.timeScale 影响）

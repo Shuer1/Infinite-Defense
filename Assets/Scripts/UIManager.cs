@@ -98,7 +98,7 @@ public class UIManager : MonoBehaviour
         // ✅ 如果升级面板正在播放动画，等待它关闭完毕
         if (upgradePanelAnim != null && (upgradePanelAnim.IsAnimating || isUpgradePanelOpen))
         {
-            upgradePanelAnim.ClosePanel();
+            upgradePanelAnim.ClosePanelImmediate(); // 立即关闭，而非动画式
             isUpgradePanelOpen = false;
 
             // 等待升级面板完全关闭
@@ -134,15 +134,10 @@ public class UIManager : MonoBehaviour
 
     private void InitializeUpgradePanel()
     {
-        if (upgradePanelAnim == null)
-        {
-            Debug.LogError("PanelScaleAnimation: 未找到升级面板引用！");
-            return;
-        }
+        if (upgradePanelAnim == null) return;
 
         // ✅ 保证对象激活后初始化并立即隐藏
-        if (!upgradePanelAnim.gameObject.activeSelf)
-            upgradePanelAnim.gameObject.SetActive(true);
+        if (!upgradePanelAnim.gameObject.activeSelf) upgradePanelAnim.gameObject.SetActive(true);
 
         // ✅ 调用其初始化方法（内部会安全设置为关闭状态）
         upgradePanelAnim.InitializePanelState();
@@ -154,10 +149,10 @@ public class UIManager : MonoBehaviour
     {
         if (firstKillPanelAnim == null) return;
 
-        if (!firstKillPanelAnim.gameObject.activeSelf)
-            firstKillPanelAnim.gameObject.SetActive(true);
+        if (!firstKillPanelAnim.gameObject.activeSelf) firstKillPanelAnim.gameObject.SetActive(true);
 
         firstKillPanelAnim.InitializePanelState();
+
         firstKillPanelAnim.ClosePanelImmediate();
     }
 
@@ -171,7 +166,7 @@ public class UIManager : MonoBehaviour
         // ✅ 如果首杀面板正在播放动画或未关闭，等待它关闭完毕
         if (firstKillPanelAnim != null && (firstKillPanelAnim.IsAnimating || isFirstKillPanelOpen))
         {
-            firstKillPanelAnim.ClosePanel();
+            firstKillPanelAnim.ClosePanelImmediate(); // 立即关闭，而非动画式⚠️
             isFirstKillPanelOpen = false;
 
             // 等待首杀面板动画完全关闭

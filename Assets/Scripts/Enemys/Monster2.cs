@@ -26,7 +26,10 @@ public class Monster2 : EnemyBase
         {
             if (chestPrefab2 != null)
             {
-                GameObject chest = Instantiate(chestPrefab2, transform.position, Quaternion.identity);
+                GameObject chest = Instantiate(chestPrefab2, transform.position, Quaternion.Euler(0f, 180f, 0f));
+
+                DontDestroyOnLoad(chest);
+
                 var chestScript = chest.GetComponent<Chest>();
                 if (chestScript != null)
                 {

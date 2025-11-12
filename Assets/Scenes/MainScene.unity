@@ -5379,6 +5379,10 @@ MonoBehaviour:
   enemyManager: {fileID: 1031757754}
   moveSound: {fileID: 754927731}
   shootSound: {fileID: 1050021791}
+  normalShootSound: {fileID: 8300000, guid: b8ff52def410b4ddbabf2997f048c4dc, type: 3}
+  explosionShootSound: {fileID: 8300000, guid: c40fd92c73f4545f2b4c9de807ecb503, type: 3}
+  frostShootSound: {fileID: 8300000, guid: 000393e3a6a7942a0ba3b2f5e68de444, type: 3}
+  ThunderShootSound: {fileID: 8300000, guid: 43b129fdb69fe4a0fb3439f26d56cd61, type: 3}
   btn_ResetLive: {fileID: 1260621336}
 --- !u!54 &942823809
 Rigidbody:

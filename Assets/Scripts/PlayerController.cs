@@ -4,6 +4,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using System.Collections.Generic;
 
 public class PlayerController : MonoBehaviour
 {
@@ -36,9 +37,14 @@ public class PlayerController : MonoBehaviour
     private Rigidbody rb;
     private Animator animator;
     private bool isInvincible = false;
-    [Header("玩家音效")]
+    [Header("射击音效-映射和移动声")]
     public AudioSource moveSound;
     public AudioSource shootSound;
+    public AudioClip normalShootSound;
+    public AudioClip explosionShootSound;
+    public AudioClip frostShootSound;
+    public AudioClip ThunderShootSound;
+    private Dictionary<BulletType, AudioClip> bulletSoundDict; //子弹音效字典～优雅
     [Header("按钮Btn_UI_Element")]
     public Button btn_ResetLive;
 
@@ -48,6 +54,14 @@ public class PlayerController : MonoBehaviour
         {
             enemyManager = FindObjectOfType<EnemyManager>();
         }
+
+        bulletSoundDict = new Dictionary<BulletType, AudioClip>()
+        {
+            { BulletType.Normal, normalShootSound },
+            { BulletType.Explosive, explosionShootSound },
+            { BulletType.Frost, frostShootSound },
+            { BulletType.Lightning, ThunderShootSound }
+        };
     }
     void Start()
     {
@@ -163,8 +177,9 @@ public class PlayerController : MonoBehaviour
         }
 
         // 播放射击音效
-        if (shootSound != null)
+        if (shootSound != null && bulletSoundDict.TryGetValue(bulletType, out var clip) && clip != null)
         {
+            shootSound.clip = clip;
             shootSound.Play();
         }
     }

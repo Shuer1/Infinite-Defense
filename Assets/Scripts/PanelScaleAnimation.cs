@@ -119,7 +119,7 @@ public class PanelScaleAnimation : MonoBehaviour
 
     private void Start()
     {
-        InitializePanelState(); // ✅ 启动时直接初始化关闭状态（防止 inactive 报错）
+        //InitializePanelState(); // ✅ 启动时直接初始化关闭状态（防止 inactive 报错）
     }
 
     private void LogDebug(string message)

@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8949026478730366960}
   - component: {fileID: 8320861538871981417}
   - component: {fileID: 343816082179457372}
-  - component: {fileID: 6701815940039268027}
+  - component: {fileID: 7813711935609725653}
   m_Layer: 0
   m_Name: CHEST_2_T2 2
   m_TagString: Untagged
@@ -127,8 +127,8 @@ MonoBehaviour:
   enemyType: 3
   chestAnimator: {fileID: 8320861538871981417}
   openSound: {fileID: 8300000, guid: 3f9fec1e3829743c0b9773244c4df3c3, type: 3}
---- !u!65 &6701815940039268027
-BoxCollider:
+--- !u!136 &7813711935609725653
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -145,9 +145,11 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 3.3578007, y: 2.4, z: 2.543207}
-  m_Center: {x: 0, y: 1.2, z: 0}
+  serializedVersion: 2
+  m_Radius: 1.5
+  m_Height: 1.5
+  m_Direction: 1
+  m_Center: {x: 0, y: 1.5, z: 0}
 --- !u!1 &7881538837327349571
 GameObject:
   m_ObjectHideFlags: 0
