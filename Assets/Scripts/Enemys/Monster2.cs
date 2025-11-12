@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class Monster2 : EnemyBase
 {
+    public GameObject chestPrefab2;
     new void Start()
     {
         base.Start();
@@ -23,7 +24,16 @@ public class Monster2 : EnemyBase
 
         if (FirstKillRewardManager.Instance != null && FirstKillRewardManager.Instance?.ShouldShowFKPanel(enemyType) == true)
         {
-            UIManager.Instance?.ShowFirstKillPanel(enemyType);
+            //UIManager.Instance?.ShowFirstKillPanel(enemyType);
+            if (chestPrefab2 != null)
+            {
+                GameObject chest = Instantiate(chestPrefab2, transform.position, Quaternion.identity);
+                var chestScript = chest.GetComponent<Chest>();
+                if (chestScript != null)
+                {
+                    chestScript.enemyType = enemyType;
+                }
+            }
         }
     }
 }

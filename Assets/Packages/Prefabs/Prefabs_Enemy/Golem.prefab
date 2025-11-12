@@ -512,7 +512,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.62, y: 1.62, z: 1.62}
+  m_LocalScale: {x: 1.85, y: 1.85, z: 1.85}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 2739163495463059061}
@@ -586,7 +586,7 @@ MonoBehaviour:
   attackRange: 2
   chaseRange: 2.5
   attackCooldown: 2
-  propPrefab: {fileID: 0}
+  chestPrefab1: {fileID: 6090436556579561852, guid: 6ec8e021c61be644a83e2ca084923276, type: 3}
 --- !u!54 &2722255502946823115
 Rigidbody:
   m_ObjectHideFlags: 0

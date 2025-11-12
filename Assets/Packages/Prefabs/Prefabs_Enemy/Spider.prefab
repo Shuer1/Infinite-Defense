@@ -313,6 +313,7 @@ MonoBehaviour:
   attackRange: 2.5
   chaseRange: 3
   attackCooldown: 1.5
+  chestPrefab2: {fileID: 4684139474675482377, guid: a42da1d7cd541384f865ff332b762f60, type: 3}
 --- !u!65 &8064463994142200791
 BoxCollider:
   m_ObjectHideFlags: 0

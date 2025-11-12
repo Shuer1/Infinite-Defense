@@ -51,13 +51,26 @@ public class FirstKillRewardManager : MonoBehaviour
         int curProp = DataManager.GetInt(DataManager.CurrentPropCountKey, 0);
         int curTicket = DataManager.GetInt(DataManager.CurrentTicketCountKey, 0);
 
-        DataManager.SaveInt(DataManager.CurrentPropCountKey, curProp + firstKillPropReward);
-        UIManager.Instance?.ShowAndUpdatePropCount(curProp + firstKillPropReward);
-
-        DataManager.SaveInt(DataManager.CurrentTicketCountKey, curTicket + 1); //获得升级自选券
-        UIManager.Instance?.ShowAndUpdateTicketCount(curTicket + 1);
-
+        DataManager.SaveIntForce(DataManager.CurrentPropCountKey, curProp + firstKillPropReward); //先存
+        DataManager.SaveIntForce(DataManager.CurrentTicketCountKey, curTicket + 1); //获得升级自选券
         DataManager.SaveIntForce(key, 1); // 标记已领取
+
+        var rewardMgr = FindObjectOfType<RewardManager>();
+        if (rewardMgr != null)
+        {
+            rewardMgr.currentPropCount = DataManager.GetInt(DataManager.CurrentPropCountKey, 0);
+        }
+
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.currentTicketCount = DataManager.GetInt(DataManager.CurrentTicketCountKey, 0); //再取，更新
+            UIManager.Instance.ShowAndUpdateTicketCount(UIManager.Instance.currentTicketCount);
+
+            int syncedProp = DataManager.GetInt(DataManager.CurrentPropCountKey, 0);
+            UIManager.Instance.ShowAndUpdatePropCount(syncedProp);
+
+            UIManager.Instance.ShowFirstKillPanel(enemyType);
+        }
 
         Debug.Log($"[首杀奖励] {enemyType} 首杀完成，获得道具 +{firstKillPropReward} / 升级自选券 +1");
     }

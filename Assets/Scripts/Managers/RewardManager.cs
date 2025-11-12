@@ -39,10 +39,6 @@ public class RewardManager : MonoBehaviour
 
     [Tooltip("UI相机(默认使用MainCamera)")]
     [SerializeField] private Camera uiCamera;
-    
-    //[Tooltip("世界空间到Canvas空间的转换因子")]
-    //[SerializeField] private float worldToCanvasScale = 100f;
-
     private bool _isDraggingProp;
     private Vector2 _dragStartPos;
     private const float _dragThreshold = 100f;
