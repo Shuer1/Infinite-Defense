@@ -60,7 +60,7 @@ public class SpawnManager : MonoBehaviour
         int specialMonsterCount = 0;
         if (wave > 10)
         {
-            float triggerChance = UnityEngine.Random.Range(0.25f, 0.75f);
+            float triggerChance = UnityEngine.Random.Range(0.5f, 0.75f);
             if (UnityEngine.Random.value < triggerChance)
             {
                 if (wave <= 20) specialMonsterCount = 1;

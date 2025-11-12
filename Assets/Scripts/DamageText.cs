@@ -14,16 +14,20 @@ public class DamageText : MonoBehaviour
     private Vector3 startPosition;
     private Color startColor;
     private RectTransform rectTransform;
-    bool isAnimating = false;
 
-    // 新增字段：当前正在播放的协程
+    // 当前是否正在播放动画
+    private bool isAnimating = false;
+
+    // 当前正在播放的协程
     private Coroutine currentAnimation;
 
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
         if (damageText == null)
+        {
             damageText = GetComponentInChildren<TMP_Text>();
+        }
     }
 
     /// <summary>
