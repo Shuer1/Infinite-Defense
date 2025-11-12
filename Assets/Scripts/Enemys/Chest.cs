@@ -32,7 +32,7 @@ public class Chest : MonoBehaviour
         //Invoke(nameof(GiveReward), 0.6f);
     }
 
-    private void GiveReward()
+    public void GiveReward()
     {
         if (FirstKillRewardManager.Instance != null)
         {

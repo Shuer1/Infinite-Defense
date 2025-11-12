@@ -24,7 +24,6 @@ public class Monster2 : EnemyBase
 
         if (FirstKillRewardManager.Instance != null && FirstKillRewardManager.Instance?.ShouldShowFKPanel(enemyType) == true)
         {
-            //UIManager.Instance?.ShowFirstKillPanel(enemyType);
             if (chestPrefab2 != null)
             {
                 GameObject chest = Instantiate(chestPrefab2, transform.position, Quaternion.identity);

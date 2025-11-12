@@ -22,9 +22,8 @@ public class Monster1 : EnemyBase
     {
         base.Die();
 
-        if (FirstKillRewardManager.Instance != null && FirstKillRewardManager.Instance?.ShouldShowFKPanel(enemyType) == true)
+        if (FirstKillRewardManager.Instance != null && FirstKillRewardManager.Instance?.ShouldShowFKPanel(enemyType) == true) //控制是否生成宝箱
         {
-            //UIManager.Instance?.ShowFirstKillPanel(enemyType);
             if (chestPrefab1 != null)
             {
                 GameObject chest = Instantiate(chestPrefab1, transform.position, Quaternion.identity);
