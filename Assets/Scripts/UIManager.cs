@@ -80,7 +80,11 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        useTicketBtn?.onClick.AddListener(UseTicket); //新增✅
+        //useTicketBtn?.onClick.AddListener(UseTicket);
+
+        useTicketBtn?.onClick.AddListener(OnUseOrWatchAdForTicketClicked);
+        AdsManager.Instance.OnTicketRewardedAdCompleted += OnTicketRewardedAdCompleted;
+        ShowAndUpdateTicketCount(currentTicketCount);
 
         grantFKRewardButton?.onClick.AddListener(OnFKRewardGrant);
         HideFirstKillPanel();
@@ -368,8 +372,70 @@ public class UIManager : MonoBehaviour
 
     void OnDestroy()
     {
-        spawnManager.OnWaveCompleted -= UpdateWaveUI;
-        GlobalDifficultyCurveController.Instance.OnEnemiesLevelUp -= UpdateEnemiesLevelUI;
+        if (spawnManager != null)
+            spawnManager.OnWaveCompleted -= UpdateWaveUI;
+
+        if (GlobalDifficultyCurveController.Instance != null)
+            GlobalDifficultyCurveController.Instance.OnEnemiesLevelUp -= UpdateEnemiesLevelUI;
+
+        if (useTicketBtn != null)
+            useTicketBtn.onClick.RemoveListener(OnUseOrWatchAdForTicketClicked);
+            
+        if(AdsManager.Instance != null)
+            AdsManager.Instance.OnTicketRewardedAdCompleted -= OnTicketRewardedAdCompleted;
+    }
+
+    private void OnTicketRewardedAdCompleted(bool success)
+    {
+        EnableTicketButton();
+
+        if (success)
+        {
+            currentTicketCount++;
+            UpdateTicketUIAndSave();
+            Debug.Log($"[UIManager] ✅ 观看广告成功，获得升级券，当前数量: {currentTicketCount}");
+        }
+        else
+        {
+            Debug.Log("[UIManager] ❌ 广告未完整观看，未获得升级券");
+        }
+    }
+
+    private void OnUseOrWatchAdForTicketClicked()
+    {
+        // 如果有券 → 直接使用
+        if (currentTicketCount > 0)
+        {
+            UseTicket();
+            return;
+        }
+
+        // 没有券 → 看广告领取
+        if (AdsManager.Instance == null)
+        {
+            Debug.LogWarning("[UIManager] AdsManager 未初始化，无法展示广告");
+            return;
+        }
+
+        bool shown = AdsManager.Instance.ShowTicketRewardedAd();
+        if (!shown)
+        {
+            Debug.Log("[UIManager] 激励广告未能展示，稍后重试");
+            useTicketBtn.interactable = false;
+            Invoke(nameof(EnableTicketButton), 1f);
+        }
+    }
+
+    private void UpdateTicketUIAndSave()
+    {
+        ShowAndUpdateTicketCount(currentTicketCount);
+        DataManager.SaveIntForce(DataManager.CurrentTicketCountKey, currentTicketCount);
+    }
+    
+    private void EnableTicketButton()
+    {
+        if(useTicketBtn != null)
+            useTicketBtn.interactable = true;
     }
 
     public void UpdateCountdownUI(int countdown)

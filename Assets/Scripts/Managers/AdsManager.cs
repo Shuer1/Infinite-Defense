@@ -24,6 +24,8 @@ public class AdsManager : MonoBehaviour //单例
 
     // 新增：激励广告回调
     public event Action<bool> OnRewardedAdCompleted;
+    // 新增：用于升级券的广告回调
+    public event Action<bool> OnTicketRewardedAdCompleted;
     // 新增：用于复活的激励广告回调
     public event Action<bool> OnReviveRewardedAdCompleted;
 
@@ -369,6 +371,15 @@ public class AdsManager : MonoBehaviour //单例
     }
 
     /// <summary>
+    /// 显示激励广告（用于升级券奖励）
+    /// </summary>
+    /// <returns>是否成功调用显示</returns>
+    public bool ShowTicketRewardedAd()
+    {
+        return ShowRewardedAdInternal(false, true);
+    }
+
+    /// <summary>
     /// 显示激励广告（用于复活）
     /// </summary>
     /// <returns>是否成功调用显示</returns>
@@ -382,7 +393,7 @@ public class AdsManager : MonoBehaviour //单例
     /// </summary>
     /// <param name="isForRevive">是否用于复活</param>
     /// <returns>是否成功调用显示</returns>
-    private bool ShowRewardedAdInternal(bool isForRevive)
+    private bool ShowRewardedAdInternal(bool isForRevive, bool isForTicket = false)
     {
         if (!isInitialized)
         {
@@ -407,6 +418,10 @@ public class AdsManager : MonoBehaviour //单例
                 {
                     OnReviveRewardedAdCompleted?.Invoke(true);
                 }
+                else if (isForTicket)
+                {
+                    OnTicketRewardedAdCompleted?.Invoke(true);
+                }
                 else
                 {
                     OnRewardedAdCompleted?.Invoke(true);
@@ -424,6 +439,10 @@ public class AdsManager : MonoBehaviour //单例
             if (isForRevive)
             {
                 OnReviveRewardedAdCompleted?.Invoke(false);
+            }
+            else if (isForTicket)
+            {
+                OnTicketRewardedAdCompleted?.Invoke(false);
             }
             else
             {
@@ -473,6 +492,7 @@ public class AdsManager : MonoBehaviour //单例
         // 通知两个可能的监听者广告失败
         OnRewardedAdCompleted?.Invoke(false);
         OnReviveRewardedAdCompleted?.Invoke(false);
+        OnTicketRewardedAdCompleted?.Invoke(false);
 
         isShowingFullScreenAd = false;
 
