@@ -23,25 +23,8 @@ MonoBehaviour:
     m_SerializedLabels:
     - obj
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 4898056eac8fe4ed4b6a013151ee4642
-    m_Address: Prefab_ExplosiveBullet
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - obj
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 4b16347d322d2439796f23eb1ff67e1b
-    m_Address: Prefab_LightningBullet
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 8f8a30a0aa3484ecab92d1dce648f981
     m_Address: Prefab_Skeleton
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - obj
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: a7f7c92e4227049f5b634ae1c99edcb2
-    m_Address: Prefab_FrostBullet
     m_ReadOnly: 0
     m_SerializedLabels:
     - obj

@@ -5101,8 +5101,8 @@ MonoBehaviour:
   explosionRadius: 0.8
   explosionDamage: 5
   hitEffectPrefab: {fileID: 6499532851927768924, guid: 3fce5ab2182394ea2bdc2525fc88751d, type: 3}
-  hitSound: {fileID: 8300000, guid: 90f94821fe37743d08308eb0c50a6450, type: 3}
-  soundVolume: 1
+  hitSound: {fileID: 8300000, guid: 37a6b5c238ee84713990fbf577d7ef49, type: 3}
+  soundVolume: 0.8
 --- !u!1 &4107443578124765817
 GameObject:
   m_ObjectHideFlags: 0
