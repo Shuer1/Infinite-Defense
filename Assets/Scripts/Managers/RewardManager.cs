@@ -33,7 +33,7 @@ public class RewardManager : MonoBehaviour
     [Tooltip("爆炸范围指示器(圆形UI,设置为Filled Mode)")]
     [SerializeField] private RectTransform bombRangeIndicator;
     [Tooltip("道具爆炸属性")]
-    [SerializeField] private int ult_Damage = 200;
+    private int ult_Damage = 200;
     [SerializeField] private float bombRange = 5f;
     [SerializeField] private GameObject bombEffectPrefab;
 
@@ -252,23 +252,22 @@ public class RewardManager : MonoBehaviour
     {
         // ✅ 2. 检测范围内敌人（3D物理）
         Collider[] targets = Physics.OverlapSphere(position, range);
-
-        int hitCount = 0;
+        HashSet<EnemyBase> hitEnemies = new HashSet<EnemyBase>(); // 去重
 
         foreach (var target in targets)
         {
             if (target.CompareTag("Enemy"))
             {
                 EnemyBase enemy = target.GetComponent<EnemyBase>();
-                if (enemy != null)
+                if (enemy != null && !hitEnemies.Contains(enemy))
                 {
                     enemy.TakeDamage(ult_Damage);
-                    hitCount++;
+                    hitEnemies.Add(enemy);
                 }
             }
         }
 
-        Debug.Log($"💥 爆炸命中敌人数量: {hitCount}，造成伤害: {ult_Damage}");
+        Debug.Log($"💥 爆炸命中敌人数量: {hitEnemies.Count}，造成伤害: {ult_Damage}");
     }
 
     private void InitPropCount() =>
@@ -408,7 +407,7 @@ public class RewardManager : MonoBehaviour
         delayedActions[methodName] = action;
         
         // 创建一个包装方法来调用存储的动作
-        System.Action wrapper = () => {
+        Action wrapper = () => {
             if (delayedActions.ContainsKey(methodName)) {
                 delayedActions[methodName]?.Invoke();
                 delayedActions.Remove(methodName);
