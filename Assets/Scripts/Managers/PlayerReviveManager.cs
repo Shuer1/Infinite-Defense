@@ -167,6 +167,9 @@ public class PlayerReviveManager : MonoBehaviour
 
     public void ShowRevivePanel()
     {
+        if(EntireBgmManager.Instance != null)
+            EntireBgmManager.Instance.PauseCurrentBgm();
+
         if (revivePanel != null && !GameManager.Instance.isGameOver)
             revivePanel.SetActive(true);
         else
@@ -226,11 +229,20 @@ public class PlayerReviveManager : MonoBehaviour
     private void OnGameOverClicked()
     {
         HideRevivePanel();
+
+        if (EntireBgmManager.Instance != null && EntireBgmManager.Instance.isPaused)
+        {
+            EntireBgmManager.Instance.ResumeCurrentBgm();
+        }
+
         GameManager.Instance?.GameOver();
     }
 
     private void PerformRevive()
     {
+        if(EntireBgmManager.Instance != null)
+            EntireBgmManager.Instance.ResumeCurrentBgm();
+
         if (!allowToRevive || reviveCount >= maxReviveCount)
             return;
 

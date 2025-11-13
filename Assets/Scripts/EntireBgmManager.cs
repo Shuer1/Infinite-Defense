@@ -27,6 +27,9 @@ public class EntireBgmManager : MonoBehaviour
     [Header("调试选项")]
     [SerializeField] private bool debugMode = true;
 
+    public bool isPaused = false; // 是否处于暂停状态
+    private float pausedTime = 0f; // 记录暂停时播放进度
+
     private void Awake()
     {
         // 单例模式，防止重复实例
@@ -213,6 +216,8 @@ public class EntireBgmManager : MonoBehaviour
         {
             entireBgms[index].Play();
             currentPlayingIndex = index;
+            isPaused = false;
+            pausedTime = 0f;
             LogDebug($"正在播放BGM索引 {index}");
         }
         else
@@ -243,10 +248,72 @@ public class EntireBgmManager : MonoBehaviour
         LogDebug($"全局音量设置为 {clampedVolume}");
     }
 
-    // 以下控制方法保持不变
-    public void StopCurrentBgm() { /* 预留接口 */ }
-    public void PauseCurrentBgm() { /* 预留接口 */ }
-    public void ResumeCurrentBgm() { /* 预留接口 */ }
+    // -------------------- 控制方法完善区 --------------------
+
+    /// <summary>
+    /// 停止当前播放的BGM
+    /// </summary>
+    public void StopCurrentBgm()
+    {
+        if (currentPlayingIndex >= 0 && currentPlayingIndex < entireBgms.Length)
+        {
+            entireBgms[currentPlayingIndex].Stop();
+            LogDebug("已停止当前BGM播放。");
+        }
+
+        currentPlayingIndex = -1;
+        isPaused = false;
+        pausedTime = 0f;
+    }
+
+    /// <summary>
+    /// 暂停当前播放的BGM（记录暂停时间）
+    /// </summary>
+    public void PauseCurrentBgm()
+    {
+        if (isPaused)
+        {
+            LogDebug("BGM已处于暂停状态。");
+            return;
+        }
+
+        if (currentPlayingIndex >= 0 && currentPlayingIndex < entireBgms.Length)
+        {
+            AudioSource current = entireBgms[currentPlayingIndex];
+            if (current.isPlaying)
+            {
+                pausedTime = current.time;
+                current.Pause();
+                isPaused = true;
+                LogDebug($"已暂停BGM（索引 {currentPlayingIndex}，时间 {pausedTime:F2}s）");
+            }
+        }
+    }
+
+    /// <summary>
+    /// 恢复当前播放的BGM（从暂停处继续）
+    /// </summary>
+    public void ResumeCurrentBgm()
+    {
+        if (!isPaused)
+        {
+            LogDebug("当前未处于暂停状态，无法恢复。");
+            return;
+        }
+
+        if (currentPlayingIndex >= 0 && currentPlayingIndex < entireBgms.Length)
+        {
+            AudioSource current = entireBgms[currentPlayingIndex];
+            current.time = pausedTime;
+            current.Play();
+            isPaused = false;
+            LogDebug($"已恢复BGM（索引 {currentPlayingIndex}，从 {pausedTime:F2}s）");
+        }
+    }
+
+    /// <summary>
+    /// 获取当前播放索引
+    /// </summary>
     public int GetCurrentPlayingIndex() => currentPlayingIndex;
 
     // -------------------- 工具函数 --------------------

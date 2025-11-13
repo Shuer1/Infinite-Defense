@@ -68,6 +68,9 @@ public class SceneLoadManager : MonoBehaviour
 
     public void LoadStartScene()
     {
+        if(EntireBgmManager.Instance != null && EntireBgmManager.Instance.isPaused == true)
+            EntireBgmManager.Instance.ResumeCurrentBgm();
+
         SceneManager.LoadScene(0); // 开始界面场景序号是0
     }
 
