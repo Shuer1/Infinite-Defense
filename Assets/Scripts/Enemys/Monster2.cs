@@ -3,6 +3,7 @@ using UnityEngine;
 public class Monster2 : EnemyBase
 {
     public GameObject chestPrefab2;
+    private const string KillMonsterKey = "KillMonster";
     new void Start()
     {
         base.Start();
@@ -35,6 +36,8 @@ public class Monster2 : EnemyBase
                 {
                     chestScript.enemyType = enemyType;
                 }
+
+                SoundManager.Instance.PlayEventSFX(KillMonsterKey);
             }
         }
     }

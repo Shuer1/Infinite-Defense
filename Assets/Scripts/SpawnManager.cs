@@ -26,6 +26,7 @@ public class SpawnManager : MonoBehaviour
     private Coroutine waveStartCoroutine;
 
     private int currentWave;
+    private const string StartWaveKey = "StartWave";
 
     void Start()
     {
@@ -53,6 +54,8 @@ public class SpawnManager : MonoBehaviour
             yield return new WaitForSeconds(1f);
         }
         UIManager.Instance.HideAllCountdownImages();
+
+        SoundManager.Instance.PlayEventSFX(StartWaveKey); // 播放开始波数音效
 
         int enemyCount = CalculateEnemyCount(wave);
 

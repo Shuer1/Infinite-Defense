@@ -10,6 +10,7 @@ public class UpgradeCard : MonoBehaviour
     [SerializeField] private Button selectButton;
 
     private UpgradeType upgradeType;
+    private const string MorePowerKey = "MorePower";
 
     private void Awake()
     {
@@ -50,6 +51,7 @@ public class UpgradeCard : MonoBehaviour
         if (UpgradePanel.Instance != null)
         {
             UpgradePanel.Instance.Hide();
+            SoundManager.Instance.PlayEventSFX(MorePowerKey);
         }
     }
 }

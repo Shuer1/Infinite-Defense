@@ -56,6 +56,10 @@ public class GlobalDifficultyCurveController : MonoBehaviour
         if (clearEnemyWaveCount >= upgradeThreshold)
         {
             clearEnemyWaveCount = 0;
+            
+            DataManager.SaveIntForce(DataManager.FirstKillMonster1Key, 0); //重置首杀怪物，即可重新获得宝箱奖励
+            DataManager.SaveIntForce(DataManager.FirstKillMonster2Key, 0);
+            
             UpdateData();
             SoundManager.Instance.PlayEventSFX(EnemiesUPKey);
             OnEnemiesLevelUp?.Invoke();

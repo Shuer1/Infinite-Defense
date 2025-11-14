@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6566598374611227676}
   - component: {fileID: 5324566484322189421}
   - component: {fileID: 7708204686851444453}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: FireEffect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4842,7 +4842,7 @@ GameObject:
   - component: {fileID: 3503769177735174835}
   - component: {fileID: 3963550265942651}
   - component: {fileID: 4209419435561992912}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: FrostTrail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4957,7 +4957,7 @@ GameObject:
   - component: {fileID: 6793263051821588993}
   - component: {fileID: 8855983656842143526}
   - component: {fileID: 7545573596937283720}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: FrostBullet Ult
   m_TagString: Bullet
   m_Icon: {fileID: 0}
@@ -5082,7 +5082,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5405041355362468107}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: EndPosition
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5115,7 +5115,7 @@ GameObject:
   - component: {fileID: 1114477670445647413}
   - component: {fileID: 6086748952135847838}
   - component: {fileID: 9013618293824477868}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: FireCylinder
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5524606337477909920}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: EndPosition
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -43,7 +43,7 @@ GameObject:
   - component: {fileID: 687238358665344505}
   - component: {fileID: 1312661144392287324}
   - component: {fileID: 6936831917109250284}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: FireTrail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -156,7 +156,7 @@ GameObject:
   - component: {fileID: 2656107653549136067}
   - component: {fileID: 3752215282564528108}
   - component: {fileID: 1804233886077011658}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: FireEffect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4988,7 +4988,7 @@ GameObject:
   - component: {fileID: 8856575508441444709}
   - component: {fileID: 7864957432519538726}
   - component: {fileID: 8049126716507038224}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: ExplosiveBullet Ult
   m_TagString: Bullet
   m_Icon: {fileID: 0}
@@ -5114,7 +5114,7 @@ GameObject:
   - component: {fileID: 534436020049181930}
   - component: {fileID: 3969938956849286954}
   - component: {fileID: 4922716064953657185}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: FireCylinder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5194,9 +5194,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7778782058059685060}
     m_Modifications:
+    - target: {fileID: 1700001683036918955, guid: 29f4c72f9a1d9d446945740c2819895b, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 5712219488875869251, guid: 29f4c72f9a1d9d446945740c2819895b, type: 3}
       propertyPath: m_Name
       value: VFX_Fire 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5712219488875869251, guid: 29f4c72f9a1d9d446945740c2819895b, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7531185571972932703, guid: 29f4c72f9a1d9d446945740c2819895b, type: 3}
       propertyPath: InitialModule.gravityModifier.scalar
