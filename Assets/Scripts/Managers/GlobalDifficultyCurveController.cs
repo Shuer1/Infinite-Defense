@@ -8,24 +8,25 @@ public class GlobalDifficultyCurveController : MonoBehaviour
     public EnemyManager eM;
     public int clearEnemyWaveCount = 0;
     public event System.Action OnEnemiesLevelUp;
-    [Header("升级增量配置")]
-    [Header("Enemy1升级提升值")]
-    [SerializeField] private int baseEnemyMaxHPDeltaValue = 50;
-    [SerializeField] private int heavyEnemyMaxHPDeltaValue = 100;
-    [SerializeField] private int baseEnemyDamageDeltaValue = 5;
-    [Header("Enemy2升级提升值")]
-    [SerializeField] private int heavyEnemyDamageDeltaValue = 10;
-    [SerializeField] private int baseEnemyExpDeltaValue = 10;
-    [SerializeField] private int heavyEnemyExpDeltaValue = 20;
-    [Header("Monster1升级提升值")]
-    [SerializeField] private int Monster1MaxHPDeltaValue = 350;
-    [SerializeField] private int Monster1DamageDeltaValue = 20;
-    [SerializeField] private int Monster1ExpDeltaValue = 65;
-    [Header("Monster2升级提升值")]
-    [SerializeField] private int Monster2MaxHPDeltaValue = 500;
-    [SerializeField] private int Monster2DamageDeltaValue = 25;
-    [SerializeField] private int Monster2ExpDeltaValue = 80;
+    // 敌人1升级变化值
+    private int baseEnemyMaxHPDeltaValue = 50;
+    private int baseEnemyDamageDeltaValue = 10;
+    private int baseEnemyExpDeltaValue = 5;
+    // 敌人2升级变化值
+    private int heavyEnemyMaxHPDeltaValue = 100;
+    private int heavyEnemyDamageDeltaValue = 15;
+    private int heavyEnemyExpDeltaValue = 15;
+    // 怪物1升级变化值
+    private int Monster1MaxHPDeltaValue = 350;
+    private int Monster1DamageDeltaValue = 25;
+    private int Monster1ExpDeltaValue = 65;
+    // 怪物2升级变化值
+    private int Monster2MaxHPDeltaValue = 500;
+    private int Monster2DamageDeltaValue = 35;
+    private int Monster2ExpDeltaValue = 80;
+    // 每次升级的波数阈值
     private const int upgradeThreshold = 10;
+    public string EnemiesUPKey = "EnemiesUP";
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -56,6 +57,7 @@ public class GlobalDifficultyCurveController : MonoBehaviour
         {
             clearEnemyWaveCount = 0;
             UpdateData();
+            SoundManager.Instance.PlayEventSFX(EnemiesUPKey);
             OnEnemiesLevelUp?.Invoke();
             Debug.Log("完成10波敌人的清除,敌人全部升级！");
 

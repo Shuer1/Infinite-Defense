@@ -33,7 +33,7 @@ public class RewardManager : MonoBehaviour
     [Tooltip("爆炸范围指示器(圆形UI,设置为Filled Mode)")]
     [SerializeField] private RectTransform bombRangeIndicator;
     [Tooltip("道具爆炸属性")]
-    private int ult_Damage = 200;
+    private int ult_Damage = 400;
     [SerializeField] private float bombRange = 5f;
     [SerializeField] private GameObject bombEffectPrefab;
 
@@ -42,6 +42,7 @@ public class RewardManager : MonoBehaviour
     private bool _isDraggingProp;
     private Vector2 _dragStartPos;
     private const float _dragThreshold = 100f;
+    private const string UsePropKey = "UseProp";
     
     // 添加炸弹位置和范围的字段
     private Vector3 bombPosition;
@@ -107,6 +108,8 @@ public class RewardManager : MonoBehaviour
     private void OnPropPointerDown(BaseEventData data)
     {
         if (currentPropCount <= 0 || _isInCooldown) return;
+
+        SoundManager.Instance.PlayEventSFX(UsePropKey);
 
         var pointerData = (PointerEventData)data;
         _dragStartPos = pointerData.position;

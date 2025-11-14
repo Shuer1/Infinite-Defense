@@ -16,7 +16,7 @@ public class EntireBgmManager : MonoBehaviour
 
     [Header("初始播放设置")]
     [SerializeField] private int initialOrder = 0;
-    public float initialVolume = 1f;
+    [Range(0f, 0.8f)] public float initialVolume = 0.8f;
 
     [Header("主场景音量滑块设置")]
     [SerializeField] private string mainSceneName = "StartGameUI"; // 主场景名称

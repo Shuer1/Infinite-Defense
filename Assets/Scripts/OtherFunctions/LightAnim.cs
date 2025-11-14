@@ -26,6 +26,8 @@ public class LightAnim : MonoBehaviour
     // 新增：危险状态颜色
     [Tooltip("生命值过低时的光源颜色")]
     public Color dangerColor = Color.red;
+    private const string LowHPKey = "LowHP"; // 新增✅
+    private bool isDangerous = false;
 
     void Start()
     {
@@ -79,17 +81,19 @@ public class LightAnim : MonoBehaviour
     // 新增：根据生命值更新光源颜色的独立方法
     private void UpdateLightColorByHealth()
     {
-        // 检查控制器是否存在且生命值有效
         if (towerController != null && towerController.maxHealth > 0)
         {
-            // 判断当前生命值是否小于最大生命值的1/3
-            if (towerController.currentHealth < towerController.maxHealth / 2)
+            bool low = towerController.currentHealth < towerController.maxHealth / 2;
+
+            if (low && !isDangerous)
             {
+                isDangerous = true;
                 towerLight.color = dangerColor;
+                SoundManager.Instance.PlayEventSFX(LowHPKey);
             }
-            else
+            else if (!low && isDangerous)
             {
-                // 恢复原始颜色
+                isDangerous = false;
                 towerLight.color = originalLightColor;
             }
         }

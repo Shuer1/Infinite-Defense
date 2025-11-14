@@ -2139,134 +2139,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 455362741}
   m_CullTransparentMesh: 1
---- !u!1 &469150678
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 469150680}
-  - component: {fileID: 469150679}
-  m_Layer: 0
-  m_Name: HitSound
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!82 &469150679
-AudioSource:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 469150678}
-  m_Enabled: 1
-  serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: e21de6fc3fefe436487f6ef372aad15f, type: 3}
-  m_PlayOnAwake: 0
-  m_Volume: 1
-  m_Pitch: 1
-  Loop: 0
-  Mute: 0
-  Spatialize: 0
-  SpatializePostEffects: 0
-  Priority: 128
-  DopplerLevel: 0
-  MinDistance: 1
-  MaxDistance: 500
-  Pan2D: 0
-  rolloffMode: 2
-  BypassEffects: 0
-  BypassListenerEffects: 0
-  BypassReverbZones: 0
-  rolloffCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  panLevelCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  spreadCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  reverbZoneMixCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
---- !u!4 &469150680
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 469150678}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 747274796}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &473153301
 GameObject:
   m_ObjectHideFlags: 0
@@ -3545,52 +3417,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!1 &747274794
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 747274796}
-  - component: {fileID: 747274795}
-  m_Layer: 0
-  m_Name: SoundManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &747274795
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 747274794}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dcecea5ba4f8c48808e9bc4693f98b63, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  lightningSource: {fileID: 469150679}
---- !u!4 &747274796
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 747274794}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 469150680}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &754504768
 Transform:
   m_ObjectHideFlags: 0
@@ -5429,10 +5255,10 @@ MonoBehaviour:
   enemyManager: {fileID: 1031757754}
   moveSound: {fileID: 754927731}
   shootSound: {fileID: 1050021791}
-  normalShootSound: {fileID: 8300000, guid: b8ff52def410b4ddbabf2997f048c4dc, type: 3}
-  explosionShootSound: {fileID: 8300000, guid: c40fd92c73f4545f2b4c9de807ecb503, type: 3}
-  frostShootSound: {fileID: 8300000, guid: 1a319fda147c4427fb16710003f9a1ce, type: 3}
-  ThunderShootSound: {fileID: 8300000, guid: 90872b565578c42fdb2b79102d1d5275, type: 3}
+  normalShootSound: {fileID: 8300000, guid: aa5ae574414134c09b7a658d13162a59, type: 3}
+  explosionShootSound: {fileID: 8300000, guid: 1a319fda147c4427fb16710003f9a1ce, type: 3}
+  frostShootSound: {fileID: 8300000, guid: 0daaef28532e9410b999d30d160febbb, type: 3}
+  ThunderShootSound: {fileID: 8300000, guid: ac63271dc8de2498da22156c31e64afc, type: 3}
   btn_ResetLive: {fileID: 1260621336}
 --- !u!54 &942823809
 Rigidbody:
@@ -5849,7 +5675,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: b8ff52def410b4ddbabf2997f048c4dc, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 0.1
+  m_Volume: 0.8
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -9887,18 +9713,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   eM: {fileID: 1031757754}
   clearEnemyWaveCount: 0
-  baseEnemyMaxHPDeltaValue: 20
-  heavyEnemyMaxHPDeltaValue: 50
-  baseEnemyDamageDeltaValue: 5
-  heavyEnemyDamageDeltaValue: 10
-  baseEnemyExpDeltaValue: 5
-  heavyEnemyExpDeltaValue: 10
-  Monster1MaxHPDeltaValue: 350
-  Monster1DamageDeltaValue: 20
-  Monster1ExpDeltaValue: 65
-  Monster2MaxHPDeltaValue: 500
-  Monster2DamageDeltaValue: 25
-  Monster2ExpDeltaValue: 80
+  EnemiesUPKey: EnemiesUP
 --- !u!4 &1742370149
 Transform:
   m_ObjectHideFlags: 0
@@ -10067,19 +9882,19 @@ MonoBehaviour:
     type: 5
   - upgradeType: 6
     displayName: RangeUp
-    description: Wider explose range
+    description: Wider explosion range
     cardImage: {fileID: 21300000, guid: 9065e93b766a04f3980f9786cb9adec4, type: 3}
     value: 1
     type: 6
   - upgradeType: 7
     displayName: FrostTime
-    description: LongerDuration
+    description: Longer Duration
     cardImage: {fileID: 21300000, guid: c7c5562fd799b4917b366ae4f0a91ba5, type: 3}
     value: 1
     type: 7
   - upgradeType: 8
     displayName: PlusLightning
-    description: MoreLightningCount
+    description: More Lightning Count
     cardImage: {fileID: 21300000, guid: 4674fc87f6e1e4f49829c27391d33514, type: 3}
     value: 1
     type: 8
@@ -12746,7 +12561,6 @@ SceneRoots:
   - {fileID: 2135707041}
   - {fileID: 433803623}
   - {fileID: 1742370149}
-  - {fileID: 747274796}
   - {fileID: 950725519}
   - {fileID: 232166977}
   - {fileID: 4237741262077510}

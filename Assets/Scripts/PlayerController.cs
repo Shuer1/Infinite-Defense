@@ -37,6 +37,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody rb;
     private Animator animator;
     private bool isInvincible = false;
+    private const string GameBeginKey = "GameBegin";
     [Header("射击音效-映射和移动声")]
     public AudioSource moveSound;
     public AudioSource shootSound;
@@ -70,6 +71,7 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
         ResetLive();                            //每次进入游戏，重置玩家状态
+        SoundManager.Instance.PlayEventSFX(GameBeginKey);
     }
 
     void Update()
