@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using TMPro;
 using UnityEngine;
 
 public class SpawnManager : MonoBehaviour
@@ -13,7 +12,7 @@ public class SpawnManager : MonoBehaviour
     public float xMax = 5f;
 
     [Header("波数设置")]
-    public const int maxEnemyCount = 30;
+    public int maxActiveEnemies = 30;
     public int baseEnemyCount = 3;
     public int enemiesPerWaveIncrease = 2;
     public float heavyEnemyBaseChance = 0.1f;
@@ -63,13 +62,7 @@ public class SpawnManager : MonoBehaviour
         int specialMonsterCount = 0;
         if (wave > 10)
         {
-            float triggerChance = UnityEngine.Random.Range(0.5f, 0.75f);
-            if (UnityEngine.Random.value < triggerChance)
-            {
-                if (wave <= 20) specialMonsterCount = 1;
-                else if (wave <= 30) specialMonsterCount = UnityEngine.Random.Range(1, 3); // 1或2
-                else specialMonsterCount = UnityEngine.Random.Range(1, 4);               // 1~3
-            }
+            specialMonsterCount = Mathf.FloorToInt(wave / 10f); // 向下取整
         }
 
         int spawned = 0;
@@ -103,13 +96,16 @@ public class SpawnManager : MonoBehaviour
                 spawn_LineFiled.position.z);
 
             enemyManager.GetEnemy(chosenType, pos, Quaternion.identity);
+
+            while (enemyManager.activeEnemies.Count >= maxActiveEnemies) // 等待直到活跃怪物数量小于上限
+                yield return null;
+
             spawned++;
             yield return new WaitForSeconds(0.2f);
         }
     }
 
-    private int CalculateEnemyCount(int wave) =>
-        Mathf.Min(baseEnemyCount + (wave - 1) * enemiesPerWaveIncrease, maxEnemyCount);
+    private int CalculateEnemyCount(int wave) => baseEnemyCount + (wave - 1) * enemiesPerWaveIncrease; // 无限制
 
     private float CalculateHeavyChance(int wave) =>
         Mathf.Clamp01(heavyEnemyBaseChance + (wave - 1) * heavyExtraChancePerWave);

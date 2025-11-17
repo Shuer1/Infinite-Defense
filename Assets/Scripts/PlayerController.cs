@@ -218,16 +218,14 @@ public class PlayerController : MonoBehaviour
         if (level <= 15)
         {
             // 线性段：1 级 100，每级 +120，可任意改基值与步长
-            experienceToNextLevel = 100 + (level - 1) * 120;
+            experienceToNextLevel = Mathf.RoundToInt((100 + (level - 1) * 120) * 1.4f);
         }
         else
         {
-            // 指数段：以 15 级的线性末端为“锚点”做平滑衔接
-            // 先求出 15 级时线性公式给出的值
-            int lv15Exp = 100 + (15 - 1) * 120;   // = 1780
-
-            // 指数增长：1780 * q^(level-15) ，q 取 1.48 与原 1.48 保持一致
-            experienceToNextLevel = Mathf.RoundToInt(lv15Exp * Mathf.Pow(1.48f, level - 15));
+           // 指数段，降低增长率至1.28，缓和曲线
+            int lv15Exp = Mathf.RoundToInt((100 + (15 - 1) * 120) * 1.4f); // 2492
+            float growthRate = 1.28f; // 指数增长率
+            experienceToNextLevel = Mathf.RoundToInt(lv15Exp * Mathf.Pow(growthRate, level - 15));
         }
 
         // 2) 清零当前经验
@@ -277,7 +275,6 @@ public class PlayerController : MonoBehaviour
         isDead = false; // 重置死亡状态
         animator.ResetTrigger("Die");
         experience /= 2; // 复活损失一半经验
-        isDead = false;
         isMoving = false;
 
         GameManager.Instance?.Restart();
