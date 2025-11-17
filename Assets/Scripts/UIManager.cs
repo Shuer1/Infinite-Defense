@@ -42,9 +42,10 @@ public class UIManager : MonoBehaviour
     public GameObject gameOverPanel;
     [Header("倒计时UI图片配置")]
     public Image[] countdownImages;
-    private bool isUpgradePanelOpen = false;
+    public bool isUpgradePanelOpen = false;
     private bool isFirstKillPanelOpen = false;
     private bool isUsingTicket = false;
+    public bool isProcessingUpgradePanel = false;
 
     void Awake()
     {
@@ -162,11 +163,18 @@ public class UIManager : MonoBehaviour
 
     public void ShowUpgradePanel()
     {
+        if (isProcessingUpgradePanel || isUpgradePanelOpen)
+        {
+            Debug.LogWarning("正在处理升级面板或面板已打开");
+            return;
+        }
+
         StartCoroutine(ShowUpgradePanelDelayed());
     }
 
     private IEnumerator ShowUpgradePanelDelayed()
     {
+        isProcessingUpgradePanel = true;
         // ✅ 如果首杀面板正在播放动画或未关闭，等待它关闭完毕
         if (firstKillPanelAnim != null && (firstKillPanelAnim.IsAnimating || isFirstKillPanelOpen))
         {
@@ -178,10 +186,25 @@ public class UIManager : MonoBehaviour
         }
 
         // ✅ 确保只显示升级面板
-        if (upgradePanelAnim == null) yield break;
+        if (upgradePanelAnim == null)
+        {
+            isProcessingUpgradePanel = false; // 处理完成-解锁
+            yield break;
+        }
+
+        // 确保面板关闭后再打开（避免动画冲突）
+        if (isUpgradePanelOpen)
+        {
+            isProcessingUpgradePanel = false;
+            yield break;
+        }
 
         upgradePanelAnim.OpenPanel();
         isUpgradePanelOpen = true;
+
+        // 等待打开动画完成后再解锁
+        yield return new WaitWhile(() => upgradePanelAnim.IsAnimating);
+        isProcessingUpgradePanel = false;
     }
 
     public void HideUpgradePanel()
@@ -327,6 +350,12 @@ public class UIManager : MonoBehaviour
         {
             // 后续添加广告进入
             Debug.LogWarning("[升级券] 已用完！");
+            return;
+        }
+
+        if (Instance.isUpgradePanelOpen || Instance.isProcessingUpgradePanel)
+        {
+            Debug.LogWarning("升级面板已被激活...");
             return;
         }
 

@@ -71,6 +71,12 @@ public class UpgradeManager : MonoBehaviour
 
     public void ShowUpgradeOptions()
     {
+        if (UIManager.Instance != null && (UIManager.Instance.isUpgradePanelOpen || UIManager.Instance.isProcessingUpgradePanel))
+        {
+            Debug.LogWarning("升级面板已打开,忽略ShowUpgradeOptions调用");
+            return;
+        }
+
         if (allUpgrades.Count < 3)
         {
             Debug.LogError($"升级选项不足3个(当前：{allUpgrades.Count})", this);
@@ -86,18 +92,12 @@ public class UpgradeManager : MonoBehaviour
         }
 
         RewardManager rewardManager = FindObjectOfType<RewardManager>();
-        if (rewardManager != null)
-        {
-            rewardManager.CancelDraggingPropIfAny();
-        }
+        rewardManager?.CancelDraggingPropIfAny();
 
         if (upgradePanelScaleAnim != null && !GameManager.Instance.isGameOver)
         {
-            if (CameraShakeController.Instance != null)
-            {
-                CameraShakeController.Instance.allowShake = false;
-                CameraShakeController.Instance.CancelShake();
-            }
+            CameraShakeController.Instance?.CancelShake();
+            CameraShakeController.Instance.allowShake = false;
             
             UIManager.Instance.ShowUpgradePanel();
         }
@@ -130,7 +130,11 @@ public class UpgradeManager : MonoBehaviour
         }
 
         ApplyUpgradeByType(upgrade.type, upgrade.value);
-        Debug.Log($"应用升级：{upgrade.displayName}（ID：{upgradeType}）");
+
+        UIManager.Instance.isProcessingUpgradePanel = false;
+        UIManager.Instance.isUpgradePanelOpen = false;
+
+        Debug.Log($"应用升级：{upgrade.displayName}(ID: {upgradeType})");
     }
 
     private void ApplyUpgradeByType(UpgradeType type, int value) // 引用外部定义的UpgradeType
