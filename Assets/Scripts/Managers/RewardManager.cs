@@ -47,6 +47,11 @@ public class RewardManager : MonoBehaviour
     // 添加炸弹位置和范围的字段
     private Vector3 bombPosition;
     private float bombRangeSaved;
+    [Header("广告提示UI")]
+    [SerializeField] private CanvasGroup adFailGroup;
+    [SerializeField] private TextMeshProUGUI adFailText;
+    private Coroutine adFailCoroutine;
+
 
     // 存储延迟执行的动作
     private Dictionary<string, Action> delayedActions = new Dictionary<string, Action>();
@@ -362,13 +367,17 @@ public class RewardManager : MonoBehaviour
     {
         if (AdsManager.Instance == null)
         {
-            EnableButtonDelayed(1f);
+            ShowAdFailMessage("The ad function has not finished loading. Please try again later.");
+            EnableButtonDelayed(0.2f);
             return;
         }
 
         bool shown = AdsManager.Instance.ShowRewardedAd();
         if (!shown)
+        {
+            ShowAdFailMessage("No ads are available. Please try again later.");
             EnableButtonDelayed(1f);
+        }
     }
 
     private void OnAdRewardCompleted(bool success)
@@ -377,8 +386,12 @@ public class RewardManager : MonoBehaviour
         if (!_isInCooldown)
             EnableButton();
 
+        EnableButton(); // 强制恢复按钮
+
         if (success)
             GiveReward();
+        else
+            ShowAdFailMessage("Ad playback failed. Please try again later.");
     }
 
     private void GiveReward()
@@ -441,5 +454,48 @@ public class RewardManager : MonoBehaviour
         if (rewardButton == null) return;
         CancelInvoke(nameof(EnableButton));
         Invoke(nameof(EnableButton), delay);
+    }
+
+    private void ShowAdFailMessage(string msg)
+    {
+        if (adFailText == null || adFailGroup == null)
+        {
+            return;
+        }
+
+        adFailText.text = msg;
+
+        if(adFailCoroutine != null)
+            StopCoroutine(adFailCoroutine);
+
+        adFailCoroutine = StartCoroutine(ShowAdFailMessageCoroutine());
+    }
+
+    private IEnumerator ShowAdFailMessageCoroutine()
+    {
+        adFailGroup.gameObject.SetActive(true);
+
+        // Fade in
+        float t = 0f;
+        while (t < 0.25f)
+        {
+            t += Time.unscaledDeltaTime;
+            adFailGroup.alpha = Mathf.Lerp(0f, 1f, t / 0.25f);
+            yield return null;
+        }
+
+        // Hold
+        yield return new WaitForSecondsRealtime(1.5f);
+
+        // Fade out
+        t = 0f;
+        while (t < 0.25f)
+        {
+            t += Time.unscaledDeltaTime;
+            adFailGroup.alpha = Mathf.Lerp(1f, 0f, t / 0.25f);
+            yield return null;
+        }
+
+        adFailGroup.gameObject.SetActive(false);
     }
 }
