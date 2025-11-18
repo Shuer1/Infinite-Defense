@@ -11,37 +11,20 @@ public class DamageTextManager : MonoBehaviour
     [SerializeField] private Canvas canvas;
     [SerializeField] private int initialPoolSize = 10;
     [SerializeField] private int maxActiveTexts = 5;
-    [SerializeField] private GameObject obj_dontDestroyOnLoad;
 
     private Queue<DamageText> pool = new Queue<DamageText>();
     private List<DamageText> activeTexts = new List<DamageText>();
 
     private void Awake()
     {
-        DontDestroyOnLoad(obj_dontDestroyOnLoad);
-
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-
-            SceneManager.sceneLoaded += OnSceneLoaded; // ✅ 订阅场景切换事件
-        }
-        else
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
             return;
         }
+        Instance = this;
 
         InitializePool();
-        EnsureCanvasBound();
-    }
-
-    /// <summary>
-    /// 场景切换时自动重新绑定 Canvas
-    /// </summary>
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
         EnsureCanvasBound();
     }
 
@@ -67,11 +50,7 @@ public class DamageTextManager : MonoBehaviour
 
         if (canvas == null)
         {
-            Debug.LogWarning("[DamageTextManager] ⚠️ 未找到 Canvas，请确保场景中存在一个 Canvas 或添加 Tag：MainUI");
-        }
-        else
-        {
-            Debug.Log($"[DamageTextManager] ✅ 绑定 Canvas：{canvas.name}", canvas);
+            Debug.LogWarning("[DamageTextManager] ⚠️ 未找到 Canvas");
         }
     }
 
@@ -164,10 +143,5 @@ public class DamageTextManager : MonoBehaviour
 
         activeTexts.Remove(dt);
         pool.Enqueue(dt);
-    }
-
-    private void OnDestroy()
-    {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 }

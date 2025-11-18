@@ -45,9 +45,7 @@ public class PlayerController : MonoBehaviour
     public AudioClip explosionShootSound;
     public AudioClip frostShootSound;
     public AudioClip ThunderShootSound;
-    private Dictionary<BulletType, AudioClip> bulletSoundDict; //子弹音效字典～优雅
-    [Header("按钮Btn_UI_Element")]
-    public Button btn_ResetLive;
+    private Dictionary<BulletType, AudioClip> bulletSoundDict; //子弹音效管理-字典实现～优雅
 
     void Awake()
     {

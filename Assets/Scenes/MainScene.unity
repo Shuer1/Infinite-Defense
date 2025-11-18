@@ -5444,7 +5444,6 @@ MonoBehaviour:
   explosionShootSound: {fileID: 8300000, guid: 1a319fda147c4427fb16710003f9a1ce, type: 3}
   frostShootSound: {fileID: 8300000, guid: 0daaef28532e9410b999d30d160febbb, type: 3}
   ThunderShootSound: {fileID: 8300000, guid: ac63271dc8de2498da22156c31e64afc, type: 3}
-  btn_ResetLive: {fileID: 1260621336}
 --- !u!54 &942823809
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -7027,7 +7026,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.9433962, g: 0.93004626, b: 0.93004626, a: 1}
+  m_Color: {r: 0.9433962, g: 0.93004626, b: 0.93004626, a: 0.98039216}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
