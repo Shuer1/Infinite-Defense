@@ -27,10 +27,11 @@ public class UpgradeManager : MonoBehaviour
     // 常量定义
     private const float FIRE_RATE_REDUCTION_MULTIPLIER = 0.01f;
     private const float SLOW_DURATION_MULTIPLIER = 0.25f;
-    private const float EXPLOSION_RANGE_MULTIPLIER = 0.2f;
+    private const float EXPLOSION_RANGE_MULTIPLIER = 0.15f;
     private const float MIN_FIRE_RATE = 0.2f;
     private const float MAX_SLOW_DURATION = 2.5f;
     private const float MAX_EXPLOSION_RANGE = 2f;
+    private const int MAX_THUNDER_COUNT = 5;
 
     private void Awake()
     {
@@ -341,7 +342,7 @@ public class UpgradeManager : MonoBehaviour
         }
 
         int currentCount = DataManager.GetInt(DataManager.LightningCountKey);
-        int newCount = currentCount + value;
+        int newCount = Mathf.Min(MAX_THUNDER_COUNT, currentCount + value);
 
         BulletManager.Instance.UpdateBulletSpecialValue(BulletType.Lightning, 1, newCount);
 

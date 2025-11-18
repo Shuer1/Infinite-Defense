@@ -5128,6 +5128,8 @@ MonoBehaviour:
   - {fileID: 324855884}
   - {fileID: 1514297488}
   - {fileID: 168855935}
+  isUpgradePanelOpen: 0
+  isProcessingUpgradePanel: 0
 --- !u!1 &856274217
 GameObject:
   m_ObjectHideFlags: 0
@@ -9436,8 +9438,9 @@ MonoBehaviour:
   spawn_LineFiled: {fileID: 450734461}
   xMin: -4.5
   xMax: 4.5
+  maxActiveEnemies: 30
   baseEnemyCount: 3
-  enemiesPerWaveIncrease: 1
+  enemiesPerWaveIncrease: 2
   heavyEnemyBaseChance: 0.1
   heavyExtraChancePerWave: 0.02
   uiPartImg: {fileID: 2093249421}

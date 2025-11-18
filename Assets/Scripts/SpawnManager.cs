@@ -59,17 +59,16 @@ public class SpawnManager : MonoBehaviour
         int enemyCount = CalculateEnemyCount(wave);
 
         /* ✅ 提前决定整波特殊怪数量（只触发一次） */
-        int specialMonsterCount = 0;
-        if (wave > 10)
-        {
-            specialMonsterCount = Mathf.FloorToInt(wave / 10f); // 向下取整
-        }
+        int specialMonsterCount = (wave > 10) ? Mathf.FloorToInt(wave / 10f) : 0;
 
         int spawned = 0;
         int specialSpawned = 0;
 
         while (spawned < enemyCount)
         {
+            while(enemyManager.activeEnemies.Count >= maxActiveEnemies) // 在生成之前等待同屏数量小于上限
+                yield return null;
+
             /* ✅ 优先生成特殊怪 */
             if (specialSpawned < specialMonsterCount)
             {
@@ -96,9 +95,6 @@ public class SpawnManager : MonoBehaviour
                 spawn_LineFiled.position.z);
 
             enemyManager.GetEnemy(chosenType, pos, Quaternion.identity);
-
-            while (enemyManager.activeEnemies.Count >= maxActiveEnemies) // 等待直到活跃怪物数量小于上限
-                yield return null;
 
             spawned++;
             yield return new WaitForSeconds(0.2f);
