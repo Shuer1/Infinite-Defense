@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using System.Collections;
 using System;
 using Unity.VisualScripting;
+using GoogleMobileAds.Api;
 
 public class UIManager : MonoBehaviour
 {
@@ -47,6 +48,9 @@ public class UIManager : MonoBehaviour
     private bool isFirstKillPanelOpen = false;
     private bool isUsingTicket = false;
     public bool isProcessingUpgradePanel = false;
+    [Header("事件触发UI")]
+    public GameObject enemiesLevelUpWarnUI;
+    public GameObject rewardLevelStartedUI;
 
     void Awake()
     {
@@ -75,6 +79,8 @@ public class UIManager : MonoBehaviour
         if (GlobalDifficultyCurveController.Instance != null)
         {
             GlobalDifficultyCurveController.Instance.OnEnemiesLevelUp += UpdateEnemiesLevelUI;
+            GlobalDifficultyCurveController.Instance.OnEnemiesLevelUp += EnemiesLevelUpWarn;
+            GlobalDifficultyCurveController.Instance.OnRewardLevelStarted += RewardLevelStartedNotice;
         }
         else
         {
@@ -82,14 +88,23 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        //useTicketBtn?.onClick.AddListener(UseTicket);
-
         useTicketBtn?.onClick.AddListener(OnUseOrWatchAdForTicketClicked);
         AdsManager.Instance.OnTicketRewardedAdCompleted += OnTicketRewardedAdCompleted;
         ShowAndUpdateTicketCount(currentTicketCount);
 
         grantFKRewardButton?.onClick.AddListener(OnFKRewardGrant);
         HideFirstKillPanel();
+
+    }
+
+    private void EnemiesLevelUpWarn()
+    {
+        enemiesLevelUpWarnUI.SetActive(true);
+    }
+
+    private void RewardLevelStartedNotice()
+    {
+        rewardLevelStartedUI.SetActive(true);
     }
 
     public void ShowFirstKillPanel(EnemyType type)
@@ -407,8 +422,11 @@ public class UIManager : MonoBehaviour
             spawnManager.OnWaveCompleted -= UpdateWaveUI;
 
         if (GlobalDifficultyCurveController.Instance != null)
+        {
             GlobalDifficultyCurveController.Instance.OnEnemiesLevelUp -= UpdateEnemiesLevelUI;
-
+            GlobalDifficultyCurveController.Instance.OnEnemiesLevelUp -= EnemiesLevelUpWarn;
+        }
+        
         if (useTicketBtn != null)
             useTicketBtn.onClick.RemoveListener(OnUseOrWatchAdForTicketClicked);
             

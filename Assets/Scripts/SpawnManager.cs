@@ -30,9 +30,19 @@ public class SpawnManager : MonoBehaviour
     void Start()
     {
         currentWave = DataManager.GetInt(DataManager.CurrentWaveKey);
+        StartWave(currentWave);
+    }
+
+    void OnEnable()
+    {
         if (enemyManager != null)
             enemyManager.OnAllEnemiesCleared += StartNextWave;
-        StartWave(currentWave);
+    }
+
+    void OnDisable()
+    {
+        if (enemyManager != null)
+            enemyManager.OnAllEnemiesCleared -= StartNextWave;
     }
 
     private void StartWave(int wave)
@@ -108,15 +118,10 @@ public class SpawnManager : MonoBehaviour
 
     private void StartNextWave()
     {
+        Debug.Log($"触发StartNextWave,当前波数从{currentWave}变为{currentWave+1}"); // 新增日志
         currentWave++;
         DataManager.SaveInt(DataManager.CurrentWaveKey, currentWave);
         StartWave(currentWave);
         OnWaveCompleted?.Invoke();
-    }
-
-    private void OnDestroy()
-    {
-        if (enemyManager != null)
-            enemyManager.OnAllEnemiesCleared -= StartNextWave;
     }
 }

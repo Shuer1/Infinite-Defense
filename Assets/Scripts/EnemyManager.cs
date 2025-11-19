@@ -1,44 +1,43 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class EnemyManager : MonoBehaviour
 {
+    // 保留原公开变量名（序列化字段不丢失，外部引用无感知）
     [Header("对象池设置")]
-    public EnemyBase basicEnemyPrefab;  // 基础怪物预制体
-    public EnemyBase heavyEnemyPrefab;  // 重型怪物预制体
-    public EnemyBase Monster1Prefab;    // 怪物1预制体 -- 新增✅
-    public EnemyBase Monster2Prefab;    // 怪物2预制体 -- 新增✅
-    public int initialPoolSize = 5;    // 初始对象池大小
+    public EnemyBase basicEnemyPrefab;
+    public EnemyBase heavyEnemyPrefab;
+    public EnemyBase Monster1Prefab;
+    public EnemyBase Monster2Prefab;
+    public int initialPoolSize = 5;
 
     [Header("分离设置")]
     public float separationRadius = 1.5f;
     public float separationForce = 3f;
 
-    // 对象池：key=怪物类型，value=待复用的怪物队列
+    // 保留原私有容器
     private Dictionary<EnemyType, Queue<EnemyBase>> enemyPools = new();
-    // 当前活跃的怪物列表
     public List<EnemyBase> activeEnemies = new();
 
-    // 所有怪物被清空时触发（用于波数更新）
-    public event System.Action OnAllEnemiesCleared; //event关键字。表示限制：该委托只能在声明其的类内部被触发，外部类通过+=和-=来添加或移除委托
+    // 保留原事件
+    public event System.Action OnAllEnemiesCleared;
 
-    // 关键修改：将初始化从Start移到Awake（Awake在Start之前执行）
+    // 保留原Awake逻辑
     void Awake()
     {
-        // 初始化对象池
         InitializePool(EnemyType.Basic, basicEnemyPrefab, 5);
         InitializePool(EnemyType.Heavy, heavyEnemyPrefab, 5);
         InitializePool(EnemyType.Monster1, Monster1Prefab, 3);
         InitializePool(EnemyType.Monster2, Monster2Prefab, 3);
     }
 
+    // 保留原Update逻辑
     void Update()
     {
-        // 处理活跃怪物的分离逻辑
         for (int i = 0; i < activeEnemies.Count; i++)
         {
-            // 跳过非活跃状态的敌人
             if (!activeEnemies[i].gameObject.activeInHierarchy) continue;
 
             Vector3 separation = Vector3.zero;
@@ -59,7 +58,7 @@ public class EnemyManager : MonoBehaviour
         }
     }
 
-    // 初始化指定类型的对象池
+    // 保留原重载方法（避免内部调用报错）
     private void InitializePool(EnemyType type, EnemyBase prefab)
     {
         if (prefab == null)
@@ -71,16 +70,16 @@ public class EnemyManager : MonoBehaviour
         Queue<EnemyBase> pool = new Queue<EnemyBase>();
         for (int i = 0; i < initialPoolSize; i++)
         {
-            EnemyBase enemy = Instantiate(prefab, transform); // 设置父物体，整理层级
+            EnemyBase enemy = Instantiate(prefab, transform);
             enemy.gameObject.SetActive(false);
-            enemy.enemyType = type; // 确保敌人类型正确
-            RegisterEnemyDeathCallback(enemy); // 注册死亡回调
+            enemy.enemyType = type;
+            RegisterEnemyDeathCallback(enemy);
             pool.Enqueue(enemy);
         }
         enemyPools[type] = pool;
     }
 
-    // ✅ 新增重载：允许自定义初始数量
+    // 保留原自定义数量重载
     private void InitializePool(EnemyType type, EnemyBase prefab, int customCount)
     {
         if (prefab == null)
@@ -101,7 +100,7 @@ public class EnemyManager : MonoBehaviour
         enemyPools[type] = pool;
     }
 
-    // 从对象池获取怪物，并重置Tag为"Enemy"
+    // 保留原GetEnemy方法（外部调用无感知）
     public EnemyBase GetEnemy(EnemyType type, Vector3 spawnPos, Quaternion rotation)
     {
         if (!enemyPools.ContainsKey(type))
@@ -113,12 +112,9 @@ public class EnemyManager : MonoBehaviour
         Queue<EnemyBase> pool = enemyPools[type];
         EnemyBase enemy;
 
-        // 池为空时动态扩容
         if (pool.Count == 0)
         {
-            //enemy = Instantiate(type == EnemyType.Basic ? basicEnemyPrefab : heavyEnemyPrefab, transform);
-
-            EnemyBase prefabToInstantiate = type switch // 扩展方法，以兼容新怪物类型
+            EnemyBase prefabToInstantiate = type switch
             {
                 EnemyType.Basic => basicEnemyPrefab,
                 EnemyType.Heavy => heavyEnemyPrefab,
@@ -137,21 +133,19 @@ public class EnemyManager : MonoBehaviour
 
             enemy.enemyType = type;
             RegisterEnemyDeathCallback(enemy);
-            // 对新实例化的敌人也要进行完整的状态重置
             enemy.ResetEnemyState(spawnPos, rotation);
         }
         else
         {
             enemy = pool.Dequeue();
-            // 调用状态重置方法
             enemy.ResetEnemyState(spawnPos, rotation);
         }
 
-        RegisterEnemy(enemy); // 注册到活跃列表
+        RegisterEnemy(enemy);
         return enemy;
     }
 
-    // 注册敌人到活跃列表
+    // 保留原注册/注销方法
     public void RegisterEnemy(EnemyBase enemy)
     {
         if (enemy == null)
@@ -163,12 +157,10 @@ public class EnemyManager : MonoBehaviour
         if (!activeEnemies.Contains(enemy))
         {
             activeEnemies.Add(enemy);
-            // 确保死亡回调已注册
             RegisterEnemyDeathCallback(enemy);
         }
     }
 
-    // 从活跃列表中注销敌人（用于敌人死亡时调用）
     public void UnregisterEnemy(EnemyBase enemy)
     {
         if (enemy == null)
@@ -183,30 +175,23 @@ public class EnemyManager : MonoBehaviour
         }
     }
 
-    // 处理怪物死亡（回收至对象池）
+    // 保留原死亡处理逻辑
     private void HandleEnemyDeath(EnemyBase enemy)
     {
         if (enemy == null) return;
-
-        // 先禁用对象，等待动画播放完成后再放入对象池
         StartCoroutine(DisableAfterAnimation(enemy));
     }
 
-    // 使用非泛型IEnumerator
+    // 保留原协程方法
     private IEnumerator DisableAfterAnimation(EnemyBase enemy)
     {
-        // 假设死亡动画时长约0.5秒，可根据实际动画调整
         yield return new WaitForSeconds(0.5f);
 
-        // 再次检查敌人是否为空（防止中途被销毁的极端情况）
         if (enemy != null && enemy.gameObject != null)
         {
-            // 在回收前彻底重置敌人状态，使用当前位置作为临时位置
-            // 真正的位置会在下次从对象池取出时设置
             enemy.ResetEnemyState(enemy.transform.position, enemy.transform.rotation);
             enemy.gameObject.SetActive(false);
 
-            // 回收至对应类型的对象池
             if (enemyPools.TryGetValue(enemy.enemyType, out var pool))
             {
                 pool.Enqueue(enemy);
@@ -214,10 +199,9 @@ public class EnemyManager : MonoBehaviour
             else
             {
                 Debug.LogError($"未找到{enemy.enemyType}类型的对象池，无法回收敌人！");
-                Destroy(enemy.gameObject); // 万不得已才销毁
+                Destroy(enemy.gameObject);
             }
 
-            // 检查当前波是否所有怪物都被消灭
             if (activeEnemies.Count == 0)
             {
                 OnAllEnemiesCleared?.Invoke();
@@ -225,62 +209,66 @@ public class EnemyManager : MonoBehaviour
         }
     }
 
+    // 保留原刷新方法（外部调用无感知）
     public void RefreshAllEnemiesStatusFromData()
     {
         Debug.Log("<color=cyan>统一刷新敌人属性...</color>");
 
         int enemiesLevel = DataManager.GetInt(DataManager.EnemiesLevelKey);
 
-        // 刷新池中敌人
         foreach (var kvp in enemyPools)
         {
             foreach (var enemy in kvp.Value)
                 ApplyUpdatedStats(enemy, enemiesLevel);
         }
 
-        // 刷新活跃敌人
         foreach (var enemy in activeEnemies)
             ApplyUpdatedStats(enemy, enemiesLevel);
     }
-    
+
+    // 修复奖励倍数应用（核心功能，不修改方法签名）
     private void ApplyUpdatedStats(EnemyBase enemy, int level)
     {
         if (enemy == null) return;
 
         enemy.EnemiesLevel = level;
         
+        bool isReward = GlobalDifficultyCurveController.Instance?.IsRewardLevel() ?? false;
+        float statMultiplier = isReward ? GlobalDifficultyCurveController.Instance.GetRewardStatMultiplier() : 1f;
+        float expMultiplier = isReward ? GlobalDifficultyCurveController.Instance.GetRewardExpMultiplier() : 1f;
+
+        // 保留原switch逻辑，仅添加倍数应用
         switch (enemy.enemyType)
         {
             case EnemyType.Basic:
-                enemy.maxHealth = DataManager.GetInt(DataManager.Enemy1MaxHealthKey);
-                enemy.damage = DataManager.GetInt(DataManager.Enemy1DamageKey);
-                enemy.expReward = DataManager.GetInt(DataManager.Enemy1ExpRewardKey);
+                enemy.maxHealth = Mathf.RoundToInt(DataManager.GetInt(DataManager.Enemy1MaxHealthKey) * statMultiplier);
+                enemy.damage = Mathf.RoundToInt(DataManager.GetInt(DataManager.Enemy1DamageKey) * statMultiplier);
+                enemy.expReward = Mathf.RoundToInt(DataManager.GetInt(DataManager.Enemy1ExpRewardKey) * expMultiplier);
                 break;
             case EnemyType.Heavy:
-                enemy.maxHealth = DataManager.GetInt(DataManager.Enemy2MaxHealthKey);
-                enemy.damage = DataManager.GetInt(DataManager.Enemy2DamageKey);
-                enemy.expReward = DataManager.GetInt(DataManager.Enemy2ExpRewardKey);
+                enemy.maxHealth = Mathf.RoundToInt(DataManager.GetInt(DataManager.Enemy2MaxHealthKey) * statMultiplier);
+                enemy.damage = Mathf.RoundToInt(DataManager.GetInt(DataManager.Enemy2DamageKey) * statMultiplier);
+                enemy.expReward = Mathf.RoundToInt(DataManager.GetInt(DataManager.Enemy2ExpRewardKey) * expMultiplier);
                 break;
             case EnemyType.Monster1:
-                enemy.maxHealth = DataManager.GetInt(DataManager.Monster1MaxHealthKey);
-                enemy.damage = DataManager.GetInt(DataManager.Monster1DamageKey);
-                enemy.expReward = DataManager.GetInt(DataManager.Monster1ExpRewardKey);
+                enemy.maxHealth = Mathf.RoundToInt(DataManager.GetInt(DataManager.Monster1MaxHealthKey) * statMultiplier);
+                enemy.damage = Mathf.RoundToInt(DataManager.GetInt(DataManager.Monster1DamageKey) * statMultiplier);
+                enemy.expReward = Mathf.RoundToInt(DataManager.GetInt(DataManager.Monster1ExpRewardKey) * expMultiplier);
                 break;
             case EnemyType.Monster2:
-                enemy.maxHealth = DataManager.GetInt(DataManager.Monster2MaxHealthKey);
-                enemy.damage = DataManager.GetInt(DataManager.Monster2DamageKey);
-                enemy.expReward = DataManager.GetInt(DataManager.Monster2ExpRewardKey);
+                enemy.maxHealth = Mathf.RoundToInt(DataManager.GetInt(DataManager.Monster2MaxHealthKey) * statMultiplier);
+                enemy.damage = Mathf.RoundToInt(DataManager.GetInt(DataManager.Monster2DamageKey) * statMultiplier);
+                enemy.expReward = Mathf.RoundToInt(DataManager.GetInt(DataManager.Monster2ExpRewardKey) * expMultiplier);
                 break;
         }
 
         enemy.currentHealth = Mathf.Min(enemy.currentHealth, enemy.maxHealth);
     }
 
-    // 注册死亡回调（避免重复注册）
+    // 保留原死亡回调注册方法
     private void RegisterEnemyDeathCallback(EnemyBase enemy)
     {
         if (enemy == null) return;
-        // 先移除再添加，防止重复注册
         enemy.OnDeath -= HandleEnemyDeath;
         enemy.OnDeath += HandleEnemyDeath;
     }

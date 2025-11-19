@@ -61,6 +61,9 @@ public class DefenseTowerController : MonoBehaviour
         if (collider != null)
             collider.enabled = false;
 
+        if(GlobalDifficultyCurveController.Instance != null)
+            GlobalDifficultyCurveController.Instance.IncreaseRewardChance(GlobalDifficultyCurveController.Instance.rewardFailIncrement);
+
         // ✅ 播放玩家死亡动画而非强制死亡
         if (pc != null)
             pc.Die();
@@ -93,9 +96,7 @@ public class DefenseTowerController : MonoBehaviour
     private IEnumerator InvincibilityTime(float duration)
     {
         isInvincible = true;
-        Debug.Log("防御塔处于无敌时间");
         yield return new WaitForSeconds(duration);
         isInvincible = false;
-        Debug.Log("防御塔无敌时间结束");
     }
 }
