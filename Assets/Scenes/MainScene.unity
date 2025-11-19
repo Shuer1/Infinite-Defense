@@ -5204,8 +5204,11 @@ MonoBehaviour:
   - {fileID: 168855935}
   isUpgradePanelOpen: 0
   isProcessingUpgradePanel: 0
-  enemiesLevelUpWarnUI: {fileID: 1348706530}
-  rewardLevelStartedUI: {fileID: 794570767}
+  enemiesLevelUpWarnUI: {fileID: 1348706532}
+  rewardLevelStartedUI: {fileID: 794570769}
+  toastFadeInTime: 0.25
+  toastStayTime: 1.25
+  toastFadeOutTime: 0.35
 --- !u!1 &856274217
 GameObject:
   m_ObjectHideFlags: 0
@@ -9954,8 +9957,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   eM: {fileID: 1031757754}
-  rewardLevelBaseChance: 0.05
-  rewardWaveIncrement: 0.05
+  rewardLevelBaseChance: 0.1
+  rewardWaveIncrement: 0.02
   rewardFailIncrement: 0.1
   rewardLevelMaxChance: 0.5
   rewardLevelStatMultiplier: 0.7
@@ -10106,7 +10109,7 @@ MonoBehaviour:
     displayName: MoreHealth
     description: To plus player health
     cardImage: {fileID: 21300000, guid: 1188bc38816864d239c9ed6bb36189da, type: 3}
-    value: 20
+    value: 5
     type: 2
   - upgradeType: 3
     displayName: ExplosiveBullet
@@ -10145,7 +10148,7 @@ MonoBehaviour:
     value: 1
     type: 8
   playerController: {fileID: 942823808}
-  towerHPMultiFactor: 5
+  towerHPMultiFactor: 40
   damageMultiFactor: 3
   upgradeEffect: {fileID: 1722948567}
   upgradeAudio: {fileID: 1761685147}

@@ -16,7 +16,7 @@ public class UpgradeManager : MonoBehaviour
     public PlayerController playerController;
 
     [Tooltip("城墙血量提升倍数因子")]
-    public int towerHPMultiFactor = 5;
+    public int towerHPMultiFactor = 40;
     public int damageMultiFactor = 3;
 
     // 升级特效、音效

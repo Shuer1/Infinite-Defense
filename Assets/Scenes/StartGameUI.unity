@@ -5065,6 +5065,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 2323955212cea405e84601640a39939b, type: 3}
   - key: Selected
     clip: {fileID: 8300000, guid: 3f9fec1e3829743c0b9773244c4df3c3, type: 3}
+  - key: EnemiesRoar
+    clip: {fileID: 8300000, guid: 153011884da2e42d1a7cf3194dad3462, type: 3}
+  - key: RewardLevel
+    clip: {fileID: 8300000, guid: 781d31079457f46a190f218442716510, type: 3}
 --- !u!4 &2007164504
 Transform:
   m_ObjectHideFlags: 0

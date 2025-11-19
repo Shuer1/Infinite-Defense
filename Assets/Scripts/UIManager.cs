@@ -49,8 +49,15 @@ public class UIManager : MonoBehaviour
     private bool isUsingTicket = false;
     public bool isProcessingUpgradePanel = false;
     [Header("事件触发UI")]
-    public GameObject enemiesLevelUpWarnUI;
-    public GameObject rewardLevelStartedUI;
+    public Image enemiesLevelUpWarnUI;
+    public Image rewardLevelStartedUI;
+    [Header("提示动画参数")]
+    public float toastFadeInTime   = 0.25f;
+    public float toastStayTime     = 1.25f;
+    public float toastFadeOutTime  = 0.35f;
+
+    private Coroutine lvlUpWarnCR;      // 敌人升级提示协程引用
+    private Coroutine rewardStartCR;    // 奖励关开始提示协程引用
 
     void Awake()
     {
@@ -99,12 +106,65 @@ public class UIManager : MonoBehaviour
 
     private void EnemiesLevelUpWarn()
     {
-        enemiesLevelUpWarnUI.SetActive(true);
+        if (enemiesLevelUpWarnUI == null) return;
+
+        // 如果上一次还没播完，先停掉
+        if (lvlUpWarnCR != null) StopCoroutine(lvlUpWarnCR);
+        lvlUpWarnCR = StartCoroutine(ToastImageCR(enemiesLevelUpWarnUI,toastFadeInTime,toastStayTime,toastFadeOutTime));
+
+        SoundManager.Instance.PlayEventSFX("EnemiesRoar");
     }
 
     private void RewardLevelStartedNotice()
     {
-        rewardLevelStartedUI.SetActive(true);
+        if (rewardLevelStartedUI == null) return;
+
+        // 如果上一次还没播完，先停掉
+        if (rewardStartCR != null) StopCoroutine(rewardStartCR);
+        rewardStartCR = StartCoroutine(ToastImageCR(rewardLevelStartedUI,toastFadeInTime,toastStayTime,toastFadeOutTime));
+
+        SoundManager.Instance.PlayEventSFX("RewardLevel");
+    }
+
+    /// <summary>
+    /// 让指定 Image 淡入 → 停留 → 淡出 → 隐藏
+    /// </summary>
+    private IEnumerator ToastImageCR(Image img, float inT, float stayT, float outT)
+    {
+        if (img == null) yield break;
+
+        img.gameObject.SetActive(true);
+        Color c = img.color;
+        c.a = 0f;
+        img.color = c;
+
+        // 淡入
+        float t = 0f;
+        while (t < inT)
+        {
+            t += Time.deltaTime;
+            c.a = Mathf.Clamp01(t / inT);
+            img.color = c;
+            yield return null;
+        }
+
+        // 停留
+        yield return new WaitForSeconds(stayT);
+
+        // 淡出
+        t = 0f;
+        while (t < outT)
+        {
+            t += Time.deltaTime;
+            c.a = 1f - Mathf.Clamp01(t / outT);
+            img.color = c;
+            yield return null;
+        }
+
+        // 收尾
+        c.a = 0f;
+        img.color = c;
+        img.gameObject.SetActive(false);
     }
 
     public void ShowFirstKillPanel(EnemyType type)

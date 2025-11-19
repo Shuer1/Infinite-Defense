@@ -15,8 +15,8 @@ public class GlobalDifficultyCurveController : MonoBehaviour
 
     // ---------------- 奖励关配置 ----------------
     [Header("奖励关卡配置")]
-    public float rewardLevelBaseChance = 0.05f;     // 基础概率
-    public float rewardWaveIncrement = 0.05f;       // 每波 +0.05
+    public float rewardLevelBaseChance = 0.1f;     // 基础概率
+    public float rewardWaveIncrement = 0.02f;       // 每波 +0.02
     public float rewardFailIncrement = 0.1f;        // 玩家失败 +0.1
     public float rewardLevelMaxChance = 0.5f;       // 概率上限
     public float rewardLevelStatMultiplier = 0.7f;  // 属性衰减
