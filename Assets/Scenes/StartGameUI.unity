@@ -5054,7 +5054,7 @@ MonoBehaviour:
   - key: KillMonster
     clip: {fileID: 8300000, guid: fe6dd691ac9584ecfb04d79ea356da31, type: 3}
   - key: StartWave
-    clip: {fileID: 8300000, guid: 0401475eee5484389b2fb58a0f35c542, type: 3}
+    clip: {fileID: 8300000, guid: 484bb4d8fa9da48be8748ecb7d7cb120, type: 3}
   - key: ClickFailed
     clip: {fileID: 8300000, guid: 9ee1e8ce485e342e09a495d3def71382, type: 3}
   - key: GrantReward

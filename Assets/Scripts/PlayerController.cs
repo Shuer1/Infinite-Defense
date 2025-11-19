@@ -74,7 +74,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (isDead) return;
+        if (isDead || GameManager.Instance.isGameOver) return;
 
         // 当游戏结束时触发玩家死亡动画（仅执行一次）
         if (GameManager.Instance.isGameOver)
@@ -253,6 +253,11 @@ public class PlayerController : MonoBehaviour
         if (isDead) return;
 
         isDead = true;
+
+        // 停止脚步
+        if (moveSound && moveSound.isPlaying)
+            moveSound.Stop();
+        
         animator.ResetTrigger("Hit");
         animator.SetTrigger("Die");
         animator.SetBool("ResetLive", false);
