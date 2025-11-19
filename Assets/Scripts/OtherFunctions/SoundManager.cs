@@ -55,7 +55,7 @@ public class SoundManager : MonoBehaviour
         }
     }
 
-    public void PlayEventSFX(string key, float volume = 0.8f)
+    public void PlayEventSFX(string key, float volume = 1f)
     {
         if (eventDict == null || !eventDict.ContainsKey(key)) return;
 

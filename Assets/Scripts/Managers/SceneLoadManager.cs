@@ -63,7 +63,8 @@ public class SceneLoadManager : MonoBehaviour
 
     public void LoadGameScene()
     {
-        LoadSceneAsync("MainScene", true, true);
+        SoundManager.Instance.PlayEventSFX("LetsGo");
+        LoadSceneAsync("MainScene", true, false);
     }
 
     public void LoadStartScene()

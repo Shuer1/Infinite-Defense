@@ -28,8 +28,7 @@ public class StartSceneButtonBinder : MonoBehaviour
             startGameButton.onClick.RemoveAllListeners();
             startGameButton.onClick.AddListener(() =>
             {
-                // 替换为你的游戏场景名称
-                SceneLoadManager.Instance.LoadSceneAsync("MainScene", true);
+                SceneLoadManager.Instance.LoadGameScene();
             });
         }
 

@@ -9,9 +9,9 @@ public class PlayerReviveManager : MonoBehaviour
 
     [Header("可在 Inspector 预先绑定（若不绑定将在场景加载时自动查找）")]
     [SerializeField] private GameObject revivePanel;
+    private const string GameOverSoundKey = "Defeat";
     [SerializeField] private Button reviveWithAdButton;
     [SerializeField] private Button gameOverButton;
-
     private PlayerController playerController;
     private int reviveCount = 0;
     private int maxReviveCount = 3;
@@ -23,7 +23,6 @@ public class PlayerReviveManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            // DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -171,9 +170,15 @@ public class PlayerReviveManager : MonoBehaviour
             EntireBgmManager.Instance.PauseCurrentBgm();
 
         if (revivePanel != null && !GameManager.Instance.isGameOver)
+        {
             revivePanel.SetActive(true);
+            SoundManager.Instance.PlayEventSFX(GameOverSoundKey);
+            UpdateReviveButtonStatus();
+        }
         else
+        {
             Debug.LogWarning("[PlayerReviveManager] 无法显示 RevivePanel（引用可能丢失或游戏已结束）");
+        }
     }
 
     public void HideRevivePanel()
@@ -185,8 +190,13 @@ public class PlayerReviveManager : MonoBehaviour
     private void OnReviveWithAdClicked()
     {
         if (isAdProcessing || !allowToRevive || reviveCount >= maxReviveCount)
+        {
+            Color color = reviveWithAdButton.image.color;
+            color.a = 0.2f;
+            reviveWithAdButton.image.color = color;
             return;
-
+        }
+            
         isAdProcessing = true;
         Debug.Log("[PlayerReviveManager] 玩家选择通过观看广告复活");
 
@@ -207,6 +217,19 @@ public class PlayerReviveManager : MonoBehaviour
             Debug.LogError("[PlayerReviveManager] 未找到 AdsManager，直接复活");
             OnRewardedAdCompleted(true);
         }
+    }
+
+    private void UpdateReviveButtonStatus()
+    {
+        if(reviveWithAdButton == null) return;
+
+        bool canRevive = allowToRevive && reviveCount < maxReviveCount;
+
+        reviveWithAdButton.interactable = canRevive;
+
+        Color btnColor = reviveWithAdButton.image.color;
+        btnColor.a = canRevive ? 1f : 0.2f;
+        reviveWithAdButton.image.color = btnColor;
     }
 
     private void OnRewardedAdCompleted(bool success)
@@ -250,6 +273,7 @@ public class PlayerReviveManager : MonoBehaviour
         if (reviveCount >= maxReviveCount)
             allowToRevive = false;
 
+        UpdateReviveButtonStatus();
         HideRevivePanel();
 
         // 确保引用存在，若不存在则尝试重找一次

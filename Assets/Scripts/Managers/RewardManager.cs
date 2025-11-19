@@ -43,6 +43,7 @@ public class RewardManager : MonoBehaviour
     private Vector2 _dragStartPos;
     private const float _dragThreshold = 100f;
     private const string UsePropKey = "UseProp";
+    private const string ClickFailedKey = "ClickFailed";
     
     // 添加炸弹位置和范围的字段
     private Vector3 bombPosition;
@@ -112,7 +113,11 @@ public class RewardManager : MonoBehaviour
 
     private void OnPropPointerDown(BaseEventData data)
     {
-        if (currentPropCount <= 0 || _isInCooldown) return;
+        if (currentPropCount <= 0 || _isInCooldown)
+        {
+            SoundManager.Instance.PlayEventSFX(ClickFailedKey);
+            return;
+        }
 
         SoundManager.Instance.PlayEventSFX(UsePropKey);
 

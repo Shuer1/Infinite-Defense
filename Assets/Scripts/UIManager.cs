@@ -36,6 +36,7 @@ public class UIManager : MonoBehaviour
     [Header("首杀领取面板")]
     [SerializeField] private PanelScaleAnimation firstKillPanelAnim;
     [SerializeField] private Button grantFKRewardButton;
+    private const string GrantRewardKey = "GrantReward";
     private EnemyType _pendingFirstKill;
 
     [Header("GameOver Panel")]
@@ -120,6 +121,7 @@ public class UIManager : MonoBehaviour
 
     private void OnFKRewardGrant()
     {
+        SoundManager.Instance.PlayEventSFX(GrantRewardKey);
         // 发放奖励
         FirstKillRewardManager.Instance.GrantFirstKillReward(_pendingFirstKill);
         HideFirstKillPanel();
