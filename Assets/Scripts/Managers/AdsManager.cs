@@ -43,9 +43,9 @@ public class AdsManager : MonoBehaviour //单例
     private const string REWARDED_ID = "ca-app-pub-3940256099942544/5224354917"; //测试激励广告ID
     #else
     //发布前需替换为真实广告ID
-    private const string APP_OPEN_ID = "ca-app-pub-3940256099942544/9257395921";
-    private const string BANNER_ID   = "ca-app-pub-3940256099942544/6300978111";
-    private const string REWARDED_ID = "ca-app-pub-3940256099942544/5224354917";
+    private const string APP_OPEN_ID = "ca-app-pub-7029478247518346/1934227914"; // 已替换
+    private const string BANNER_ID   = "ca-app-pub-7029478247518346/6168986392";
+    private const string REWARDED_ID = "ca-app-pub-7029478247518346/4869057603";
     #endif
 #else
     private const string APP_OPEN_ID = "unused";
