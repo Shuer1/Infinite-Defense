@@ -163,8 +163,6 @@ public class EntireBgmManager : MonoBehaviour
     {
         SetGlobalVolume(value);
         DataManager.SaveFloatForce(DataManager.LastestVolumeKey, value);
-        LogDebug($"滑块调节音量：{value}");
-        // TODO: 可考虑未来增加延时保存（0.3秒后写入），避免频繁写入PlayerPrefs
     }
 
     /// <summary>

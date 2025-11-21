@@ -380,7 +380,7 @@ MonoBehaviour:
   entireBgms:
   - {fileID: 1293339436}
   initialOrder: 0
-  initialVolume: 0.8
+  initialVolume: 1
   mainSceneName: StartGameUI
   soundVolumeSliderName: VolumeSlider
   debugMode: 0
@@ -2198,7 +2198,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 646740c342aa74804a9fad0785a044f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isDebugMode: 0
+  isDebugMode: 1
   closeBannerButton: {fileID: 1031366897}
 --- !u!4 &812034665
 Transform:
