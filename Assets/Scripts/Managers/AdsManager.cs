@@ -29,6 +29,9 @@ public class AdsManager : MonoBehaviour //单例
     // 新增：用于复活的激励广告回调
     public event Action<bool> OnReviveRewardedAdCompleted;
 
+    [Header("调试模式")]
+    public bool isDebugMode = false;
+
     [Header("UI 绑定")]
     [SerializeField] private Button closeBannerButton;
     public const string mainSceneName = "UIScene";
@@ -39,7 +42,8 @@ public class AdsManager : MonoBehaviour //单例
     private const string BANNER_ID   = "ca-app-pub-3940256099942544/6300978111"; //测试BannerAdID
     private const string REWARDED_ID = "ca-app-pub-3940256099942544/5224354917"; //测试激励广告ID
     #else
-    private const string APP_OPEN_ID = "ca-app-pub-3940256099942544/9257395921"; //发布前需替换为真实广告ID
+    //发布前需替换为真实广告ID
+    private const string APP_OPEN_ID = "ca-app-pub-3940256099942544/9257395921";
     private const string BANNER_ID   = "ca-app-pub-3940256099942544/6300978111";
     private const string REWARDED_ID = "ca-app-pub-3940256099942544/5224354917";
     #endif
@@ -74,14 +78,23 @@ public class AdsManager : MonoBehaviour //单例
 
     private void Start()
     {
+        if (isDebugMode)
+        {
+            Debug.LogWarning("[AdsManager] 🚧 调试模式已启用, 广告将被跳过/隐藏, 激励奖励直接发放！");
+        }
+
         MobileAds.RaiseAdEventsOnUnityMainThread = true;
 
         MobileAds.Initialize(initStatus =>
         {
             isInitialized = true;
             Debug.Log("[AdsManager] ✅ MobileAds SDK 初始化完成。");
-            LoadAppOpenAd();
-            LoadRewardedAd(); // 新增：初始化后加载激励广告
+
+            if (!isDebugMode)
+            {
+                LoadAppOpenAd();
+                LoadRewardedAd(); // 新增：初始化后加载激励广告
+            }  
         });
 
         // 初始绑定按钮（首次加载场景时）
@@ -92,13 +105,21 @@ public class AdsManager : MonoBehaviour //单例
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         Debug.Log($"[AdsManager] 场景 {scene.name} 加载完成，准备重建横幅广告");
-        
-        // 销毁旧横幅并重新创建
-        DestroyBanner();
-        // 重新绑定当前场景的关闭按钮
-        BindCloseButton();
-        // 延迟显示横幅
-        StartCoroutine(DelayShowBanner(0.5f));
+
+        if (!isDebugMode)
+        {
+            // 销毁旧横幅并重新创建
+            DestroyBanner();
+            // 重新绑定当前场景的关闭按钮
+            BindCloseButton();
+            // 延迟显示横幅
+            StartCoroutine(DelayShowBanner(0.5f));
+        }
+        else
+        {
+            if (closeBannerButton != null)
+                closeBannerButton.gameObject.SetActive(false);
+        }
     }
 
     private void BindCloseButton()
@@ -136,6 +157,12 @@ public class AdsManager : MonoBehaviour //单例
     // 开屏广告代码保持不变
     public void LoadAppOpenAd()
     {
+        if (isDebugMode)
+        {
+            Debug.Log("[AdsManager] 🚧 调试模式已启用，跳过加载 AppOpen");
+            return;
+        }
+
         if (!isInitialized)
         {
             Debug.LogWarning("[AdsManager] SDK 未初始化，跳过加载 AppOpen");
@@ -168,6 +195,12 @@ public class AdsManager : MonoBehaviour //单例
 
     public void ShowAppOpenAd()
     {
+        if (isDebugMode) // 新增✅
+        {
+            Debug.Log("[AdsManager] 🚧 调试模式已启用，跳过展示 AppOpen");
+            return;
+        }
+
         if (appOpenAd == null)
         {
             Debug.LogWarning("[AdsManager] 无可用 AppOpenAd，尝试重新加载");
@@ -215,6 +248,12 @@ public class AdsManager : MonoBehaviour //单例
     // 横幅广告代码保持不变
     public void ShowBanner()
     {
+        if (isDebugMode) // 新增✅
+        {
+            Debug.Log("[AdsManager] 🚧 调试模式已启用，跳过加载 Banner");
+            return;
+        }
+
         if (!isInitialized)
         {
             Debug.LogWarning("[AdsManager] SDK 未初始化，无法加载横幅");
@@ -245,7 +284,7 @@ public class AdsManager : MonoBehaviour //单例
         while (true)
         {
             yield return new WaitForSeconds(REFRESH_INTERVAL);
-            if (bannerView != null)
+            if (bannerView != null && !isDebugMode) // 新增✅
             {
                 Debug.Log($"[AdsManager] 🔁 自动刷新横幅广告");
                 bannerView.LoadAd(new AdRequest());
@@ -331,6 +370,12 @@ public class AdsManager : MonoBehaviour //单例
     /// </summary>
     public void LoadRewardedAd()
     {
+        if (isDebugMode) // 新增✅
+        {
+            Debug.Log("[AdsManager] 🚧 调试模式已启用，跳过加载激励");
+            return;
+        }
+
         if (!isInitialized)
         {
             Debug.LogWarning("[AdsManager] SDK 未初始化，无法加载激励广告");
@@ -395,6 +440,14 @@ public class AdsManager : MonoBehaviour //单例
     /// <returns>是否成功调用显示</returns>
     private bool ShowRewardedAdInternal(bool isForRevive, bool isForTicket = false)
     {
+        if (isDebugMode) // 新增✅
+        {
+            Debug.Log("[AdsManager] 🚧 调试模式：直接发放奖励！");
+            StartCoroutine(DelayTriggerRewardCallback(isForRevive, isForTicket));
+            isShowingFullScreenAd = false;
+            return true;
+        }
+
         if (!isInitialized)
         {
             Debug.LogWarning("[AdsManager] SDK 未初始化，无法显示激励广告");
@@ -450,6 +503,25 @@ public class AdsManager : MonoBehaviour //单例
             }
             LoadRewardedAd();
             return false;
+        }
+    }
+
+    // 新增：延迟触发奖励回调（模拟真实广告流程）✅
+    private IEnumerator DelayTriggerRewardCallback(bool isForRevive, bool isForTicket)
+    {
+        yield return new WaitForSeconds(0.1f);
+        
+        if (isForRevive)
+        {
+            OnReviveRewardedAdCompleted?.Invoke(true);
+        }
+        else if (isForTicket)
+        {
+            OnTicketRewardedAdCompleted?.Invoke(true);
+        }
+        else
+        {
+            OnRewardedAdCompleted?.Invoke(true);
         }
     }
 
@@ -513,6 +585,8 @@ public class AdsManager : MonoBehaviour //单例
     #region 生命周期 / 清理
     private void OnApplicationPause(bool isPaused)
     {
+        if (isDebugMode) return;
+
         if (isPaused)
         {
             Debug.Log("[AdsManager] 应用进入后台，检查开屏");
@@ -568,8 +642,12 @@ public class AdsManager : MonoBehaviour //单例
         isShowingAppOpenAd = false;
         isShowingFullScreenAd = false;//✅新增
         UnregisterAppOpenAdEvents();
-        ShowBanner();
-        LoadAppOpenAd();
+
+        if (!isDebugMode)
+        {
+            ShowBanner();
+            LoadAppOpenAd();
+        }
     }
 
     private void HandleAppOpenFailed(AdError error)
@@ -578,8 +656,12 @@ public class AdsManager : MonoBehaviour //单例
         isShowingAppOpenAd = false;
         isShowingFullScreenAd = false;//✅新增
         UnregisterAppOpenAdEvents();
-        ShowBanner();
-        LoadAppOpenAd();
+
+        if (!isDebugMode)
+        {
+            ShowBanner();
+            LoadAppOpenAd();
+        }
     }
     #endregion
 }

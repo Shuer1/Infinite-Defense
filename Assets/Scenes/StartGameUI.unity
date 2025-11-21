@@ -745,7 +745,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: c00b4019d1297441fa9dd4b45724f9a5, type: 3}
+  m_Sprite: {fileID: 21300000, guid: aaf85fea91b2746e687b16a3b5dc16d1, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2198,6 +2198,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 646740c342aa74804a9fad0785a044f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isDebugMode: 1
   closeBannerButton: {fileID: 1031366897}
 --- !u!4 &812034665
 Transform:
