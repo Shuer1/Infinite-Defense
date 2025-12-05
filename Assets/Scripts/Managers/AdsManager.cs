@@ -48,9 +48,9 @@ public class AdsManager : MonoBehaviour //单例
     private const string REWARDED_ID = "ca-app-pub-7029478247518346/4869057603";
     #endif
 #else
-    private const string APP_OPEN_ID = "unused";
-    private const string BANNER_ID   = "unused";
-    private const string REWARDED_ID = "unused"; //新增：iOS激励广告ID
+    private const string APP_OPEN_ID = "ca-app-pub-7029478247518346/1934227914";
+    private const string BANNER_ID   = "ca-app-pub-7029478247518346/6168986392";
+    private const string REWARDED_ID = "ca-app-pub-7029478247518346/4869057603";
 #endif
 
     private void Awake()
