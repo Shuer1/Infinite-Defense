@@ -12,14 +12,15 @@
         android:allowBackup="true"
         android:label="@string/app_name">
 
-        <!-- Google AdMob App ID: 替换为你的 App ID -->
+        <!-- Google AdMob App ID: 替换为实际 App ID -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-7029478247518346~7238525487"/>
 
         <!-- Unity 默认 Activity -->
         <activity android:name="com.unity3d.player.UnityPlayerActivity"
-                  android:theme="@style/UnityThemeSelector">
+                  android:theme="@style/UnityThemeSelector"
+                  android:exported="false"> <!-- 新增属性：禁止外部应用交互，修复编辑器版本漏洞 -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

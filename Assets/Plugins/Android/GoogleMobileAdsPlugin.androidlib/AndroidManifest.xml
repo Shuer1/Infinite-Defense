@@ -1,10 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.google.unity.ads">
-  <uses-sdk android:minSdkVersion="23" />
-  <uses-permission android:name="android.permission.INTERNET" />
+  <!-- 仅保留插件必需的核心配置，移除所有重复/冗余项 -->
   <application>
-    <uses-library android:required="false" android:name="org.apache.http.legacy" />
-    <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-7029478247518346~7238525487" />
+    <!-- 插件自用：Unity版本标识（不可移除，用于广告SDK适配） -->
     <meta-data android:name="com.google.unity.ads.UNITY_VERSION" android:value="2022.3.53f1c1" />
+    <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-7029478247518346~7238525487" />
   </application>
 </manifest>

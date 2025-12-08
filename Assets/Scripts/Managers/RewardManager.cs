@@ -401,7 +401,6 @@ public class RewardManager : MonoBehaviour
 
         currentPropCount++;
         UpdatePropUIAndSave();
-        AdsManager.Instance.ReportMission("RewardAdCompleted"); // 新增✅：上报任务完成，通知WebGL端
     }
 
     private void UpdatePropUIAndSave()
