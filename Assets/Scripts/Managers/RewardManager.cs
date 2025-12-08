@@ -256,11 +256,6 @@ public class RewardManager : MonoBehaviour
         Destroy(fx,0.5f);
     }
     
-    private void TriggerBombDamage()
-    {
-        TriggerBombDamageAtPosition(bombPosition, bombRangeSaved);
-    }
-    
     private void TriggerBombDamageAtPosition(Vector3 position, float range)
     {
         // ✅ 2. 检测范围内敌人（3D物理）
@@ -406,6 +401,7 @@ public class RewardManager : MonoBehaviour
 
         currentPropCount++;
         UpdatePropUIAndSave();
+        AdsManager.Instance.ReportMission("RewardAdCompleted"); // 新增✅：上报任务完成，通知WebGL端
     }
 
     private void UpdatePropUIAndSave()

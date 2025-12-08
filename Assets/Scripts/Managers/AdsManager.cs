@@ -1,5 +1,13 @@
 using UnityEngine;
+
+#if UNITY_WEBGL && !UNITY_EDITOR  // WebGL 端调用 JS --- 宏区分开发环境 新增✅
+using System.Runtime.InteropServices;
+#endif
+
+#if UNITY_ANDROID || UNITY_EDITOR || DEVELOPMENT_BUILD // Android 端调用 GoogleMobileAds 必须保留✅
 using GoogleMobileAds.Api;
+#endif
+
 using UnityEngine.UI;
 using System;
 using System.Collections;
@@ -38,20 +46,27 @@ public class AdsManager : MonoBehaviour //单例
 
 #if UNITY_ANDROID
     #if UNITY_EDITOR || DEVELOPMENT_BUILD
-    private const string APP_OPEN_ID = "ca-app-pub-3940256099942544/9257395921"; //测试openAdID
-    private const string BANNER_ID   = "ca-app-pub-3940256099942544/6300978111"; //测试BannerAdID
-    private const string REWARDED_ID = "ca-app-pub-3940256099942544/5224354917"; //测试激励广告ID
+    //此分支为编辑器内调试：使用测试广告ID
+    private const string APP_OPEN_ID = "ca-app-pub-3940256099942544/9257395921";
+    private const string BANNER_ID   = "ca-app-pub-3940256099942544/6300978111";
+    private const string REWARDED_ID = "ca-app-pub-3940256099942544/5224354917";
     #else
-    //发布前需替换为真实广告ID
-    private const string APP_OPEN_ID = "ca-app-pub-7029478247518346/1934227914"; // 已替换
+    //此分支为Android：发布前需替换为真实广告ID（已替换为正式AdUnitID）
+    private const string APP_OPEN_ID = "ca-app-pub-7029478247518346/1934227914";
     private const string BANNER_ID   = "ca-app-pub-7029478247518346/6168986392";
     private const string REWARDED_ID = "ca-app-pub-7029478247518346/4869057603";
     #endif
 #else
-    private const string APP_OPEN_ID = "ca-app-pub-7029478247518346/1934227914";
-    private const string BANNER_ID   = "ca-app-pub-7029478247518346/6168986392";
-    private const string REWARDED_ID = "ca-app-pub-7029478247518346/4869057603";
+    private const string APP_OPEN_ID = "";
+    private const string BANNER_ID   = "";
+    private const string REWARDED_ID = "";
 #endif
+
+
+#if UNITY_WEBGL && !UNITY_EDITOR  // WebGL 端获取 WALL 用户信息 新增✅
+    [DllImport("__Internal")] private static extern string GetWallUser();
+#endif
+    private static string wallUserJson = "{}";
 
     private void Awake()
     {
@@ -64,6 +79,10 @@ public class AdsManager : MonoBehaviour //单例
         { 
             Destroy(gameObject); 
         }
+
+        #if UNITY_WEBGL && !UNITY_EDITOR // WebGL 端获取 WALL 用户信息 新增✅
+            wallUserJson = GetWallUser();
+        #endif
     }
 
     private void OnEnable()
@@ -663,5 +682,26 @@ public class AdsManager : MonoBehaviour //单例
             LoadAppOpenAd();
         }
     }
+    #endregion
+    
+    #region 统一“任务完成”处理
+    public void ReportMission(string taskType,int stage=0) // 新增✅,并将访问修饰符设为public
+    {
+        var u = JsonUtility.FromJson<WallUser>(wallUserJson);
+        var body = new {
+            userId = u.userId,
+            token  = u.token,
+            taskId = u.taskId,
+            taskType,
+            stage
+        };
+        string json = JsonUtility.ToJson(body);
+        #if UNITY_WEBGL && !UNITY_EDITOR
+            NotifyTaskComplete(json);   // 调 JS
+        #else
+            Debug.Log("[ReportMission] "+json);
+        #endif
+    }
+    [Serializable] private class WallUser{public string userId,token,taskId;}
     #endregion
 }
