@@ -18,7 +18,6 @@ public class AdsManager : MonoBehaviour //单例
     private bool isShowingFullScreenAd = false;
     private DateTime adExpireTime;
     private readonly TimeSpan APP_OPEN_AD_TIMEOUT = TimeSpan.FromHours(1);
-
     private Coroutine bannerRefreshRoutine;
     private int bannerRefreshCount = 0;
 
@@ -54,13 +53,6 @@ public class AdsManager : MonoBehaviour //单例
     private const string REWARDED_ID = "";
 #endif
 
-/*
-#if UNITY_WEBGL && !UNITY_EDITOR  // WebGL 端获取 WALL 用户信息 新增✅
-    [DllImport("__Internal")] private static extern string GetWallUser();
-#endif
-    private static string wallUserJson = "{}";
-*/
-
     private void Awake()
     {
         if (Instance == null) 
@@ -72,12 +64,6 @@ public class AdsManager : MonoBehaviour //单例
         { 
             Destroy(gameObject); 
         }
-
-        /*
-        #if UNITY_WEBGL && !UNITY_EDITOR // WebGL 端获取 WALL 用户信息 新增✅
-            wallUserJson = GetWallUser();
-        #endif
-        */
     }
 
     private void OnEnable()
@@ -679,26 +665,4 @@ public class AdsManager : MonoBehaviour //单例
     }
     #endregion
     
-    /*
-    #region 统一“任务完成”处理
-    public void ReportMission(string taskType,int stage=0) // 新增✅,并将访问修饰符设为public
-    {
-        var u = JsonUtility.FromJson<WallUser>(wallUserJson);
-        var body = new {
-            userId = u.userId,
-            token  = u.token,
-            taskId = u.taskId,
-            taskType,
-            stage
-        };
-        string json = JsonUtility.ToJson(body);
-        #if UNITY_WEBGL && !UNITY_EDITOR
-            NotifyTaskComplete(json);   // 调 JS
-        #else
-            Debug.Log("[ReportMission] "+json);
-        #endif
-    }
-    [Serializable] private class WallUser{public string userId,token,taskId;}
-    #endregion
-    */
 }
