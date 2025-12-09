@@ -1,13 +1,5 @@
 using UnityEngine;
-
-#if UNITY_WEBGL && !UNITY_EDITOR  // WebGL 端调用 JS --- 宏区分开发环境 新增✅
-using System.Runtime.InteropServices;
-#endif
-
-#if UNITY_ANDROID || UNITY_EDITOR || DEVELOPMENT_BUILD // Android 端调用 GoogleMobileAds 必须保留✅
 using GoogleMobileAds.Api;
-#endif
-
 using UnityEngine.UI;
 using System;
 using System.Collections;
@@ -62,11 +54,12 @@ public class AdsManager : MonoBehaviour //单例
     private const string REWARDED_ID = "";
 #endif
 
-
+/*
 #if UNITY_WEBGL && !UNITY_EDITOR  // WebGL 端获取 WALL 用户信息 新增✅
     [DllImport("__Internal")] private static extern string GetWallUser();
 #endif
     private static string wallUserJson = "{}";
+*/
 
     private void Awake()
     {
@@ -80,9 +73,11 @@ public class AdsManager : MonoBehaviour //单例
             Destroy(gameObject); 
         }
 
+        /*
         #if UNITY_WEBGL && !UNITY_EDITOR // WebGL 端获取 WALL 用户信息 新增✅
             wallUserJson = GetWallUser();
         #endif
+        */
     }
 
     private void OnEnable()
@@ -684,6 +679,7 @@ public class AdsManager : MonoBehaviour //单例
     }
     #endregion
     
+    /*
     #region 统一“任务完成”处理
     public void ReportMission(string taskType,int stage=0) // 新增✅,并将访问修饰符设为public
     {
@@ -704,4 +700,5 @@ public class AdsManager : MonoBehaviour //单例
     }
     [Serializable] private class WallUser{public string userId,token,taskId;}
     #endregion
+    */
 }
