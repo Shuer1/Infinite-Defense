@@ -2198,7 +2198,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 646740c342aa74804a9fad0785a044f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isDebugMode: 0
+  isDebugMode: 1
   closeBannerButton: {fileID: 1031366897}
 --- !u!4 &812034665
 Transform:

@@ -11,28 +11,22 @@
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
 
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:label="@string/app_name"
         android:usesCleartextTraffic="false"
         tools:replace="android:allowBackup">
 
-        <!-- Unity HTTP Fallback Support（必须，不然 UnityWebRequest 会异常） -->
-        <uses-library
-            android:name="org.apache.http.legacy"
-            android:required="false" />
-
-        <!-- AdMob 必需的 Activity（缺失会导致 Device & Network Abuse） -->
+        <!-- AdMob Activity（必须） -->
         <activity
             android:name="com.google.android.gms.ads.AdActivity"
             android:exported="false"
             android:theme="@android:style/Theme.Translucent" />
 
-        <!-- AdMob APP ID（仅一次，且必须在主 Manifest 中声明） -->
+        <!-- AdMob APP ID（仅保留这里） -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-7029478247518346~7238525487" />
 
-        <!-- Unity 主 Activity -->
         <activity
             android:name="com.unity3d.player.UnityPlayerActivity"
             android:theme="@style/UnityThemeSelector"
@@ -46,7 +40,7 @@
             <meta-data android:name="unityplayer.UnityActivity" android:value="true" />
         </activity>
 
-        <!-- 插件版本信息（来自插件 Manifest） -->
+        <!-- 插件版本信息 -->
         <meta-data
             android:name="com.google.unity.ads.UNITY_VERSION"
             android:value="2022.3.53f1c1" />
