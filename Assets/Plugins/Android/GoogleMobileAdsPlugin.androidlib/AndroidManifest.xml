@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.google.unity.ads">
   <application>
-    <!-- 插件必须保留的 Unity Ads 版本信息 -->
+    <!-- AdMob 广告活动（保留） -->
+    <activity android:name="com.google.android.gms.ads.AdActivity" android:exported="false" android:theme="@android:style/Theme.Translucent" />
     <meta-data android:name="com.google.unity.ads.UNITY_VERSION" android:value="2022.3.53f1c1" />
-    <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-7029478247518346~7238525487" />
   </application>
 </manifest>
