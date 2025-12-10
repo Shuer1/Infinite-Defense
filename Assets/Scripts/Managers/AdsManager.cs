@@ -5,7 +5,7 @@ using System;
 using System.Collections;
 using UnityEngine.SceneManagement;
 
-public class AdsManager : MonoBehaviour //单例
+public class AdsManager : MonoBehaviour
 {
     public static AdsManager Instance;
 
@@ -93,7 +93,7 @@ public class AdsManager : MonoBehaviour //单例
             if (!isDebugMode)
             {
                 LoadAppOpenAd();
-                LoadRewardedAd(); // 新增：初始化后加载激励广告
+                LoadRewardedAd();
             }  
         });
 
@@ -157,6 +157,14 @@ public class AdsManager : MonoBehaviour //单例
     // 开屏广告代码保持不变
     public void LoadAppOpenAd()
     {
+        if (!NetworkChecker.IsNetworkAvailable())
+        {
+            Debug.LogWarning("[AdsManager] 无网络连接,暂停加载AppOpenAd");
+            // 延迟重试（避免立即重试）
+            StartCoroutine(RetryLoadAppOpenAd(60f)); // 无网络时延长重试间隔
+            return;
+        }
+
         if (isDebugMode)
         {
             Debug.Log("[AdsManager] 🚧 调试模式已启用，跳过加载 AppOpen");

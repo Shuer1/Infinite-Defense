@@ -1,0 +1,5 @@
+# 保留Google Ads SDK类不被混淆
+-keep class com.google.android.gms.ads.** { *; }
+-keep class com.google.unity.ads.** { *; }
+-keepattributes *Annotation*
+-dontwarn com.google.android.gms.ads.**
