@@ -1,0 +1,18 @@
+# 保留 Google Play Services / AdMob SDK 相关类
+-keep class com.google.android.gms.ads.** { *; }
+-keep class com.google.android.gms.common.** { *; }
+-keep class com.google.android.gms.measurement.** { *; }
+-keep class com.google.android.gms.internal.ads.** { *; }
+-keep class com.google.android.gms.internal.measurement.** { *; }
+-keep class com.google.android.gms.internal.play_billing.** { *; }
+-keep class com.google.android.gms.internal.** { *; }
+
+# 保留 Unity 与 AdMob 的桥接
+-keep class com.unity3d.player.** { *; }
+
+# 保留广告回调接口
+-keep interface com.google.android.gms.ads.** { *; }
+-keep interface com.google.android.gms.ads.reward.** { *; }
+
+# 不警告
+-dontwarn com.google.android.gms.**

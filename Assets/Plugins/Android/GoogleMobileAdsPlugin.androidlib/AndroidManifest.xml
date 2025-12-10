@@ -3,6 +3,7 @@
   <application>
     <!-- AdMob 广告活动（保留） -->
     <activity android:name="com.google.android.gms.ads.AdActivity" android:exported="false" android:theme="@android:style/Theme.Translucent" />
+    <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-7029478247518346~7238525487" />
     <meta-data android:name="com.google.unity.ads.UNITY_VERSION" android:value="2022.3.53f1c1" />
   </application>
 </manifest>
