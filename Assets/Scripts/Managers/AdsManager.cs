@@ -21,6 +21,12 @@ public class AdsManager : MonoBehaviour
     private Coroutine bannerRefreshRoutine;
     private int bannerRefreshCount = 0;
 
+    // 节流与状态追踪
+    private DateTime lastFullScreenAdShown = DateTime.MinValue;
+    private readonly TimeSpan MIN_FULLSCREEN_AD_INTERVAL = TimeSpan.FromMinutes(1);
+    // Banner 可见性标识（用于在后台停止刷新）
+    private bool isBannerVisible = false;
+
     // 新增：激励广告回调
     public event Action<bool> OnRewardedAdCompleted;
     // 新增：用于升级券的广告回调
@@ -62,7 +68,7 @@ public class AdsManager : MonoBehaviour
         }
         else 
         { 
-            Destroy(gameObject); 
+            Destroy(gameObject);
         }
     }
 
@@ -124,7 +130,10 @@ public class AdsManager : MonoBehaviour
 
     private void BindCloseButton()
     {
-        GameObject buttonObj = GameObject.Find("AdsManager/BannerCanvas/CloseBannerBtn");
+        GameObject buttonObj = GameObject.Find("AdsManager/BannerCanvas/CloseBannerBtn"); // 尝试查找不同路径和名称
+        if(buttonObj == null) buttonObj = GameObject.Find("CloseBannerBtn");
+        if(buttonObj == null) buttonObj = GameObject.Find("CloseBannerButton");
+
         if (buttonObj != null)
         {
             closeBannerButton = buttonObj.GetComponent<Button>();
@@ -234,6 +243,7 @@ public class AdsManager : MonoBehaviour
         try
         {
             appOpenAd.Show();
+            lastFullScreenAdShown = DateTime.Now; // 记录时间
             Debug.Log("[AdsManager] 🚀 AppOpen 开始展示");
         }
         catch (Exception ex)
@@ -292,11 +302,15 @@ public class AdsManager : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(REFRESH_INTERVAL);
-            if (bannerView != null && !isDebugMode) // 新增✅
+            if (bannerView != null && !isDebugMode && isBannerVisible) // 新增✅：仅在banner存在、可见、且不是调试模式时刷新
             {
                 Debug.Log($"[AdsManager] 🔁 自动刷新横幅广告");
                 bannerView.LoadAd(new AdRequest());
                 bannerRefreshCount++;
+            }
+            else
+            {
+                Debug.Log("[AdsManager] 横幅广告不可见或调试模式，跳过刷新");
             }
         }
     }
@@ -307,7 +321,9 @@ public class AdsManager : MonoBehaviour
         if (bannerView != null)
         {
             bannerView.Show();
+            isBannerVisible = true;
         }
+
         if (closeBannerButton != null)
         {
             closeBannerButton.gameObject.SetActive(true);
@@ -333,12 +349,13 @@ public class AdsManager : MonoBehaviour
         if (bannerView != null)
         {
             bannerView.Hide();
+            isBannerVisible = false;
         }
+
         if (closeBannerButton != null)
         {
             closeBannerButton.gameObject.SetActive(false);
         }
-        Debug.Log("[AdsManager] 🟨 横幅隐藏");
     }
 
     public void DestroyBanner()
@@ -361,6 +378,8 @@ public class AdsManager : MonoBehaviour
         {
             closeBannerButton.gameObject.SetActive(false);
         }
+
+        isBannerVisible = false;
         Debug.Log("[AdsManager] 🧹 横幅销毁完毕");
     }
 
@@ -597,14 +616,45 @@ public class AdsManager : MonoBehaviour
 
         if (isPaused)
         {
-            Debug.Log("[AdsManager] 应用进入后台，检查开屏");
-            if (!isShowingFullScreenAd && hasShownFirstOpenAd)
+            // 进入后台：停止横幅自动刷新，避免后台网络/展示
+            Debug.Log("[AdsManager] 应用进入后台 — 停止横幅刷新");
+            if (bannerRefreshRoutine != null)
             {
-                ShowAppOpenAd();
+                StopCoroutine(bannerRefreshRoutine);
+                bannerRefreshRoutine = null;
             }
-            else
+            // 注意：绝不在后台展示广告
+            return;
+        }
+        else
+        {
+            // 恢复前台：在合适条件下（节流 + 非游戏关键时机）展示开屏广告
+            Debug.Log("[AdsManager] 应用恢复前台，检查是否展示开屏广告");
+            
+            // 如果当前在展示全屏广告，则跳过
+            if (isShowingFullScreenAd)
             {
-                Debug.Log("[AdsManager] 跳过开屏展示（当前正显示或刚显示完全屏广告）");
+                Debug.Log("[AdsManager] 当前已有全屏广告正在显示，跳过开屏");
+                return;
+            }
+
+            // 节流：确保距离上次展示大于最小间隔
+            if ((DateTime.Now - lastFullScreenAdShown) < MIN_FULLSCREEN_AD_INTERVAL)
+            {
+                Debug.Log("[AdsManager] 距离上次全屏广告展示间隔太短，跳过开屏");
+            }
+            else if (hasShownFirstOpenAd) // 只在已经展示第一次开屏后的后续恢复展示
+            {
+                // 仅在非游戏关键时机展示（这里仅作为示例；你可在调用处增加更细粒度的校验）
+                ShowAppOpenAd();
+                lastFullScreenAdShown = DateTime.Now;
+            }
+
+            // 恢复横幅刷新（如果需要显示）
+            if (bannerView != null && isBannerVisible == false)
+            {
+                bannerRefreshRoutine = StartCoroutine(BannerAutoRefreshRoutine());
+                isBannerVisible = true;
             }
         }
     }
