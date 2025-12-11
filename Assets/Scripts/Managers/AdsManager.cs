@@ -53,10 +53,6 @@ public class AdsManager : MonoBehaviour
     private const string BANNER_ID   = "ca-app-pub-7029478247518346/6168986392";
     private const string REWARDED_ID = "ca-app-pub-7029478247518346/4869057603";
     #endif
-#else
-    private const string APP_OPEN_ID = "";
-    private const string BANNER_ID   = "";
-    private const string REWARDED_ID = "";
 #endif
 
     private void Awake()

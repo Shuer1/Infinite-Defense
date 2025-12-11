@@ -365,6 +365,7 @@ public class RewardManager : MonoBehaviour
 
     private void ShowRewardedAdForReward()
     {
+        #if UNITY_ANDROID || UNITY_EDITOR
         if (AdsManager.Instance == null)
         {
             ShowAdFailMessage("The ad function has not finished loading. Please try again later.");
@@ -378,6 +379,17 @@ public class RewardManager : MonoBehaviour
             ShowAdFailMessage("No ads are available. Please try again later.");
             EnableButtonDelayed(1f);
         }
+        #elif UNITY_WEBGL
+            // WebGL 路径
+            if (WebGLAdsManager.Instance == null)
+            {
+                ShowAdFailMessage("Ad module not ready.");
+                EnableButtonDelayed(1f);
+                return;
+            }
+            bool shown = WebGLAdsManager.Instance.ShowRewardedAd();
+            if (!shown) { ShowAdFailMessage("No ads available."); EnableButtonDelayed(1f); }
+        #endif
     }
 
     private void OnAdRewardCompleted(bool success)
