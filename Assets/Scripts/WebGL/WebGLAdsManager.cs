@@ -12,13 +12,13 @@ public class WebGLAdsManager : MonoBehaviour
     private void Start()
     {
         // 初始化
-        AdsInit();   // 替代原来的 ExternalEval
+        AdsInit();
     }
 
     public void ShowOpenAd()
     {
         if (isDebugMode) return;
-        AdsShowOpen();   // 替代 ExternalEval
+        AdsShowOpen();
     }
 
     public void ShowBanner()
