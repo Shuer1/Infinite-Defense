@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 using System.Runtime.InteropServices;
 
-#if UNITY_WEBGL && !UNITY_EDITOR
+#if UNITY_WEBGL || UNITY_EDITOR
 public class WebGLAdsManager : MonoBehaviour
 {
     public static WebGLAdsManager Instance;

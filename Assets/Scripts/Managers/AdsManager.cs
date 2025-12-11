@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using UnityEngine.SceneManagement;
 
+#if UNITY_ANDROID || UNITY_EDITOR
 public class AdsManager : MonoBehaviour
 {
     public static AdsManager Instance;
@@ -41,19 +42,15 @@ public class AdsManager : MonoBehaviour
     [SerializeField] private Button closeBannerButton;
     public const string mainSceneName = "UIScene";
 
-#if UNITY_ANDROID
-    #if UNITY_EDITOR || DEVELOPMENT_BUILD
-    //此分支为编辑器内调试：使用测试广告ID
-    private const string APP_OPEN_ID = "ca-app-pub-3940256099942544/9257395921";
-    private const string BANNER_ID   = "ca-app-pub-3940256099942544/6300978111";
-    private const string REWARDED_ID = "ca-app-pub-3940256099942544/5224354917";
-    #else
-    //此分支为Android：发布前需替换为真实广告ID（已替换为正式AdUnitID）
+    #if UNITY_ANDROID //此分支为Android：发布前需替换为真实广告ID（已替换为正式AdUnitID）
     private const string APP_OPEN_ID = "ca-app-pub-7029478247518346/1934227914";
     private const string BANNER_ID   = "ca-app-pub-7029478247518346/6168986392";
     private const string REWARDED_ID = "ca-app-pub-7029478247518346/4869057603";
+    #else                                       //此分支为编辑器内调试：使用测试广告ID
+    private const string APP_OPEN_ID = "ca-app-pub-3940256099942544/9257395921";
+    private const string BANNER_ID   = "ca-app-pub-3940256099942544/6300978111";
+    private const string REWARDED_ID = "ca-app-pub-3940256099942544/5224354917";
     #endif
-#endif
 
     private void Awake()
     {
@@ -720,3 +717,4 @@ public class AdsManager : MonoBehaviour
     #endregion
     
 }
+#endif
