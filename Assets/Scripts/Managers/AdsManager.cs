@@ -5,7 +5,6 @@ using System;
 using System.Collections;
 using UnityEngine.SceneManagement;
 
-#if UNITY_ANDROID || UNITY_EDITOR
 public class AdsManager : MonoBehaviour
 {
     public static AdsManager Instance;
@@ -14,25 +13,16 @@ public class AdsManager : MonoBehaviour
     private BannerView bannerView;
     private RewardedAd rewardedAd;
     private bool isInitialized = false;
+
     private bool hasShownFirstOpenAd = false;
-    private bool isShowingAppOpenAd = false;
     private bool isShowingFullScreenAd = false;
+
     private DateTime adExpireTime;
     private readonly TimeSpan APP_OPEN_AD_TIMEOUT = TimeSpan.FromHours(1);
-    private Coroutine bannerRefreshRoutine;
-    private int bannerRefreshCount = 0;
 
-    // 节流与状态追踪
-    private DateTime lastFullScreenAdShown = DateTime.MinValue;
-    private readonly TimeSpan MIN_FULLSCREEN_AD_INTERVAL = TimeSpan.FromMinutes(1);
-    // Banner 可见性标识（用于在后台停止刷新）
-    private bool isBannerVisible = false;
-
-    // 新增：激励广告回调
+    // 激励广告回调
     public event Action<bool> OnRewardedAdCompleted;
-    // 新增：用于升级券的广告回调
     public event Action<bool> OnTicketRewardedAdCompleted;
-    // 新增：用于复活的激励广告回调
     public event Action<bool> OnReviveRewardedAdCompleted;
 
     [Header("调试模式")]
@@ -40,93 +30,92 @@ public class AdsManager : MonoBehaviour
 
     [Header("UI 绑定")]
     [SerializeField] private Button closeBannerButton;
-    public const string mainSceneName = "UIScene";
 
-    #if UNITY_ANDROID //此分支为Android：发布前需替换为真实广告ID（已替换为正式AdUnitID）
+#if UNITY_ANDROID
     private const string APP_OPEN_ID = "ca-app-pub-7029478247518346/1934227914";
     private const string BANNER_ID   = "ca-app-pub-7029478247518346/6168986392";
     private const string REWARDED_ID = "ca-app-pub-7029478247518346/4869057603";
-    #else                                       //此分支为编辑器内调试：使用测试广告ID
+#else
     private const string APP_OPEN_ID = "ca-app-pub-3940256099942544/9257395921";
     private const string BANNER_ID   = "ca-app-pub-3940256099942544/6300978111";
     private const string REWARDED_ID = "ca-app-pub-3940256099942544/5224354917";
-    #endif
+#endif
 
     private void Awake()
     {
-        if (Instance == null) 
-        { 
-            Instance = this; 
+        if (Instance == null)
+        {
+            Instance = this;
             DontDestroyOnLoad(gameObject);
         }
-        else 
-        { 
+        else
+        {
             Destroy(gameObject);
         }
-    }
-
-    private void OnEnable()
-    {
-        SceneManager.sceneLoaded += OnSceneLoaded;
-    }
-
-    private void OnDisable()
-    {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
     private void Start()
     {
         if (isDebugMode)
-        {
-            Debug.LogWarning("[AdsManager] 🚧 调试模式已启用, 广告将被跳过/隐藏, 激励奖励直接发放！");
-        }
+            Debug.Log("[AdsManager] 调试模式：广告将被模拟跳过");
 
         MobileAds.RaiseAdEventsOnUnityMainThread = true;
 
         MobileAds.Initialize(initStatus =>
         {
             isInitialized = true;
-            Debug.Log("[AdsManager] ✅ MobileAds SDK 初始化完成。");
+            Debug.Log("[AdsManager] MobileAds 初始化完成");
 
             if (!isDebugMode)
             {
                 LoadAppOpenAd();
                 LoadRewardedAd();
-            }  
+            }
         });
 
-        // 初始绑定按钮（首次加载场景时）
-        BindCloseButton();
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
-    // 场景加载完成后触发
+    private void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+
+        UnregisterAppOpenAdEvents();
+        appOpenAd?.Destroy();
+
+        if (rewardedAd != null)
+        {
+            UnregisterRewardedAdEvents();
+            rewardedAd.Destroy();
+            rewardedAd = null;
+        }
+
+        if (bannerView != null)
+        {
+            bannerView.Destroy();
+            bannerView = null;
+        }
+    }
+
+    // 场景加载后显示 Banner（符合需求：两个场景都显示）
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        Debug.Log($"[AdsManager] 场景 {scene.name} 加载完成，准备重建横幅广告");
+        BindCloseButton();
 
-        if (!isDebugMode)
+        if (scene.name == "StartGameUI" || scene.name == "MainScene")
         {
-            // 销毁旧横幅并重新创建
-            DestroyBanner();
-            // 重新绑定当前场景的关闭按钮
-            BindCloseButton();
-            // 延迟显示横幅
-            StartCoroutine(DelayShowBanner(0.5f));
+            if (!isDebugMode)
+                StartCoroutine(DelayShowBanner(0.5f));
         }
         else
         {
-            if (closeBannerButton != null)
-                closeBannerButton.gameObject.SetActive(false);
+            HideBanner();
         }
     }
 
     private void BindCloseButton()
     {
-        GameObject buttonObj = GameObject.Find("AdsManager/BannerCanvas/CloseBannerBtn"); // 尝试查找不同路径和名称
-        if(buttonObj == null) buttonObj = GameObject.Find("CloseBannerBtn");
-        if(buttonObj == null) buttonObj = GameObject.Find("CloseBannerButton");
-
+        GameObject buttonObj = GameObject.Find("CloseBannerBtn");
         if (buttonObj != null)
         {
             closeBannerButton = buttonObj.GetComponent<Button>();
@@ -135,17 +124,7 @@ public class AdsManager : MonoBehaviour
                 closeBannerButton.onClick.RemoveAllListeners();
                 closeBannerButton.onClick.AddListener(HideBanner);
                 closeBannerButton.gameObject.SetActive(false);
-                Debug.Log("[AdsManager] 成功绑定当前场景的关闭按钮");
             }
-            else
-            {
-                Debug.LogWarning("[AdsManager] 找到按钮对象，但未获取到Button组件");
-            }
-        }
-        else
-        {
-            Debug.LogWarning("[AdsManager] 未找到关闭按钮对象，请检查场景中是否存在名称为'CloseBannerButton'的按钮");
-            closeBannerButton = null;
         }
     }
 
@@ -155,45 +134,24 @@ public class AdsManager : MonoBehaviour
         ShowBanner();
     }
 
-    #region AppOpen (开屏广告)
-    // 开屏广告代码保持不变
+    #region AppOpen 开屏广告
     public void LoadAppOpenAd()
     {
-        if (!NetworkChecker.IsNetworkAvailable())
-        {
-            Debug.LogWarning("[AdsManager] 无网络连接,暂停加载AppOpenAd");
-            // 延迟重试（避免立即重试）
-            StartCoroutine(RetryLoadAppOpenAd(60f)); // 无网络时延长重试间隔
-            return;
-        }
+        if (isDebugMode) return;
+        if (!isInitialized) return;
 
-        if (isDebugMode)
-        {
-            Debug.Log("[AdsManager] 🚧 调试模式已启用，跳过加载 AppOpen");
-            return;
-        }
-
-        if (!isInitialized)
-        {
-            Debug.LogWarning("[AdsManager] SDK 未初始化，跳过加载 AppOpen");
-            return;
-        }
-
-        AdRequest request = new AdRequest();
-
-        AppOpenAd.Load(APP_OPEN_ID, request, (loadedAd, loadError) =>
+        AppOpenAd.Load(APP_OPEN_ID, new AdRequest(), (loadedAd, loadError) =>
         {
             if (loadError != null || loadedAd == null)
             {
-                Debug.LogWarning($"[AdsManager] AppOpen 加载失败: {loadError?.ToString()}，30s后重试。");
-                StartCoroutine(RetryLoadAppOpenAd(30f));
+                Debug.LogWarning($"[AdsManager] AppOpen 加载失败：{loadError}");
                 return;
             }
 
             appOpenAd = loadedAd;
             adExpireTime = DateTime.Now + APP_OPEN_AD_TIMEOUT;
             RegisterAppOpenAdEvents();
-            Debug.Log($"[AdsManager] ✅ AppOpen 加载成功，有效期至 {adExpireTime:HH:mm:ss}");
+            Debug.Log("[AdsManager] AppOpen 加载成功");
 
             if (!hasShownFirstOpenAd)
             {
@@ -205,470 +163,22 @@ public class AdsManager : MonoBehaviour
 
     public void ShowAppOpenAd()
     {
-        if (isDebugMode) // 新增✅
-        {
-            Debug.Log("[AdsManager] 🚧 调试模式已启用，跳过展示 AppOpen");
-            return;
-        }
+        if (isDebugMode) return;
 
-        if (appOpenAd == null)
-        {
-            Debug.LogWarning("[AdsManager] 无可用 AppOpenAd，尝试重新加载");
-            LoadAppOpenAd();
-            return;
-        }
-
-        if (isShowingAppOpenAd)
-        {
-            Debug.Log("[AdsManager] AppOpen 正在展示中，忽略重复请求");
-            return;
-        }
-
-        if (!appOpenAd.CanShowAd() || DateTime.Now >= adExpireTime)
-        {
-            Debug.Log("[AdsManager] AppOpen 已失效或不可展示，重新加载");
-            LoadAppOpenAd();
-            return;
-        }
-
-        isShowingAppOpenAd = true;
-        isShowingFullScreenAd = true;
-        try
-        {
-            appOpenAd.Show();
-            lastFullScreenAdShown = DateTime.Now; // 记录时间
-            Debug.Log("[AdsManager] 🚀 AppOpen 开始展示");
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError("[AdsManager] 展示 AppOpen 发生异常: " + ex);
-            isShowingAppOpenAd = false;
-            LoadAppOpenAd();
-            ShowBanner();
-        }
-    }
-
-    private IEnumerator RetryLoadAppOpenAd(float delaySeconds)
-    {
-        yield return new WaitForSeconds(delaySeconds);
-        LoadAppOpenAd();
-    }
-    #endregion
-
-    #region Banner (横幅广告)
-    // 横幅广告代码保持不变
-    public void ShowBanner()
-    {
-        if (isDebugMode) // 新增✅
-        {
-            Debug.Log("[AdsManager] 🚧 调试模式已启用，跳过加载 Banner");
-            return;
-        }
-
-        if (!isInitialized)
-        {
-            Debug.LogWarning("[AdsManager] SDK 未初始化，无法加载横幅");
-            return;
-        }
-
-        if (bannerView == null)
-        {
-            bannerView = new BannerView(BANNER_ID, AdSize.Banner, AdPosition.Bottom);
-            bannerView.OnBannerAdLoaded += HandleBannerLoaded;
-            bannerView.OnBannerAdLoadFailed += HandleBannerFailed;
-        }
-
-        AdRequest request = new AdRequest();
-        bannerView.LoadAd(request);
-
-        bannerRefreshCount++;
-
-        if (bannerRefreshRoutine == null)
-        {
-            bannerRefreshRoutine = StartCoroutine(BannerAutoRefreshRoutine());
-        }
-    }
-
-    private IEnumerator BannerAutoRefreshRoutine()
-    {
-        const float REFRESH_INTERVAL = 45f;
-        while (true)
-        {
-            yield return new WaitForSeconds(REFRESH_INTERVAL);
-            if (bannerView != null && !isDebugMode && isBannerVisible) // 新增✅：仅在banner存在、可见、且不是调试模式时刷新
-            {
-                Debug.Log($"[AdsManager] 🔁 自动刷新横幅广告");
-                bannerView.LoadAd(new AdRequest());
-                bannerRefreshCount++;
-            }
-            else
-            {
-                Debug.Log("[AdsManager] 横幅广告不可见或调试模式，跳过刷新");
-            }
-        }
-    }
-
-    private void HandleBannerLoaded()
-    {
-        Debug.Log($"[AdsManager] ✅ 横幅加载成功（第 {bannerRefreshCount} 次），准备显示");
-        if (bannerView != null)
-        {
-            bannerView.Show();
-            isBannerVisible = true;
-        }
-
-        if (closeBannerButton != null)
-        {
-            closeBannerButton.gameObject.SetActive(true);
-        }
-        else
-        {
-            Debug.LogWarning("[AdsManager] 关闭按钮引用无效，无法显示按钮");
-        }
-    }
-
-    private void HandleBannerFailed(LoadAdError error)
-    {
-        Debug.LogWarning($"[AdsManager] ❌ 横幅加载失败: {error?.ToString()}");
-        if (closeBannerButton != null)
-        {
-            closeBannerButton.gameObject.SetActive(false);
-        }
-        StartCoroutine(RetryLoadBanner(60f));
-    }
-
-    public void HideBanner()
-    {
-        if (bannerView != null)
-        {
-            bannerView.Hide();
-            isBannerVisible = false;
-        }
-
-        if (closeBannerButton != null)
-        {
-            closeBannerButton.gameObject.SetActive(false);
-        }
-    }
-
-    public void DestroyBanner()
-    {
-        if (bannerRefreshRoutine != null)
-        {
-            StopCoroutine(bannerRefreshRoutine);
-            bannerRefreshRoutine = null;
-        }
-
-        if (bannerView != null)
-        {
-            bannerView.OnBannerAdLoaded -= HandleBannerLoaded;
-            bannerView.OnBannerAdLoadFailed -= HandleBannerFailed;
-            bannerView.Destroy();
-            bannerView = null;
-        }
-
-        if (closeBannerButton != null)
-        {
-            closeBannerButton.gameObject.SetActive(false);
-        }
-
-        isBannerVisible = false;
-        Debug.Log("[AdsManager] 🧹 横幅销毁完毕");
-    }
-
-    private IEnumerator RetryLoadBanner(float delaySeconds)
-    {
-        yield return new WaitForSeconds(delaySeconds);
-        ShowBanner();
-    }
-    #endregion
-
-    #region Rewarded (激励奖励广告)
-    // 新增：激励广告相关方法
-    /// <summary>
-    /// 加载激励广告
-    /// </summary>
-    public void LoadRewardedAd()
-    {
-        if (isDebugMode) // 新增✅
-        {
-            Debug.Log("[AdsManager] 🚧 调试模式已启用，跳过加载激励");
-            return;
-        }
-
-        if (!isInitialized)
-        {
-            Debug.LogWarning("[AdsManager] SDK 未初始化，无法加载激励广告");
-            return;
-        }
-
-        // 清除现有广告引用
-        if (rewardedAd != null)
-        {
-            UnregisterRewardedAdEvents();
-            rewardedAd = null;
-        }
-
-        AdRequest request = new AdRequest();
-        
-        RewardedAd.Load(REWARDED_ID, request, (loadedAd, loadError) =>
-        {
-            if (loadError != null || loadedAd == null)
-            {
-                Debug.LogWarning($"[AdsManager] ❌ 激励广告加载失败: {loadError?.ToString()}，10s后重试");
-                StartCoroutine(RetryLoadRewardedAd(10f));
-                return;
-            }
-
-            rewardedAd = loadedAd;
-            RegisterRewardedAdEvents();
-            Debug.Log("[AdsManager] ✅ 激励广告加载成功");
-        });
-    }
-
-    /// <summary>
-    /// 显示激励广告（用于道具奖励）
-    /// </summary>
-    /// <returns>是否成功调用显示</returns>
-    public bool ShowRewardedAd()
-    {
-        return ShowRewardedAdInternal(false);
-    }
-
-    /// <summary>
-    /// 显示激励广告（用于升级券奖励）
-    /// </summary>
-    /// <returns>是否成功调用显示</returns>
-    public bool ShowTicketRewardedAd()
-    {
-        return ShowRewardedAdInternal(false, true);
-    }
-
-    /// <summary>
-    /// 显示激励广告（用于复活）
-    /// </summary>
-    /// <returns>是否成功调用显示</returns>
-    public bool ShowReviveRewardedAd()
-    {
-        return ShowRewardedAdInternal(true);
-    }
-
-    /// <summary>
-    /// 显示激励广告的内部实现
-    /// </summary>
-    /// <param name="isForRevive">是否用于复活</param>
-    /// <returns>是否成功调用显示</returns>
-    private bool ShowRewardedAdInternal(bool isForRevive, bool isForTicket = false)
-    {
-        if (isDebugMode) // 新增✅
-        {
-            Debug.Log("[AdsManager] 🚧 调试模式：直接发放奖励！");
-            StartCoroutine(DelayTriggerRewardCallback(isForRevive, isForTicket));
-            isShowingFullScreenAd = false;
-            return true;
-        }
-
-        if (!isInitialized)
-        {
-            Debug.LogWarning("[AdsManager] SDK 未初始化，无法显示激励广告");
-            return false;
-        }
-
-        if (rewardedAd == null)
-        {
-            Debug.LogWarning("[AdsManager] 激励广告未加载完成，尝试重新加载");
-            LoadRewardedAd();
-            return false;
-        }
+        if (appOpenAd == null) return;
+        if (!appOpenAd.CanShowAd()) return;
 
         try
         {
             isShowingFullScreenAd = true;
-
-            rewardedAd.Show((reward) => 
-            {
-                if (isForRevive)
-                {
-                    OnReviveRewardedAdCompleted?.Invoke(true);
-                }
-                else if (isForTicket)
-                {
-                    OnTicketRewardedAdCompleted?.Invoke(true);
-                }
-                else
-                {
-                    OnRewardedAdCompleted?.Invoke(true);
-                }
-            });
-            Debug.Log("[AdsManager] 🚀 激励广告开始展示");
-            return true;
+            appOpenAd.Show();
+            Debug.Log("[AdsManager] AppOpen 展示");
         }
-        catch (Exception ex)
+        catch (Exception e)
         {
-            Debug.LogError("[AdsManager] 显示激励广告发生异常: " + ex);
-
-            isShowingFullScreenAd = false;
-
-            if (isForRevive)
-            {
-                OnReviveRewardedAdCompleted?.Invoke(false);
-            }
-            else if (isForTicket)
-            {
-                OnTicketRewardedAdCompleted?.Invoke(false);
-            }
-            else
-            {
-                OnRewardedAdCompleted?.Invoke(false);
-            }
-            LoadRewardedAd();
-            return false;
+            Debug.LogError("[AdsManager] 展示开屏失败: " + e);
         }
     }
-
-    // 新增：延迟触发奖励回调（模拟真实广告流程）✅
-    private IEnumerator DelayTriggerRewardCallback(bool isForRevive, bool isForTicket)
-    {
-        yield return new WaitForSeconds(0.1f);
-        
-        if (isForRevive)
-        {
-            OnReviveRewardedAdCompleted?.Invoke(true);
-        }
-        else if (isForTicket)
-        {
-            OnTicketRewardedAdCompleted?.Invoke(true);
-        }
-        else
-        {
-            OnRewardedAdCompleted?.Invoke(true);
-        }
-    }
-
-    private IEnumerator RetryLoadRewardedAd(float delaySeconds)
-    {
-        yield return new WaitForSeconds(delaySeconds);
-        LoadRewardedAd();
-    }
-
-    private void RegisterRewardedAdEvents()
-    {
-        if (rewardedAd == null) return;
-        
-        rewardedAd.OnAdFullScreenContentClosed += HandleRewardedAdClosed;
-        rewardedAd.OnAdFullScreenContentFailed += HandleRewardedAdFailed;
-        rewardedAd.OnAdFullScreenContentOpened += HandleRewardedAdOpened;
-        rewardedAd.OnAdImpressionRecorded += HandleRewardedAdImpression;
-    }
-
-    private void UnregisterRewardedAdEvents()
-    {
-        if (rewardedAd == null) return;
-        
-        rewardedAd.OnAdFullScreenContentClosed -= HandleRewardedAdClosed;
-        rewardedAd.OnAdFullScreenContentFailed -= HandleRewardedAdFailed;
-        rewardedAd.OnAdFullScreenContentOpened -= HandleRewardedAdOpened;
-        rewardedAd.OnAdImpressionRecorded -= HandleRewardedAdImpression;
-    }
-
-    // 激励广告事件处理
-    private void HandleRewardedAdOpened()
-    {
-        Debug.Log("[AdsManager] 激励广告已打开");
-        isShowingFullScreenAd = true; //保险操作
-    }
-    private void HandleRewardedAdImpression() => Debug.Log("[AdsManager] 激励广告展示记录");
-    private void HandleRewardedAdFailed(AdError error)
-    {
-        Debug.LogWarning($"[AdsManager] 激励广告展示失败: {error?.ToString()}");
-        // 通知两个可能的监听者广告失败
-        OnRewardedAdCompleted?.Invoke(false);
-        OnReviveRewardedAdCompleted?.Invoke(false);
-        OnTicketRewardedAdCompleted?.Invoke(false);
-
-        isShowingFullScreenAd = false;
-
-        UnregisterRewardedAdEvents();
-        LoadRewardedAd(); // 失败后重新加载
-    }
-    private void HandleRewardedAdClosed()
-    {
-        Debug.Log("[AdsManager] 激励广告已关闭");
-
-        isShowingFullScreenAd = false;
-
-        UnregisterRewardedAdEvents();
-        LoadRewardedAd(); // 关闭后立即加载新的
-    }
-    #endregion
-
-    #region 生命周期 / 清理
-    private void OnApplicationPause(bool isPaused)
-    {
-        if (isDebugMode) return;
-
-        if (isPaused)
-        {
-            // 进入后台：停止横幅自动刷新，避免后台网络/展示
-            Debug.Log("[AdsManager] 应用进入后台 — 停止横幅刷新");
-            if (bannerRefreshRoutine != null)
-            {
-                StopCoroutine(bannerRefreshRoutine);
-                bannerRefreshRoutine = null;
-            }
-            // 注意：绝不在后台展示广告
-            return;
-        }
-        else
-        {
-            // 恢复前台：在合适条件下（节流 + 非游戏关键时机）展示开屏广告
-            Debug.Log("[AdsManager] 应用恢复前台，检查是否展示开屏广告");
-            
-            // 如果当前在展示全屏广告，则跳过
-            if (isShowingFullScreenAd)
-            {
-                Debug.Log("[AdsManager] 当前已有全屏广告正在显示，跳过开屏");
-                return;
-            }
-
-            // 节流：确保距离上次展示大于最小间隔
-            if ((DateTime.Now - lastFullScreenAdShown) < MIN_FULLSCREEN_AD_INTERVAL)
-            {
-                Debug.Log("[AdsManager] 距离上次全屏广告展示间隔太短，跳过开屏");
-            }
-            else if (hasShownFirstOpenAd) // 只在已经展示第一次开屏后的后续恢复展示
-            {
-                // 仅在非游戏关键时机展示（这里仅作为示例；你可在调用处增加更细粒度的校验）
-                ShowAppOpenAd();
-                lastFullScreenAdShown = DateTime.Now;
-            }
-
-            // 恢复横幅刷新（如果需要显示）
-            if (bannerView != null && isBannerVisible == false)
-            {
-                bannerRefreshRoutine = StartCoroutine(BannerAutoRefreshRoutine());
-                isBannerVisible = true;
-            }
-        }
-    }
-
-    private void OnDestroy()
-    {
-        UnregisterAppOpenAdEvents();
-        appOpenAd?.Destroy();
-        
-        // 新增：清理激励广告
-        if (rewardedAd != null)
-        {
-            UnregisterRewardedAdEvents();
-            rewardedAd.Destroy();
-        }
-        
-        DestroyBanner();
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-        Debug.Log("[AdsManager] 🧩 资源释放完成");
-    }
-
     private void RegisterAppOpenAdEvents()
     {
         if (appOpenAd == null) return;
@@ -685,36 +195,216 @@ public class AdsManager : MonoBehaviour
         appOpenAd.OnAdFullScreenContentOpened -= HandleAppOpenOpened;
     }
 
-    private void HandleAppOpenOpened() => Debug.Log("[AdsManager] AppOpen 已打开");
+    private void HandleAppOpenOpened()
+    {
+        Debug.Log("[AdsManager] AppOpen 已打开");
+    }
 
     private void HandleAppOpenClosed()
     {
-        Debug.Log("[AdsManager] AppOpen 已关闭 -> 显示横幅");
-        isShowingAppOpenAd = false;
-        isShowingFullScreenAd = false;//✅新增
-        UnregisterAppOpenAdEvents();
+        Debug.Log("[AdsManager] AppOpen 已关闭");
+        isShowingFullScreenAd = false;
 
-        if (!isDebugMode)
-        {
-            ShowBanner();
-            LoadAppOpenAd();
-        }
+        UnregisterAppOpenAdEvents();
+        LoadAppOpenAd();
     }
 
     private void HandleAppOpenFailed(AdError error)
     {
-        Debug.LogWarning($"[AdsManager] AppOpen 展示失败: {error?.ToString()}");
-        isShowingAppOpenAd = false;
-        isShowingFullScreenAd = false;//✅新增
-        UnregisterAppOpenAdEvents();
+        Debug.LogWarning("[AdsManager] AppOpen 展示失败：" + error);
+        isShowingFullScreenAd = false;
 
-        if (!isDebugMode)
-        {
-            ShowBanner();
-            LoadAppOpenAd();
-        }
+        UnregisterAppOpenAdEvents();
+        LoadAppOpenAd();
     }
     #endregion
-    
+
+    #region Banner 横幅（官方标准刷新+失败自动重试）
+    public void ShowBanner()
+    {
+        if (isDebugMode) return;
+        if (!isInitialized) return;
+
+        // 若已存在旧 Banner（可能被关闭），销毁后重新创建
+        if (bannerView != null)
+        {
+            bannerView.Destroy();
+            bannerView = null;
+        }
+
+        bannerView = new BannerView(BANNER_ID, AdSize.Banner, AdPosition.Bottom);
+
+        bannerView.OnBannerAdLoaded += HandleBannerLoaded;
+        bannerView.OnBannerAdLoadFailed += HandleBannerFailed;
+
+        bannerView.LoadAd(new AdRequest());
+    }
+
+    private void HandleBannerLoaded()
+    {
+        if (bannerView == null) return;
+
+        bannerView.Show();
+
+        if (closeBannerButton != null)
+            closeBannerButton.gameObject.SetActive(true);
+    }
+
+    private void HandleBannerFailed(LoadAdError error)
+    {
+        Debug.LogWarning("[AdsManager] Banner 加载失败：" + error);
+        if (closeBannerButton != null)
+            closeBannerButton.gameObject.SetActive(false);
+
+        // 合规：失败时延迟重试（非刷新）
+        StartCoroutine(RetryBannerAfterDelay());
+    }
+
+    private IEnumerator RetryBannerAfterDelay()
+    {
+        yield return new WaitForSeconds(10f);
+
+        if (bannerView == null)
+            ShowBanner();
+        else
+            bannerView.LoadAd(new AdRequest());
+    }
+
+    public void HideBanner()
+    {
+        if (bannerView != null)
+        {
+            bannerView.Destroy();
+            bannerView = null;
+        }
+
+        if (closeBannerButton != null)
+            closeBannerButton.gameObject.SetActive(false);
+    }
+    #endregion
+
+    #region Rewarded 激励广告
+    public void LoadRewardedAd()
+    {
+        if (isDebugMode) return;
+        if (!isInitialized) return;
+
+        if (rewardedAd != null)
+        {
+            UnregisterRewardedAdEvents();
+            rewardedAd.Destroy();
+            rewardedAd = null;
+        }
+
+        RewardedAd.Load(REWARDED_ID, new AdRequest(), (loadedAd, loadError) =>
+        {
+            if (loadError != null || loadedAd == null)
+            {
+                Debug.LogWarning("[AdsManager] 激励广告加载失败：" + loadError);
+                return;
+            }
+
+            rewardedAd = loadedAd;
+            RegisterRewardedAdEvents();
+            Debug.Log("[AdsManager] 激励广告加载成功");
+        });
+    }
+
+    public bool ShowRewardedAd() => ShowRewardedInternal(false, false);
+    public bool ShowTicketRewardedAd() => ShowRewardedInternal(false, true);
+    public bool ShowReviveRewardedAd() => ShowRewardedInternal(true, false);
+
+    private bool ShowRewardedInternal(bool isRevive, bool isTicket = false)
+    {
+        if (isDebugMode)
+        {
+            StartCoroutine(SimulateRewardCallback(isRevive, isTicket));
+            return true;
+        }
+
+        if (rewardedAd == null)
+        {
+            Debug.LogWarning("[AdsManager] 激励广告未加载");
+            LoadRewardedAd();
+            return false;
+        }
+
+        try
+        {
+            rewardedAd.Show((reward) =>
+            {
+                if (isRevive) OnReviveRewardedAdCompleted?.Invoke(true);
+                else if (isTicket) OnTicketRewardedAdCompleted?.Invoke(true);
+                else OnRewardedAdCompleted?.Invoke(true);
+            });
+            return true;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e);
+            return false;
+        }
+    }
+
+    private IEnumerator SimulateRewardCallback(bool isRevive, bool isTicket)
+    {
+        yield return new WaitForSeconds(0.1f);
+
+        if (isRevive) OnReviveRewardedAdCompleted?.Invoke(true);
+        else if (isTicket) OnTicketRewardedAdCompleted?.Invoke(true);
+        else OnRewardedAdCompleted?.Invoke(true);
+    }
+
+    // 注册 / 注销 激励广告事件
+    private void RegisterRewardedAdEvents()
+    {
+        if (rewardedAd == null) return;
+
+        rewardedAd.OnAdFullScreenContentClosed += HandleRewardedClosed;
+        rewardedAd.OnAdFullScreenContentFailed += HandleRewardedFailed;
+        rewardedAd.OnAdFullScreenContentOpened += HandleRewardedOpened;
+        rewardedAd.OnAdImpressionRecorded += HandleRewardedImpression;
+    }
+
+    private void UnregisterRewardedAdEvents()
+    {
+        if (rewardedAd == null) return;
+
+        rewardedAd.OnAdFullScreenContentClosed -= HandleRewardedClosed;
+        rewardedAd.OnAdFullScreenContentFailed -= HandleRewardedFailed;
+        rewardedAd.OnAdFullScreenContentOpened -= HandleRewardedOpened;
+        rewardedAd.OnAdImpressionRecorded -= HandleRewardedImpression;
+    }
+
+    private void HandleRewardedOpened()
+    {
+        Debug.Log("[AdsManager] 激励广告已打开");
+        isShowingFullScreenAd = true;
+    }
+
+    private void HandleRewardedImpression()
+    {
+        Debug.Log("[AdsManager] 激励广告展示记录");
+    }
+
+    private void HandleRewardedFailed(AdError error)
+    {
+        Debug.LogWarning("[AdsManager] 激励广告展示失败：" + error);
+        OnRewardedAdCompleted?.Invoke(false);
+        OnReviveRewardedAdCompleted?.Invoke(false);
+        OnTicketRewardedAdCompleted?.Invoke(false);
+
+        UnregisterRewardedAdEvents();
+        LoadRewardedAd();
+    }
+
+    private void HandleRewardedClosed()
+    {
+        Debug.Log("[AdsManager] 激励广告已关闭");
+        isShowingFullScreenAd = false;
+
+        UnregisterRewardedAdEvents();
+        LoadRewardedAd();
+    }
+    #endregion
 }
-#endif
