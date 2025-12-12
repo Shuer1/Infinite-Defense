@@ -31,13 +31,18 @@ public class AdsManager : MonoBehaviour
     [Header("UI 绑定")]
     [SerializeField] private Button closeBannerButton;
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID // 封闭式测试阶段-统一使用测试广告UnitID
+    private const string APP_OPEN_ID = "ca-app-pub-3940256099942544/9257395921";
+    private const string BANNER_ID   = "ca-app-pub-3940256099942544/9214589741";
+    private const string REWARDED_ID = "ca-app-pub-3940256099942544/5224354917";
+    /*
     private const string APP_OPEN_ID = "ca-app-pub-7029478247518346/1934227914";
     private const string BANNER_ID   = "ca-app-pub-7029478247518346/6168986392";
     private const string REWARDED_ID = "ca-app-pub-7029478247518346/4869057603";
+    */
 #else
     private const string APP_OPEN_ID = "ca-app-pub-3940256099942544/9257395921";
-    private const string BANNER_ID   = "ca-app-pub-3940256099942544/6300978111";
+    private const string BANNER_ID   = "ca-app-pub-3940256099942544/9214589741";
     private const string REWARDED_ID = "ca-app-pub-3940256099942544/5224354917";
 #endif
 
