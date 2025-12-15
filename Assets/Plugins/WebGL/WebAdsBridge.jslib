@@ -1,53 +1,55 @@
 mergeInto(LibraryManager.library, {
-  // 安全调用 Unity 消息
-  _safeSendUnityMessage: function (gameObject, methodName, param = '') {
+  _safeSendUnityMessage: function (go, method, param = '') {
     if (typeof unityInstance !== 'undefined' && unityInstance.SendMessage) {
-      try {
-        unityInstance.SendMessage(gameObject, methodName, param);
-      } catch (e) {
-        console.error('SendMessage failed:', e);
+      try { unityInstance.SendMessage(go, method, param); } catch (e) {
+        console.error('[WebAdsBridge] SendMessage failed:', e);
       }
     } else {
-      console.warn('unityInstance not ready, cannot send message:', methodName);
+      console.warn('[WebAdsBridge] unityInstance not ready, skip', method);
     }
   },
 
   WebGLAdsInit: function () {
+    // 隐私合规示例
+    if (typeof canShowAds === 'boolean' && !canShowAds) {
+      console.log('[WebAdsBridge] User consent denied, ads init skipped.');
+      return;
+    }
     if (typeof adBreak === 'undefined') {
       window.adsbygoogle = window.adsbygoogle || [];
       window.adBreak = function (o) { adsbygoogle.push(o); };
-    }
-    if (typeof unityInstance === 'undefined') {
-      console.warn('unityInstance is not initialized when ads init');
     }
   },
 
   WebGLAdsShowOpen: function () {
     if (!window.webglAdConfig?.openAdSlot) {
-      console.error('WebGL Open Ad Slot is missing!');
       Module._safeSendUnityMessage('WebGLAdsManager', 'JS_OpenAdDone', 'config_error');
       return;
     }
+    if (Module._openLock) return;   // 防重点
+    Module._openLock = true;
     adBreak({
-      type: 'start', 
-      name: 'webgl-open', 
+      type: 'start',
+      name: 'webgl-open',
       ad_slot: window.webglAdConfig.openAdSlot,
       beforeAd: function () { Module._safeSendUnityMessage('WebGLAdsManager', 'JS_BeforeAd'); },
       afterAd: function () { Module._safeSendUnityMessage('WebGLAdsManager', 'JS_AfterAd'); },
       adBreakDone: function (info) {
+        Module._openLock = false;
         Module._safeSendUnityMessage('WebGLAdsManager', 'JS_OpenAdDone', info.error || 'ok');
       }
     });
+    // 8 秒兜底
+    setTimeout(() => { if (Module._openLock) { Module._openLock = false; Module._safeSendUnityMessage('WebGLAdsManager', 'JS_OpenAdDone', 'timeout'); } }, 8000);
   },
 
   WebGLAdsShowBanner: function () {
     if (!window.webglAdConfig?.bannerAdSlot) {
-      console.error('WebGL Banner Ad Slot is missing!');
       Module._safeSendUnityMessage('WebGLAdsManager', 'JS_BannerDone', 'config_error');
       return;
     }
     adBreak({
-      type: 'sticky', 
+      type: 'sticky',
       name: 'webgl-banner',
       ad_slot: window.webglAdConfig.bannerAdSlot,
       beforeAd: function () {},
@@ -59,26 +61,32 @@ mergeInto(LibraryManager.library, {
   },
 
   WebGLAdsShowRewarded: function () {
+    if (!window.webglAdConfig?.rewardedAdSlot) {
+      Module._safeSendUnityMessage('WebGLAdsManager', 'JS_RewardedDone', 'fail|config_error');
+      return;
+    }
+    if (Module._rewardedLock) return;
+    Module._rewardedLock = true;
     adBreak({
-      type: 'reward', 
+      type: 'reward',
       name: 'webgl-reward',
       ad_slot: window.webglAdConfig.rewardedAdSlot,
       beforeAd: function () { Module._safeSendUnityMessage('WebGLAdsManager', 'JS_BeforeAd'); },
       afterAd: function () { Module._safeSendUnityMessage('WebGLAdsManager', 'JS_AfterAd'); },
       adBreakDone: function (info) {
+        Module._rewardedLock = false;
         const isSuccess = !info.error && info.isRewarded === true;
-        const res = isSuccess ? 'ok|' : 'fail|' + (info.error || (info.isRewarded === false ? 'user_abort' : 'unknown'));
+        const res = (isSuccess ? 'ok|' : 'fail|') + (info.error || (info.isRewarded === false ? 'user_abort' : 'unknown'));
         Module._safeSendUnityMessage('WebGLAdsManager', 'JS_RewardedDone', res);
       }
     });
+    setTimeout(() => { if (Module._rewardedLock) { Module._rewardedLock = false; Module._safeSendUnityMessage('WebGLAdsManager', 'JS_RewardedDone', 'fail|timeout'); } }, 15000);
   },
 
-  // ===== 设备 ID 相关 =====
   SetUserAdId: function (udidPtr) {
-    var udid = UTF8ToString(udidPtr);
+    const udid = UTF8ToString(udidPtr);
     if (typeof setUserAdId === 'function') {
-      try { setUserAdId(udid); } 
-      catch (e) { console.error('[WebAdsBridge] setUserAdId failed:', e); }
+      try { setUserAdId(udid); } catch (e) { console.error('[WebAdsBridge] setUserAdId failed:', e); }
     } else {
       console.warn('[WebAdsBridge] setUserAdId not found on page');
     }
