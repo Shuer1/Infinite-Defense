@@ -4,7 +4,6 @@ using UnityEngine.UI;
 using System.Collections;
 using System;
 using Unity.VisualScripting;
-using GoogleMobileAds.Api;
 
 public class UIManager : MonoBehaviour
 {
@@ -71,7 +70,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    void Start()
+    void Start() // 已宏分区
     {
         InitUI();
         HideAllCountdownImages();
@@ -96,7 +95,13 @@ public class UIManager : MonoBehaviour
         }
 
         useTicketBtn?.onClick.AddListener(OnUseOrWatchAdForTicketClicked);
+
+    #if UNITY_ANDROID || UNITY_EDITOR
         AdsManager.Instance.OnTicketRewardedAdCompleted += OnTicketRewardedAdCompleted;
+    #elif UNITY_WEBGL && !UNITY_EDITOR
+        WebGLAdsManager.Instance.OnTicketRewardedAdCompleted += OnTicketRewardedAdCompleted;
+    #endif
+
         ShowAndUpdateTicketCount(currentTicketCount);
 
         grantFKRewardButton?.onClick.AddListener(OnFKRewardGrant);

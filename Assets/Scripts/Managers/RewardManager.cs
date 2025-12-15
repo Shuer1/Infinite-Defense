@@ -8,6 +8,10 @@ using System;
 using System.Linq;
 using System.Collections;
 
+#if UNITY_WEBGL && !UNITY_EDITOR
+using System.Runtime.InteropServices;
+#endif
+
 /// <summary>
 /// 奖励管理器 - 处理道具获取、使用及冷却逻辑（支持拖动释放）
 /// </summary>
@@ -329,22 +333,32 @@ public class RewardManager : MonoBehaviour
         }
     }
 
-    private void RegisterEvents()
+    private void RegisterEvents() // 宏分区
     {
         if (rewardButton != null)
             rewardButton.onClick.AddListener(OnFreeRewardClicked);
 
+    #if UNITY_ANDROID || UNITY_EDITOR
         if (AdsManager.Instance != null)
             AdsManager.Instance.OnRewardedAdCompleted += OnAdRewardCompleted;
+    #elif UNITY_WEBGL && !UNITY_EDITOR
+        if (WebGLAdsManager.Instance != null)
+            WebGLAdsManager.Instance.OnRewardedAdCompleted += OnAdRewardCompleted;
+    #endif
     }
 
-    private void UnregisterEvents()
+    private void UnregisterEvents() // 宏分区
     {
         if (rewardButton != null)
             rewardButton.onClick.RemoveListener(OnFreeRewardClicked);
 
+    #if UNITY_ANDROID || UNITY_EDITOR
         if (AdsManager.Instance != null)
             AdsManager.Instance.OnRewardedAdCompleted -= OnAdRewardCompleted;
+    #elif UNITY_WEBGL && !UNITY_EDITOR
+        if (WebGLAdsManager.Instance != null)
+            WebGLAdsManager.Instance.OnRewardedAdCompleted -= OnAdRewardCompleted;
+    #endif
     }
 
     private void OnFreeRewardClicked()
@@ -363,7 +377,7 @@ public class RewardManager : MonoBehaviour
         StartCooldown();
     }
 
-    private void ShowRewardedAdForReward()
+    private void ShowRewardedAdForReward() // 宏分区
     {
         #if UNITY_ANDROID || UNITY_EDITOR
         if (AdsManager.Instance == null)
@@ -379,8 +393,8 @@ public class RewardManager : MonoBehaviour
             ShowAdFailMessage("No ads are available. Please try again later.");
             EnableButtonDelayed(1f);
         }
-        #elif UNITY_WEBGL
-            // WebGL 路径
+        #elif UNITY_WEBGL && !UNITY_EDITOR
+            // WebGL
             if (WebGLAdsManager.Instance == null)
             {
                 ShowAdFailMessage("Ad module not ready.");
@@ -388,7 +402,11 @@ public class RewardManager : MonoBehaviour
                 return;
             }
             bool shown = WebGLAdsManager.Instance.ShowRewardedAd();
-            if (!shown) { ShowAdFailMessage("No ads available."); EnableButtonDelayed(1f); }
+            if (!shown)
+            {
+                ShowAdFailMessage("No ads available.");
+                EnableButtonDelayed(1f);
+            }
         #endif
     }
 

@@ -187,7 +187,7 @@ public class PlayerReviveManager : MonoBehaviour
             revivePanel.SetActive(false);
     }
 
-    private void OnReviveWithAdClicked()
+    private void OnReviveWithAdClicked() // ⚠️待宏分区
     {
         if (isAdProcessing || !allowToRevive || reviveCount >= maxReviveCount)
         {
@@ -200,9 +200,10 @@ public class PlayerReviveManager : MonoBehaviour
         isAdProcessing = true;
         Debug.Log("[PlayerReviveManager] 玩家选择通过观看广告复活");
 
+    #if UNITY_ANDROID || UNITY_EDITOR
         if (AdsManager.Instance != null)
         {
-            // 防止重复订阅
+            // 防止重复订阅：先删除再订阅
             AdsManager.Instance.OnReviveRewardedAdCompleted -= OnRewardedAdCompleted;
             AdsManager.Instance.OnReviveRewardedAdCompleted += OnRewardedAdCompleted;
 
@@ -217,6 +218,25 @@ public class PlayerReviveManager : MonoBehaviour
             Debug.LogError("[PlayerReviveManager] 未找到 AdsManager，直接复活");
             OnRewardedAdCompleted(true);
         }
+    #elif UNITY_WEBGL && !UNITY_EDITOR
+        if (WebGLAdsManager.Instance != null)
+        {
+            WebGLAdsManager.Instance.OnReviveRewardedAdCompleted -= OnRewardedAdCompleted;
+            WebGLAdsManager.Instance.OnReviveRewardedAdCompleted += OnRewardedAdCompleted;
+
+            if (!WebGLAdsManager.Instance.ShowReviveRewardedAd())
+            {
+                Debug.LogWarning("[PlayerReviveManager] 广告无法显示，直接复活");
+                OnRewardedAdCompleted(true);
+            }
+        }
+        else
+        {
+            Debug.LogError("[PlayerReviveManager] 未找到 WebGLAdsManager，直接复活");
+            OnRewardedAdCompleted(true);
+        }
+    #endif
+
     }
 
     private void UpdateReviveButtonStatus()
@@ -232,12 +252,17 @@ public class PlayerReviveManager : MonoBehaviour
         reviveWithAdButton.image.color = btnColor;
     }
 
-    private void OnRewardedAdCompleted(bool success)
+    private void OnRewardedAdCompleted(bool success) // 宏分区
     {
         isAdProcessing = false;
 
+    #if UNITY_ANDROID || UNITY_EDITOR
         if (AdsManager.Instance != null)
             AdsManager.Instance.OnReviveRewardedAdCompleted -= OnRewardedAdCompleted;
+    #elif UNITY_WEBGL && !UNITY_EDITOR
+        if (WebGLAdsManager.Instance != null)
+            WebGLAdsManager.Instance.OnReviveRewardedAdCompleted -= OnRewardedAdCompleted;
+    #endif
 
         if (success)
         {
@@ -266,12 +291,10 @@ public class PlayerReviveManager : MonoBehaviour
         if(EntireBgmManager.Instance != null)
             EntireBgmManager.Instance.ResumeCurrentBgm();
 
-        if (!allowToRevive || reviveCount >= maxReviveCount)
-            return;
+        if (!allowToRevive || reviveCount >= maxReviveCount) return;
 
         reviveCount++;
-        if (reviveCount >= maxReviveCount)
-            allowToRevive = false;
+        if (reviveCount >= maxReviveCount) allowToRevive = false;
 
         UpdateReviveButtonStatus();
         HideRevivePanel();
