@@ -1,5 +1,5 @@
 mergeInto(LibraryManager.library, {
-  // 新增：安全调用 Unity 消息（避免 unityInstance 未初始化）
+  // 安全调用 Unity 消息
   _safeSendUnityMessage: function (gameObject, methodName, param = '') {
     if (typeof unityInstance !== 'undefined' && unityInstance.SendMessage) {
       try {
@@ -17,13 +17,11 @@ mergeInto(LibraryManager.library, {
       window.adsbygoogle = window.adsbygoogle || [];
       window.adBreak = function (o) { adsbygoogle.push(o); };
     }
-    // 初始化时校验 unityInstance（提前暴露风险）
     if (typeof unityInstance === 'undefined') {
       console.warn('unityInstance is not initialized when ads init');
     }
   },
 
-  // 开屏广告（替换为 safeSendUnityMessage）
   WebGLAdsShowOpen: function () {
     if (!window.webglAdConfig?.openAdSlot) {
       console.error('WebGL Open Ad Slot is missing!');
@@ -42,7 +40,6 @@ mergeInto(LibraryManager.library, {
     });
   },
 
-  // 横幅广告（同步替换）
   WebGLAdsShowBanner: function () {
     if (!window.webglAdConfig?.bannerAdSlot) {
       console.error('WebGL Banner Ad Slot is missing!');
@@ -61,12 +58,11 @@ mergeInto(LibraryManager.library, {
     });
   },
 
-  // 激励广告（同步替换）
   WebGLAdsShowRewarded: function () {
     adBreak({
       type: 'reward', 
       name: 'webgl-reward',
-      ad_slot: window.webglAdConfig.rewardedAdSlot, // 补充激励广告单元ID（需index.html配置）
+      ad_slot: window.webglAdConfig.rewardedAdSlot,
       beforeAd: function () { Module._safeSendUnityMessage('WebGLAdsManager', 'JS_BeforeAd'); },
       afterAd: function () { Module._safeSendUnityMessage('WebGLAdsManager', 'JS_AfterAd'); },
       adBreakDone: function (info) {
@@ -75,6 +71,16 @@ mergeInto(LibraryManager.library, {
         Module._safeSendUnityMessage('WebGLAdsManager', 'JS_RewardedDone', res);
       }
     });
-  }
+  },
 
+  // ===== 设备 ID 相关 =====
+  SetUserAdId: function (udidPtr) {
+    var udid = UTF8ToString(udidPtr);
+    if (typeof setUserAdId === 'function') {
+      try { setUserAdId(udid); } 
+      catch (e) { console.error('[WebAdsBridge] setUserAdId failed:', e); }
+    } else {
+      console.warn('[WebAdsBridge] setUserAdId not found on page');
+    }
+  }
 });

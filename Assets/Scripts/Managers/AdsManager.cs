@@ -16,6 +16,7 @@ public class AdsManager : MonoBehaviour
 
     private bool hasShownFirstOpenAd = false;
     private bool isShowingFullScreenAd = false;
+    private int bannerRetryCount = 0;
 
     private DateTime adExpireTime;
     private readonly TimeSpan APP_OPEN_AD_TIMEOUT = TimeSpan.FromHours(1);
@@ -160,10 +161,17 @@ public class AdsManager : MonoBehaviour
 
             if (!hasShownFirstOpenAd)
             {
-                ShowAppOpenAd();
+                StartCoroutine(DelayFirstOpenAd()); // Delay to ensure UI is ready and Avoid conflicts.
                 hasShownFirstOpenAd = true;
             }
+            
         });
+    }
+
+    private IEnumerator DelayFirstOpenAd()
+    {
+        yield return new WaitForSeconds(2.5f);
+        ShowAppOpenAd();
     }
 
     public void ShowAppOpenAd()
@@ -258,16 +266,16 @@ public class AdsManager : MonoBehaviour
     private void HandleBannerFailed(LoadAdError error)
     {
         Debug.LogWarning("[AdsManager] Banner 加载失败：" + error);
-        if (closeBannerButton != null)
-            closeBannerButton.gameObject.SetActive(false);
+        if (closeBannerButton != null) closeBannerButton.gameObject.SetActive(false);
 
-        // 合规：失败时延迟重试（非刷新）
-        StartCoroutine(RetryBannerAfterDelay());
+        // If failed, retry with exponential backoff
+        if(++bannerRetryCount >= 3) return; // Maximum 3 retries
+        StartCoroutine(RetryBannerAfterDelay(10f * bannerRetryCount));
     }
 
-    private IEnumerator RetryBannerAfterDelay()
+    private IEnumerator RetryBannerAfterDelay(float delay)
     {
-        yield return new WaitForSeconds(10f);
+        yield return new WaitForSeconds(delay);
 
         if (bannerView == null)
             ShowBanner();
@@ -395,10 +403,11 @@ public class AdsManager : MonoBehaviour
     private void HandleRewardedFailed(AdError error)
     {
         Debug.LogWarning("[AdsManager] 激励广告展示失败：" + error);
+        /*
         OnRewardedAdCompleted?.Invoke(false);
         OnReviveRewardedAdCompleted?.Invoke(false);
         OnTicketRewardedAdCompleted?.Invoke(false);
-
+        */
         UnregisterRewardedAdEvents();
         LoadRewardedAd();
     }
