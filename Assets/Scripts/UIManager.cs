@@ -481,7 +481,7 @@ public class UIManager : MonoBehaviour
         DataManager.SaveInt(DataManager.EnemiesLevelKey, enemiesLevel);
     }
 
-    void OnDestroy()
+    void OnDestroy() // 宏分区取消订阅事件
     {
         if (spawnManager != null)
             spawnManager.OnWaveCompleted -= UpdateWaveUI;
@@ -495,8 +495,13 @@ public class UIManager : MonoBehaviour
         if (useTicketBtn != null)
             useTicketBtn.onClick.RemoveListener(OnUseOrWatchAdForTicketClicked);
             
+    #if UNITY_ANDROID || UNITY_EDITOR
         if(AdsManager.Instance != null)
             AdsManager.Instance.OnTicketRewardedAdCompleted -= OnTicketRewardedAdCompleted;
+    #elif UNITY_WEBGL && !UNITY_EDITOR
+        if(WebGLAdsManager.Instance != null)
+            WebGLAdsManager.Instance.OnTicketRewardedAdCompleted -= OnTicketRewardedAdCompleted;
+    #endif
     }
 
     private void OnTicketRewardedAdCompleted(bool success)
