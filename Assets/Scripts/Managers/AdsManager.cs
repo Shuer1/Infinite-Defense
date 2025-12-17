@@ -26,13 +26,14 @@ public class AdsManager : MonoBehaviour
     public event Action<bool> OnTicketRewardedAdCompleted;
     public event Action<bool> OnReviveRewardedAdCompleted;
 
-    [Header("调试模式")]
+    [Header("调试模式-仅测试阶段使用")]
     public bool isDebugMode = false;
 
     [Header("UI 绑定")]
     [SerializeField] private Button closeBannerButton;
 
-#if UNITY_ANDROID // 封闭式测试阶段-统一使用测试广告UnitID
+#if UNITY_ANDROID
+    /* 封闭式测试阶段-统一使用测试广告UnitID */
     private const string APP_OPEN_ID = "ca-app-pub-3940256099942544/9257395921";
     private const string BANNER_ID   = "ca-app-pub-3940256099942544/9214589741";
     private const string REWARDED_ID = "ca-app-pub-3940256099942544/5224354917";

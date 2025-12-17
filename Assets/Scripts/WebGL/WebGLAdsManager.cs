@@ -1,3 +1,4 @@
+#if UNITY_WEBGL && !UNITY_EDITOR
 using UnityEngine;
 using System.Runtime.InteropServices;
 
@@ -197,3 +198,4 @@ public class WebGLAdsManager : MonoBehaviour
         // UIManager.Instance.ShowTip(msg);
     }
 }
+#endif
