@@ -9,7 +9,7 @@
     <!-- AdActivity -->
     <activity android:name="com.google.android.gms.ads.AdActivity" android:exported="false" android:theme="@android:style/Theme.Translucent" android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" tools:node="merge" />
     <!-- AdMob 应用 ID -->
-    <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-3940256099942544~3347511713" tools:node="merge" />
+    <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-7029478247518346~7238525487" tools:node="merge" />
     <!-- AdMob 测试 ID -->
     <!-- Unity 版本 -->
     <meta-data android:name="com.google.unity.ads.UNITY_VERSION" android:value="2022.3.53f1c1" tools:node="merge" />
