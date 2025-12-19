@@ -18,7 +18,7 @@ public class SafeAreaAdapter : MonoBehaviour
 
         if (_parentCanvas == null)
         {
-            Debug.LogError($"{gameObject.name} 未挂载在任何Canvas下，适配失效！");
+            Debug.LogError($"{gameObject.name} 未挂载在任何Canvas下,适配失效！");
             enabled = false; // 禁用脚本，避免报错
         }
     }
@@ -68,7 +68,7 @@ public class SafeAreaAdapter : MonoBehaviour
 
             default:
                 // 世界空间模式（World Space）：通常无需适配安全区域，直接跳过
-                Debug.LogWarning($"{_parentCanvas.name} 是世界空间Canvas，不支持安全区域适配");
+                Debug.LogWarning($"{_parentCanvas.name} 是世界空间Canvas,不支持安全区域适配");
                 return;
         }
 
